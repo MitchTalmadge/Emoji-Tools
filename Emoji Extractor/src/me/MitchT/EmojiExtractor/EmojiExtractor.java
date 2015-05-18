@@ -55,7 +55,7 @@ public class EmojiExtractor
         }
         catch(FileNotFoundException e)
         {
-            e.printStackTrace();
+            System.out.println(fileName+" not found!");
         }
         catch(IOException e)
         {
