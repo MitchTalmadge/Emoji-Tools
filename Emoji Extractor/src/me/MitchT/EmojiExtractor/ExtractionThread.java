@@ -23,6 +23,9 @@ public class ExtractionThread extends Thread
     private MainFrame mainFrame;
     private ProgressPanel progressPanel;
     
+    private long startTime = 0;
+    private long currTime = 0;
+    
     public ExtractionThread(File filePath, MainFrame mainFrame, ProgressPanel progressPanel)
     {
         this.filePath = filePath;
@@ -42,6 +45,8 @@ public class ExtractionThread extends Thread
                 emojisDir.mkdir();
             }
             
+            startTime = System.currentTimeMillis();
+            
             int imageID = 0;
             while(inputStream.available() >= 1)
             {
@@ -54,11 +59,14 @@ public class ExtractionThread extends Thread
                 if(progressPanel.getStopped())
                     continue;
                 
-                updateProgress();
+                if(currentBytePos % 512 == 0)
+                    updateProgress();
+                
                 if(checkForPrefix(inputStream.read()))
                 {
                     imageID++;
                     extractEmoji(inputStream, imageID);
+                    updateProgress();
                 }
             }
             
@@ -183,8 +191,9 @@ public class ExtractionThread extends Thread
     
     private void updateProgress()
     {
-        int progress = (int) (((double)currentBytePos / filePath.length())*100);
-        progressPanel.setProgress(progress);
+        this.currTime = System.currentTimeMillis();
+        progressPanel.setProgress(currentBytePos, filePath.length());
+        progressPanel.setTimeRemaining(currentBytePos, filePath.length(), currTime, startTime);
     }
     
     public void endExtraction()
