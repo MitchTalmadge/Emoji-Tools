@@ -8,14 +8,15 @@ import java.io.File;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import me.MitchT.EmojiExtractor.ExtractionThread;
+import me.MitchT.EmojiExtractor.ExtractionManager;
+import me.MitchT.EmojiExtractor.Extractors.StandardExtractionThread;
 
 public class MainFrame extends JFrame
 {
     private CardLayout cardLayout;
-    private ExtractionThread extractionThread;
     private SelectionPanel selectionPanel;
-
+    private ExtractionManager extractionManager;
+    
     public MainFrame(File filePath)
     {
         setTitle("Emoji Extractor");
@@ -23,19 +24,10 @@ public class MainFrame extends JFrame
         this.addWindowListener(new WindowAdapter()
         {
             @Override
-            public void windowClosing(WindowEvent e) {
-                if(extractionThread != null && extractionThread.isAlive())
-                {
-                    extractionThread.endExtraction();
-                    try
-                    {
-                        extractionThread.join();
-                    }
-                    catch(InterruptedException e1)
-                    {
-                    }
-                    extractionThread = null;
-                }
+            public void windowClosing(WindowEvent e)
+            {
+                if(extractionManager != null)
+                    extractionManager.stopExtraction();
                 System.exit(0);
             }
         });
@@ -46,7 +38,7 @@ public class MainFrame extends JFrame
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-
+        
         if(filePath != null && filePath.exists())
         {
             startExtraction(filePath);
@@ -55,20 +47,16 @@ public class MainFrame extends JFrame
     
     public void showSelectionPanel()
     {
-        if(extractionThread != null && extractionThread.isAlive())
-        {
-            extractionThread.endExtraction();
-        }
+        if(extractionManager != null)
+            extractionManager.stopExtraction();
         this.setContentPane(selectionPanel);
         this.pack();
     }
     
     public void showMessagePanel(final String message)
     {
-        if(extractionThread != null && extractionThread.isAlive())
-        {
-            extractionThread.endExtraction();
-        }
+        if(extractionManager != null)
+            extractionManager.stopExtraction();
         final MainFrame mainFrame = this;
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -88,7 +76,7 @@ public class MainFrame extends JFrame
         ProgressPanel progressPanel = new ProgressPanel(this);
         this.setContentPane(progressPanel);
         this.pack();
-        this.extractionThread = new ExtractionThread(filePath, this, progressPanel);
-        extractionThread.start();
+        this.extractionManager = new ExtractionManager(filePath, this, progressPanel);
+        this.extractionManager.startExtraction();
     }
 }

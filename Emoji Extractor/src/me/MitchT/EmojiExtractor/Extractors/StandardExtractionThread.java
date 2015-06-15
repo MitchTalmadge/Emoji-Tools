@@ -1,4 +1,4 @@
-package me.MitchT.EmojiExtractor;
+package me.MitchT.EmojiExtractor.Extractors;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,10 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import me.MitchT.EmojiExtractor.GUI.MainFrame;
+import me.MitchT.EmojiExtractor.EmojiExtractor;
+import me.MitchT.EmojiExtractor.ExtractionManager;
 import me.MitchT.EmojiExtractor.GUI.ProgressPanel;
 
-public class ExtractionThread extends Thread
+public class StandardExtractionThread extends ExtractionThread
 {
     private static boolean[] searchBooleans = new boolean[8];
     private static final int[] prefix = new int[] { 0x89, 0x50, 0x4E, 0x47 };
@@ -18,18 +19,16 @@ public class ExtractionThread extends Thread
     private static final File emojisDir = new File(EmojiExtractor.getRootDirectory() + "/ExtractedEmojis");
     
     private long currentBytePos = 0;
-    private boolean running = true;
-    private File filePath;
-    private MainFrame mainFrame;
+    private ExtractionManager extractionManager;
     private ProgressPanel progressPanel;
     
     private long startTime = 0;
     private long currTime = 0;
     
-    public ExtractionThread(File filePath, MainFrame mainFrame, ProgressPanel progressPanel)
+    public StandardExtractionThread(File font, ExtractionManager extractionManager, ProgressPanel progressPanel)
     {
-        this.filePath = filePath;
-        this.mainFrame = mainFrame;
+        super(font);
+        this.extractionManager = extractionManager;
         this.progressPanel = progressPanel;
     }
     
@@ -38,7 +37,7 @@ public class ExtractionThread extends Thread
     {
         try
         {
-            InputStream inputStream = new FileInputStream(filePath);
+            InputStream inputStream = new FileInputStream(this.font);
             
             if(!emojisDir.exists())
             {
@@ -69,16 +68,15 @@ public class ExtractionThread extends Thread
                     updateProgress();
                 }
             }
+            inputStream.close();
             
             System.out.println("No more Emojis to extract! All done! :)");
-            mainFrame.showMessagePanel("No more Emojis to extract! All done! :)");
-            
-            inputStream.close();
+            extractionManager.showMessagePanel("No more Emojis to extract! All done! :)");
         }
         catch(FileNotFoundException e)
         {
-            System.out.println(filePath.getName()+" not found!");
-            mainFrame.showMessagePanel(filePath.getName()+" not found!");
+            System.out.println(this.font.getName()+" not found!");
+            extractionManager.showMessagePanel(this.font.getName()+" not found!");
         }
         catch(IOException e)
         {
@@ -192,12 +190,8 @@ public class ExtractionThread extends Thread
     private void updateProgress()
     {
         this.currTime = System.currentTimeMillis();
-        progressPanel.setProgress(currentBytePos, filePath.length());
-        progressPanel.setTimeRemaining(currentBytePos, filePath.length(), currTime, startTime);
+        progressPanel.setProgress(currentBytePos, this.font.length());
+        progressPanel.setTimeRemaining(currentBytePos, this.font.length(), currTime, startTime);
     }
     
-    public void endExtraction()
-    {
-        running = false;
-    }
 }
