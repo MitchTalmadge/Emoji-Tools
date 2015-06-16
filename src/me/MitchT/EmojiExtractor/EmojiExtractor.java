@@ -13,11 +13,11 @@ import java.net.URISyntaxException;
  */
 public class EmojiExtractor {
     public static void main(String[] args) {
-        String fileName = null;
+        String font = null;
         if (args.length > 0)
-            fileName = args[0];
+            font = args[0];
 
-        final File filePath = new File(getRootDirectory() + "/" + fileName);
+        final File filePath = new File(getRootDirectory() + "/" + font);
 
         SwingUtilities.invokeLater(new Runnable() {
 
