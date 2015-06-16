@@ -14,7 +14,7 @@ public class MainFrame extends JFrame {
     private ExtractionManager extractionManager;
 
     public MainFrame(File filePath) {
-        setTitle("Emoji Extractor by Mitch Talmadge");
+        setTitle("Emoji Extractor");
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             @Override

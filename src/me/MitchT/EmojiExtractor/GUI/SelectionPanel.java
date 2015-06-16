@@ -29,6 +29,8 @@ public class SelectionPanel extends JPanel implements ActionListener {
         this.startButton = new JButton("Start Extraction");
         startButton.addActionListener(this);
 
+        JLabel copyrightLabel = new JLabel("Copyright 2015 Mitch Talmadge");
+
         JPanel browsePanel = new JPanel();
         browsePanel.add(fileField);
         browsePanel.add(browseButton);
@@ -48,6 +50,10 @@ public class SelectionPanel extends JPanel implements ActionListener {
         gbc.gridy = 1;
         gbc.gridwidth = 2;
         this.add(startButton, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        this.add(copyrightLabel, gbc);
     }
 
     private void openFileChooser() {
