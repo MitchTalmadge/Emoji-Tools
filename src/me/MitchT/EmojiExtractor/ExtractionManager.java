@@ -2,6 +2,7 @@ package me.MitchT.EmojiExtractor;
 
 import me.MitchT.EmojiExtractor.Extractors.AppleExtractionThread;
 import me.MitchT.EmojiExtractor.Extractors.ExtractionThread;
+import me.MitchT.EmojiExtractor.Extractors.GoogleExtractionThread;
 import me.MitchT.EmojiExtractor.Extractors.StandardExtractionThread;
 import me.MitchT.EmojiExtractor.GUI.MainFrame;
 import me.MitchT.EmojiExtractor.GUI.ProgressPanel;
@@ -59,6 +60,8 @@ public class ExtractionManager {
 
             if (tableNames.contains("sbix"))
                 extractionThread = new AppleExtractionThread(font, tableNames, tableOffsets, tableLengths, this, progressPanel);
+            else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
+                extractionThread = new GoogleExtractionThread(font, tableNames, tableOffsets, tableLengths, this, progressPanel);
             else
                 extractionThread = new StandardExtractionThread(font, this, progressPanel);
 

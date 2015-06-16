@@ -51,6 +51,8 @@ public class SelectionPanel extends JPanel implements ActionListener {
     }
 
     private void openFileChooser() {
+        this.fileField.setText("");
+
         this.fileChooser = new JFileChooser(EmojiExtractor.getRootDirectory());
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Emoji Font File (*.ttf)", "ttf");
         fileChooser.setFileFilter(filter);

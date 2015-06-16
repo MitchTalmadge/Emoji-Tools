@@ -22,6 +22,9 @@ public class StandardExtractionThread extends ExtractionThread {
         super(font);
         this.extractionManager = extractionManager;
         this.progressPanel = progressPanel;
+
+        progressPanel.setShowTimeRemaining(true);
+        progressPanel.setShowStatusMessage(true);
     }
 
     @Override
@@ -45,8 +48,10 @@ public class StandardExtractionThread extends ExtractionThread {
                 if (progressPanel.getStopped())
                     continue;
 
-                if (currentBytePos % 512 == 0)
+                if (currentBytePos % 512 == 0) {
+                    setProgressStatusMessage("Searching for Emojis - Please wait until complete!");
                     updateProgress();
+                }
 
                 if (checkForPrefix(inputStream.read())) {
                     imageID++;
@@ -76,6 +81,7 @@ public class StandardExtractionThread extends ExtractionThread {
         resetSearchBooleans();
 
         System.out.println("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
+        setProgressStatusMessage("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
         try {
             FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, emojiID + ".png"));
 
@@ -151,8 +157,12 @@ public class StandardExtractionThread extends ExtractionThread {
 
     private void updateProgress() {
         this.currTime = System.currentTimeMillis();
-        progressPanel.setProgress(currentBytePos, this.font.length());
+        progressPanel.setProgress((int) (((double) currentBytePos / this.font.length()) * 100));
         progressPanel.setTimeRemaining(currentBytePos, this.font.length(), currTime, startTime);
+    }
+
+    private void setProgressStatusMessage(String message) {
+        progressPanel.setStatusMessage(message);
     }
 
 }

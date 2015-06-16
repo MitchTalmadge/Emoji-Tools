@@ -10,6 +10,7 @@ public class ProgressPanel extends JPanel implements ActionListener {
     private MainFrame mainFrame;
     private JProgressBar progressBar;
     private JLabel timeRemainingLabel;
+    private JLabel statusLabel;
     private boolean stopped = false;
 
     public ProgressPanel(MainFrame frame) {
@@ -21,6 +22,8 @@ public class ProgressPanel extends JPanel implements ActionListener {
         progressBar.setValue(0);
 
         this.timeRemainingLabel = new JLabel("Time Remaining: Unknown");
+
+        this.statusLabel = new JLabel("Status: Unknown");
 
         this.stopButton = new JButton("Stop Extraction");
         stopButton.addActionListener(this);
@@ -42,14 +45,26 @@ public class ProgressPanel extends JPanel implements ActionListener {
         this.add(timeRemainingLabel, gbc);
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        this.add(statusLabel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         this.add(stopButton, gbc);
     }
 
-    public void setProgress(final long currentBytePos, final long filePathLength) {
+    public void setShowTimeRemaining(boolean show) {
+        this.timeRemainingLabel.setVisible(show);
+    }
+
+    public void setShowStatusMessage(boolean show) {
+        this.statusLabel.setVisible(show);
+    }
+
+    public void setProgress(final int progress) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                progressBar.setValue((int) (((double) currentBytePos / filePathLength) * 100));
+                progressBar.setValue(progress);
                 progressBar.updateUI();
             }
         });
@@ -90,5 +105,9 @@ public class ProgressPanel extends JPanel implements ActionListener {
                 timeRemainingLabel.setText("Time Remaining: " + time);
             }
         });
+    }
+
+    public void setStatusMessage(String message) {
+        this.statusLabel.setText(message);
     }
 }

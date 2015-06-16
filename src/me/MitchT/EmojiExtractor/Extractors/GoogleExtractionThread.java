@@ -11,8 +11,6 @@ import java.util.List;
 public class GoogleExtractionThread extends ExtractionThread {
     private static final File emojisDir = new File(EmojiExtractor.getRootDirectory() + "/ExtractedEmojis");
 
-    private long currentBytePos = 0;
-
     private List<String> tableNames;
     private List<Integer> tableOffsets;
     private List<Integer> tableLengths;
@@ -23,9 +21,6 @@ public class GoogleExtractionThread extends ExtractionThread {
     private ExtractionManager extractionManager;
     private ProgressPanel progressPanel;
 
-    private long startTime = 0;
-    private long currTime = 0;
-
     public GoogleExtractionThread(File font, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ProgressPanel progressPanel) {
         super(font);
 
@@ -35,6 +30,9 @@ public class GoogleExtractionThread extends ExtractionThread {
 
         this.extractionManager = extractionManager;
         this.progressPanel = progressPanel;
+
+        progressPanel.setShowTimeRemaining(false);
+        progressPanel.setShowStatusMessage(true);
     }
 
     @Override
@@ -46,7 +44,7 @@ public class GoogleExtractionThread extends ExtractionThread {
                 emojisDir.mkdir();
             }
 
-            startTime = System.currentTimeMillis();
+            setProgressStatusMessage("Searching for Emojis - Please wait until complete!");
 
             //Get numGlyphs, ordinal numbers, and glyphNames from post table
             int postIndex = tableNames.indexOf("post");
@@ -106,69 +104,75 @@ public class GoogleExtractionThread extends ExtractionThread {
                 return;
             }
 
-            //Get number of strikes, and scan for PNG files.
-            int sbixIndex = tableNames.indexOf("sbix");
-            if (sbixIndex > -1) {
-                int offset = tableOffsets.get(sbixIndex);
-                int length = tableLengths.get(sbixIndex);
+            int CBLCIndex = tableNames.indexOf("CBLC");
+            if (CBLCIndex > -1) {
+                int CBLCOffset = tableOffsets.get(CBLCIndex);
+                int CBLCLength = tableLengths.get(CBLCIndex);
 
-                inputStream.seek(offset);
-
-                inputStream.skipBytes(4);
+                inputStream.seek(CBLCOffset);
 
                 b = new byte[4];
                 inputStream.readFully(b);
+                if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
+                    extractionManager.showMessagePanel("Invalid 'CBLC' table! Contact developer for help.");
+                    inputStream.close();
+                    return;
+                }
 
-                int numStrikes = ExtractionUtilites.getIntFromBytes(b);
-                int[] strikeOffsets = new int[numStrikes];
-                for (int i = 0; i < numStrikes; i++) {
+                inputStream.skipBytes(44);
+
+                b = new byte[2];
+                inputStream.readFully(b);
+                short beginGlyphID = ExtractionUtilites.getShortFromBytes(b);
+
+                inputStream.readFully(b);
+                short endGlyphID = ExtractionUtilites.getShortFromBytes(b);
+
+                //Get number of strikes, and scan for PNG files.
+                int CBDTIndex = tableNames.indexOf("CBDT");
+                if (CBDTIndex > -1) {
+                    int CBDTOffset = tableOffsets.get(CBDTIndex);
+                    int CBDTLength = tableLengths.get(CBDTIndex);
+
+                    inputStream.seek(CBDTOffset);
+
+                    b = new byte[4];
                     inputStream.readFully(b);
-                    strikeOffsets[i] = ExtractionUtilites.getIntFromBytes(b);
-                }
+                    if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
+                        extractionManager.showMessagePanel("Invalid 'CBDT' table! Contact developer for help.");
+                        inputStream.close();
+                        return;
+                    }
 
-                //TODO: Figure out how to convert rgbl to png.. for now, use last strike..
-                inputStream.seek(offset + strikeOffsets[strikeOffsets.length - 1]);
-                inputStream.skipBytes(4);
-
-                int[] glyphOffsets = new int[numGlyphs];
-                int[] glyphLengths = new int[numGlyphs];
-                b = new byte[4];
-
-                for (int i = 0; i < numGlyphs; i++) {
-                    inputStream.readFully(b);
-                    glyphOffsets[i] = ExtractionUtilites.getIntFromBytes(b);
-                }
-
-                for (int i = 0; i < numGlyphs; i++) {
-                    if (i + 1 == numGlyphs)
-                        glyphLengths[i] = length - strikeOffsets[strikeOffsets.length - 1] - glyphOffsets[i];
-                    else
-                        glyphLengths[i] = glyphOffsets[i + 1] - glyphOffsets[i];
-                }
-
-                inputStream.seek(offset + strikeOffsets[strikeOffsets.length - 1]);
-                inputStream.skipBytes(glyphOffsets[0]);
-
-                for (int i = 0; i < numGlyphs; i++) {
-                    if (glyphLengths[i] > 0) {
-                        inputStream.skipBytes(4);
+                    for (int i = 0; i < endGlyphID - beginGlyphID; i++) {
+                        inputStream.skipBytes(5);
                         b = new byte[4];
                         inputStream.readFully(b);
-                        if (ExtractionUtilites.getStringFromBytes(b).equals("png ")) {
-                            System.out.println("Extracting Glyph #" + i + " to '" + glyphNames[i] + ".png'");
-                            FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, glyphNames[i] + ".png"));
-                            b = new byte[glyphLengths[i] - 8];
+
+                        int glyphLength = ExtractionUtilites.getIntFromBytes(b);
+                        if (glyphLength > 0) {
+                            b = new byte[glyphLength];
+                            System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i + beginGlyphID] + ".png'");
+                            setProgressStatusMessage("Extracting Emoji #" + i + " to '" + glyphNames[i + beginGlyphID] + ".png'");
+                            updateProgress((int) ((i / (float) (endGlyphID - beginGlyphID) * 100)));
+                            FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, glyphNames[i + beginGlyphID] + ".png"));
+                            b = new byte[glyphLength];
                             inputStream.readFully(b);
                             outputStream.write(b);
                             outputStream.close();
                         }
                     }
+                } else {
+                    extractionManager.showMessagePanel("Could not find 'CBDT' table! Contact developer for help.");
+                    inputStream.close();
+                    return;
                 }
             } else {
-                extractionManager.showMessagePanel("Could not find 'sbix' table! Contact developer for help.");
+                extractionManager.showMessagePanel("Could not find 'CBLC' table! Contact developer for help.");
                 inputStream.close();
                 return;
             }
+
             inputStream.close();
 
             System.out.println("No more Emojis to extract! All done! :)");
@@ -181,10 +185,12 @@ public class GoogleExtractionThread extends ExtractionThread {
         }
     }
 
-    private void updateProgress() {
-        this.currTime = System.currentTimeMillis();
-        progressPanel.setProgress(currentBytePos, this.font.length());
-        progressPanel.setTimeRemaining(currentBytePos, this.font.length(), currTime, startTime);
+    private void updateProgress(int progress) {
+        progressPanel.setProgress(progress);
+    }
+
+    private void setProgressStatusMessage(String message) {
+        progressPanel.setStatusMessage(message);
     }
 
 }
