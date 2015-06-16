@@ -8,7 +8,7 @@ import me.MitchT.EmojiExtractor.GUI.ProgressPanel;
 import java.io.*;
 import java.util.List;
 
-public class AppleExtractionThread extends ExtractionThread {
+public class GoogleExtractionThread extends ExtractionThread {
     private static final File emojisDir = new File(EmojiExtractor.getRootDirectory() + "/ExtractedEmojis");
 
     private long currentBytePos = 0;
@@ -26,7 +26,7 @@ public class AppleExtractionThread extends ExtractionThread {
     private long startTime = 0;
     private long currTime = 0;
 
-    public AppleExtractionThread(File font, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ProgressPanel progressPanel) {
+    public GoogleExtractionThread(File font, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ProgressPanel progressPanel) {
         super(font);
 
         this.tableNames = tableNames;

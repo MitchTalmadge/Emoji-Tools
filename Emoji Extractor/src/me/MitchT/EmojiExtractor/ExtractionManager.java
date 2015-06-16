@@ -1,61 +1,53 @@
 package me.MitchT.EmojiExtractor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-
 import me.MitchT.EmojiExtractor.Extractors.AppleExtractionThread;
 import me.MitchT.EmojiExtractor.Extractors.ExtractionThread;
 import me.MitchT.EmojiExtractor.Extractors.StandardExtractionThread;
 import me.MitchT.EmojiExtractor.GUI.MainFrame;
 import me.MitchT.EmojiExtractor.GUI.ProgressPanel;
 
-public class ExtractionManager
-{
-    
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Arrays;
+import java.util.List;
+
+public class ExtractionManager {
+
     private File font;
     private MainFrame mainFrame;
-    
+
     private ExtractionThread extractionThread;
 
-    
-    public ExtractionManager(File font, MainFrame mainFrame, ProgressPanel progressPanel)
-    {
+
+    public ExtractionManager(File font, MainFrame mainFrame, ProgressPanel progressPanel) {
         this.font = font;
         this.mainFrame = mainFrame;
-        
+
         //Determine which Extraction Method to use
-        try
-        {
+        try {
             RandomAccessFile inputStream = new RandomAccessFile(font, "r");
-            
+
             byte[] b = new byte[4];
             inputStream.readFully(b);
-            
-            if(!ExtractionUtilites.compareBytes(b, (byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00))
-            {
+
+            if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
                 showMessagePanel("Selected Font is not a valid True Type Font! (*.ttf)");
                 inputStream.close();
                 return;
-            }          
-            
+            }
+
             b = new byte[2];
             inputStream.readFully(b);
-            
+
             short numTables = ExtractionUtilites.getShortFromBytes(b);
             List<String> tableNames = Arrays.asList(new String[numTables]);
             List<Integer> tableOffsets = Arrays.asList(new Integer[numTables]);
             List<Integer> tableLengths = Arrays.asList(new Integer[numTables]);
-            
+
             inputStream.seek(12);
             b = new byte[4];
-            for(int i = 0; i < numTables; i++)
-            {
+            for (int i = 0; i < numTables; i++) {
                 inputStream.readFully(b);
                 tableNames.set(i, ExtractionUtilites.getStringFromBytes(b));
                 inputStream.skipBytes(4);
@@ -64,39 +56,29 @@ public class ExtractionManager
                 inputStream.readFully(b);
                 tableLengths.set(i, ExtractionUtilites.getIntFromBytes(b));
             }
-            
-            if(tableNames.contains("sbix"))
+
+            if (tableNames.contains("sbix"))
                 extractionThread = new AppleExtractionThread(font, tableNames, tableOffsets, tableLengths, this, progressPanel);
             else
                 extractionThread = new StandardExtractionThread(font, this, progressPanel);
-            
+
             inputStream.close();
-        }
-        catch(FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
-    public void startExtraction()
-    {
+
+    public void startExtraction() {
         extractionThread.start();
     }
-    
-    public void stopExtraction()
-    {
-        if(extractionThread != null && extractionThread.isAlive())
-        {
+
+    public void stopExtraction() {
+        if (extractionThread != null && extractionThread.isAlive()) {
             extractionThread.endExtraction();
         }
     }
-    
-    public void showMessagePanel(String message)
-    {
+
+    public void showMessagePanel(String message) {
         this.mainFrame.showMessagePanel(message);
     }
 }

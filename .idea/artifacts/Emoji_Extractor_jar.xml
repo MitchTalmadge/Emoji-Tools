@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Emoji Extractor:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/EmojiExtractor_jar</output-path>
+    <root id="archive" name="EmojiExtractor.jar">
+      <element id="module-output" name="Emoji Extractor" />
+    </root>
+  </artifact>
+</component>

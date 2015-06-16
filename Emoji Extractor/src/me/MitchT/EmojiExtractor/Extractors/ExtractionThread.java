@@ -2,10 +2,7 @@ package me.MitchT.EmojiExtractor.Extractors;
 
 import java.io.File;
 
-public class ExtractionThread extends Thread
-{
-    boolean running = true;
-    
+public class ExtractionThread extends Thread {
     final static String[] standardOrderNames = {
             ".notdef", //0
             ".null",
@@ -266,17 +263,15 @@ public class ExtractionThread extends Thread
             "ccaron",
             "dcroat" //257
     };
-
+        boolean running = true;
     File font;
     byte[] b;
-    
-    public ExtractionThread(File font)
-    {
+
+        public ExtractionThread(File font) {
         this.font = font;
     }
-    
-    public void endExtraction()
-    {
+
+        public void endExtraction() {
         running = false;
     }
 
