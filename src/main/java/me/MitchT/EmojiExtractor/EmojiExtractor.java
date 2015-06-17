@@ -1,6 +1,6 @@
 package me.MitchT.EmojiExtractor;
 
-import me.MitchT.EmojiExtractor.GUI.MainFrame;
+import me.MitchT.EmojiExtractor.GUI.EmojiToolsGUI;
 
 import javax.swing.*;
 import java.io.File;
@@ -13,17 +13,24 @@ import java.net.URISyntaxException;
  */
 public class EmojiExtractor {
     public static void main(String[] args) {
-        String font = null;
+        String fontName = null;
         if (args.length > 0)
-            font = args[0];
+            fontName = args[0];
 
-        final File filePath = new File(getRootDirectory() + "/" + font);
+        final File font = new File(getRootDirectory() + "/" + fontName);
+
+        try {
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
 
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                new MainFrame(filePath);
+                new EmojiToolsGUI(font);
             }
         });
     }

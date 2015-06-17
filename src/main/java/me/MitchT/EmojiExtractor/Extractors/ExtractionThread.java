@@ -263,15 +263,15 @@ public class ExtractionThread extends Thread {
             "ccaron",
             "dcroat" //257
     };
-        boolean running = true;
+    boolean running = true;
     File font;
     byte[] b;
 
-        public ExtractionThread(File font) {
+    public ExtractionThread(File font) {
         this.font = font;
     }
 
-        public void endExtraction() {
+    public void endExtraction() {
         running = false;
     }
 

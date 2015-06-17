@@ -4,8 +4,8 @@ import me.MitchT.EmojiExtractor.Extractors.AppleExtractionThread;
 import me.MitchT.EmojiExtractor.Extractors.ExtractionThread;
 import me.MitchT.EmojiExtractor.Extractors.GoogleExtractionThread;
 import me.MitchT.EmojiExtractor.Extractors.StandardExtractionThread;
-import me.MitchT.EmojiExtractor.GUI.MainFrame;
-import me.MitchT.EmojiExtractor.GUI.ProgressPanel;
+import me.MitchT.EmojiExtractor.GUI.EmojiToolsGUI;
+import me.MitchT.EmojiExtractor.GUI.ExtractionDialog;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,15 +15,13 @@ import java.util.List;
 
 public class ExtractionManager {
 
-    private File font;
-    private MainFrame mainFrame;
+    private EmojiToolsGUI gui;
 
     private ExtractionThread extractionThread;
 
 
-    public ExtractionManager(File font, MainFrame mainFrame, ProgressPanel progressPanel) {
-        this.font = font;
-        this.mainFrame = mainFrame;
+    public ExtractionManager(File font, EmojiToolsGUI gui, ExtractionDialog extractionDialog) {
+        this.gui = gui;
 
         //Determine which Extraction Method to use
         try {
@@ -33,7 +31,7 @@ public class ExtractionManager {
             inputStream.readFully(b);
 
             if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
-                showMessagePanel("Selected Font is not a valid True Type Font! (*.ttf)");
+                showMessageDialog("Selected Font is not a valid True Type Font! (*.ttf)");
                 inputStream.close();
                 return;
             }
@@ -59,11 +57,11 @@ public class ExtractionManager {
             }
 
             if (tableNames.contains("sbix"))
-                extractionThread = new AppleExtractionThread(font, tableNames, tableOffsets, tableLengths, this, progressPanel);
+                extractionThread = new AppleExtractionThread(font, tableNames, tableOffsets, tableLengths, this, extractionDialog);
             else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
-                extractionThread = new GoogleExtractionThread(font, tableNames, tableOffsets, tableLengths, this, progressPanel);
+                extractionThread = new GoogleExtractionThread(font, tableNames, tableOffsets, tableLengths, this, extractionDialog);
             else
-                extractionThread = new StandardExtractionThread(font, this, progressPanel);
+                extractionThread = new StandardExtractionThread(font, this, extractionDialog);
 
             inputStream.close();
         } catch (IOException e) {
@@ -81,7 +79,7 @@ public class ExtractionManager {
         }
     }
 
-    public void showMessagePanel(String message) {
-        this.mainFrame.showMessagePanel(message);
+    public void showMessageDialog(String message) {
+        this.gui.showMessageDialog(message);
     }
 }

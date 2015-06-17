@@ -3,7 +3,7 @@ package me.MitchT.EmojiExtractor.Extractors;
 import me.MitchT.EmojiExtractor.EmojiExtractor;
 import me.MitchT.EmojiExtractor.ExtractionManager;
 import me.MitchT.EmojiExtractor.ExtractionUtilites;
-import me.MitchT.EmojiExtractor.GUI.ProgressPanel;
+import me.MitchT.EmojiExtractor.GUI.ExtractionDialog;
 
 import java.io.*;
 import java.util.List;
@@ -15,13 +15,10 @@ public class AppleExtractionThread extends ExtractionThread {
     private List<Integer> tableOffsets;
     private List<Integer> tableLengths;
 
-    private short numGlyphs = 0;
-    private String[] glyphNames;
-
     private ExtractionManager extractionManager;
-    private ProgressPanel progressPanel;
+    private ExtractionDialog extractionDialog;
 
-    public AppleExtractionThread(File font, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ProgressPanel progressPanel) {
+    public AppleExtractionThread(File font, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
         super(font);
 
         this.tableNames = tableNames;
@@ -29,10 +26,10 @@ public class AppleExtractionThread extends ExtractionThread {
         this.tableLengths = tableLengths;
 
         this.extractionManager = extractionManager;
-        this.progressPanel = progressPanel;
+        this.extractionDialog = extractionDialog;
 
-        progressPanel.setShowTimeRemaining(false);
-        progressPanel.setShowStatusMessage(true);
+        this.extractionDialog.setTimeRemainingVisible(false);
+
     }
 
     @Override
@@ -44,7 +41,7 @@ public class AppleExtractionThread extends ExtractionThread {
                 emojisDir.mkdir();
             }
 
-            setProgressStatusMessage("Searching for Emojis - Please wait until complete!");
+            appendToStatus("Searching for Emojis - Please wait until complete!");
 
             //Get numGlyphs, ordinal numbers, and glyphNames from post table
             int postIndex = tableNames.indexOf("post");
@@ -58,8 +55,9 @@ public class AppleExtractionThread extends ExtractionThread {
                 inputStream.readFully(b);
 
                 if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                    extractionManager.showMessagePanel("Invalid 'post' table format! Contact developer for help.");
+                    extractionManager.showMessageDialog("Invalid 'post' table format! Contact developer for help.");
                     inputStream.close();
+                    extractionDialog.dispose();
                     return;
                 }
 
@@ -67,7 +65,7 @@ public class AppleExtractionThread extends ExtractionThread {
                 b = new byte[2];
                 inputStream.readFully(b);
 
-                numGlyphs = ExtractionUtilites.getShortFromBytes(b);
+                short numGlyphs = ExtractionUtilites.getShortFromBytes(b);
                 short[] ordinalNumbers = new short[numGlyphs];
 
                 short numNewGlyphs = 0;
@@ -90,7 +88,7 @@ public class AppleExtractionThread extends ExtractionThread {
                 }
 
                 //Build list of names for GlyphIDs
-                glyphNames = new String[numGlyphs];
+                String[] glyphNames = new String[numGlyphs];
                 for (int i = 0; i < numGlyphs; i++) {
                     if (ordinalNumbers[i] <= 257) {
                         glyphNames[i] = standardOrderNames[ordinalNumbers[i]];
@@ -143,14 +141,19 @@ public class AppleExtractionThread extends ExtractionThread {
                     inputStream.skipBytes(glyphOffsets[0]);
 
                     for (int i = 0; i < numGlyphs; i++) {
+                        if (!running) {
+                            inputStream.close();
+                            extractionDialog.dispose();
+                            return;
+                        }
                         if (glyphLengths[i] > 0) {
                             inputStream.skipBytes(4);
                             b = new byte[4];
                             inputStream.readFully(b);
                             if (ExtractionUtilites.getStringFromBytes(b).equals("png ")) {
                                 System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
-                                setProgressStatusMessage("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
-
+                                appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
+                                updateProgress((int) ((i / (float) (numGlyphs) * 100)));
                                 FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, glyphNames[i] + ".png"));
                                 b = new byte[glyphLengths[i] - 8];
                                 inputStream.readFully(b);
@@ -160,34 +163,37 @@ public class AppleExtractionThread extends ExtractionThread {
                         }
                     }
                 } else {
-                    extractionManager.showMessagePanel("Could not find 'sbix' table! Contact developer for help.");
+                    extractionManager.showMessageDialog("Could not find 'sbix' table! Contact developer for help.");
                     inputStream.close();
+                    extractionDialog.dispose();
                     return;
                 }
             } else {
-                extractionManager.showMessagePanel("Could not find 'post' table! Contact developer for help.");
+                extractionManager.showMessageDialog("Could not find 'post' table! Contact developer for help.");
                 inputStream.close();
+                extractionDialog.dispose();
                 return;
             }
 
             inputStream.close();
 
             System.out.println("No more Emojis to extract! All done! :)");
-            extractionManager.showMessagePanel("No more Emojis to extract! All done! :)");
+            extractionManager.showMessageDialog("No more Emojis to extract! All done! :)");
+            extractionDialog.dispose();
         } catch (FileNotFoundException e) {
             System.out.println(this.font.getName() + " not found!");
-            extractionManager.showMessagePanel(this.font.getName() + " not found!");
+            extractionManager.showMessageDialog(this.font.getName() + " not found!");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void updateProgress(int progress) {
-        progressPanel.setProgress(progress);
+        extractionDialog.setProgress(progress);
     }
 
-    private void setProgressStatusMessage(String message) {
-        progressPanel.setStatusMessage(message);
+    private void appendToStatus(String message) {
+        extractionDialog.appendToStatus(message);
     }
 
 }

@@ -2,7 +2,7 @@ package me.MitchT.EmojiExtractor.Extractors;
 
 import me.MitchT.EmojiExtractor.EmojiExtractor;
 import me.MitchT.EmojiExtractor.ExtractionManager;
-import me.MitchT.EmojiExtractor.GUI.ProgressPanel;
+import me.MitchT.EmojiExtractor.GUI.ExtractionDialog;
 
 import java.io.*;
 
@@ -13,18 +13,15 @@ public class StandardExtractionThread extends ExtractionThread {
     private static boolean[] searchBooleans = new boolean[8];
     private long currentBytePos = 0;
     private ExtractionManager extractionManager;
-    private ProgressPanel progressPanel;
+    private ExtractionDialog extractionDialog;
 
     private long startTime = 0;
-    private long currTime = 0;
 
-    public StandardExtractionThread(File font, ExtractionManager extractionManager, ProgressPanel progressPanel) {
+    public StandardExtractionThread(File font, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
         super(font);
         this.extractionManager = extractionManager;
-        this.progressPanel = progressPanel;
+        this.extractionDialog = extractionDialog;
 
-        progressPanel.setShowTimeRemaining(true);
-        progressPanel.setShowStatusMessage(true);
     }
 
     @Override
@@ -38,18 +35,17 @@ public class StandardExtractionThread extends ExtractionThread {
 
             startTime = System.currentTimeMillis();
 
+            appendToStatus("Searching for Emojis - Please wait until complete!");
+
             int imageID = 0;
             while (inputStream.available() >= 1) {
                 if (!running) {
                     inputStream.close();
+                    extractionDialog.dispose();
                     return;
                 }
 
-                if (progressPanel.getStopped())
-                    continue;
-
                 if (currentBytePos % 512 == 0) {
-                    setProgressStatusMessage("Searching for Emojis - Please wait until complete!");
                     updateProgress();
                 }
 
@@ -62,10 +58,12 @@ public class StandardExtractionThread extends ExtractionThread {
             inputStream.close();
 
             System.out.println("No more Emojis to extract! All done! :)");
-            extractionManager.showMessagePanel("No more Emojis to extract! All done! :)");
+            extractionManager.showMessageDialog("No more Emojis to extract! All done! :)");
+
+            extractionDialog.dispose();
         } catch (FileNotFoundException e) {
             System.out.println(this.font.getName() + " not found!");
-            extractionManager.showMessagePanel(this.font.getName() + " not found!");
+            extractionManager.showMessageDialog(this.font.getName() + " not found!");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -81,7 +79,7 @@ public class StandardExtractionThread extends ExtractionThread {
         resetSearchBooleans();
 
         System.out.println("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
-        setProgressStatusMessage("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
+        appendToStatus("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
         try {
             FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, emojiID + ".png"));
 
@@ -156,13 +154,12 @@ public class StandardExtractionThread extends ExtractionThread {
     }
 
     private void updateProgress() {
-        this.currTime = System.currentTimeMillis();
-        progressPanel.setProgress((int) (((double) currentBytePos / this.font.length()) * 100));
-        progressPanel.setTimeRemaining(currentBytePos, this.font.length(), currTime, startTime);
+        extractionDialog.setProgress((int) (((double) currentBytePos / this.font.length()) * 100));
+        extractionDialog.setTimeRemaining(currentBytePos, this.font.length(), System.currentTimeMillis(), startTime);
     }
 
-    private void setProgressStatusMessage(String message) {
-        progressPanel.setStatusMessage(message);
+    private void appendToStatus(String message) {
+        extractionDialog.appendToStatus(message);
     }
 
 }
