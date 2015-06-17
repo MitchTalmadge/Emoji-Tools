@@ -1,15 +1,15 @@
-package me.MitchT.EmojiExtractor.Extractors;
+package me.MitchT.EmojiTools.Extraction.Extractors;
 
-import me.MitchT.EmojiExtractor.EmojiExtractor;
-import me.MitchT.EmojiExtractor.ExtractionManager;
-import me.MitchT.EmojiExtractor.GUI.ExtractionDialog;
+import me.MitchT.EmojiTools.EmojiTools;
+import me.MitchT.EmojiTools.Extraction.ExtractionManager;
+import me.MitchT.EmojiTools.GUI.ExtractionDialog;
 
 import java.io.*;
 
 public class StandardExtractionThread extends ExtractionThread {
     private static final int[] prefix = new int[]{0x89, 0x50, 0x4E, 0x47};
     private static final int[] suffix = new int[]{0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82};
-    private static final File emojisDir = new File(EmojiExtractor.getRootDirectory() + "/ExtractedEmojis");
+    private static final File emojisDir = new File(EmojiTools.getRootDirectory() + "/ExtractedEmojis");
     private static boolean[] searchBooleans = new boolean[8];
     private long currentBytePos = 0;
     private ExtractionManager extractionManager;

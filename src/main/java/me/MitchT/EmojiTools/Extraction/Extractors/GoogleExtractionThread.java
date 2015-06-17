@@ -1,15 +1,15 @@
-package me.MitchT.EmojiExtractor.Extractors;
+package me.MitchT.EmojiTools.Extraction.Extractors;
 
-import me.MitchT.EmojiExtractor.EmojiExtractor;
-import me.MitchT.EmojiExtractor.ExtractionManager;
-import me.MitchT.EmojiExtractor.ExtractionUtilites;
-import me.MitchT.EmojiExtractor.GUI.ExtractionDialog;
+import me.MitchT.EmojiTools.EmojiTools;
+import me.MitchT.EmojiTools.Extraction.ExtractionManager;
+import me.MitchT.EmojiTools.Extraction.ExtractionUtilites;
+import me.MitchT.EmojiTools.GUI.ExtractionDialog;
 
 import java.io.*;
 import java.util.List;
 
 public class GoogleExtractionThread extends ExtractionThread {
-    private static final File emojisDir = new File(EmojiExtractor.getRootDirectory() + "/ExtractedEmojis");
+    private static final File emojisDir = new File(EmojiTools.getRootDirectory() + "/ExtractedEmojis");
 
     private List<String> tableNames;
     private List<Integer> tableOffsets;
@@ -151,7 +151,7 @@ public class GoogleExtractionThread extends ExtractionThread {
                                 b = new byte[glyphLength];
                                 System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i + beginGlyphID] + ".png'");
                                 appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i + beginGlyphID] + ".png'");
-                                updateProgress((int) ((i / (float) (endGlyphID - beginGlyphID) * 100)));
+                                updateProgress((int) (i / (float) (endGlyphID - beginGlyphID) * 100));
                                 FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, glyphNames[i + beginGlyphID] + ".png"));
                                 b = new byte[glyphLength];
                                 inputStream.readFully(b);

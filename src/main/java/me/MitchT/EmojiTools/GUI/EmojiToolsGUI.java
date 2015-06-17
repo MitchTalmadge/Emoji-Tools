@@ -1,7 +1,7 @@
-package me.MitchT.EmojiExtractor.GUI;
+package me.MitchT.EmojiTools.GUI;
 
-import me.MitchT.EmojiExtractor.EmojiExtractor;
-import me.MitchT.EmojiExtractor.ExtractionManager;
+import me.MitchT.EmojiTools.EmojiTools;
+import me.MitchT.EmojiTools.Extraction.ExtractionManager;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -84,7 +84,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     private void openFileChooser() {
         this.fileNameField.setText("File Name");
 
-        JFileChooser fileChooser = new JFileChooser(EmojiExtractor.getRootDirectory());
+        JFileChooser fileChooser = new JFileChooser(EmojiTools.getRootDirectory());
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Emoji Font File (*.ttf)", "ttf");
         fileChooser.setFileFilter(filter);
         int returnVal = fileChooser.showOpenDialog(this);

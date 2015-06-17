@@ -1,11 +1,11 @@
-package me.MitchT.EmojiExtractor;
+package me.MitchT.EmojiTools.Extraction;
 
-import me.MitchT.EmojiExtractor.Extractors.AppleExtractionThread;
-import me.MitchT.EmojiExtractor.Extractors.ExtractionThread;
-import me.MitchT.EmojiExtractor.Extractors.GoogleExtractionThread;
-import me.MitchT.EmojiExtractor.Extractors.StandardExtractionThread;
-import me.MitchT.EmojiExtractor.GUI.EmojiToolsGUI;
-import me.MitchT.EmojiExtractor.GUI.ExtractionDialog;
+import me.MitchT.EmojiTools.Extraction.Extractors.AppleExtractionThread;
+import me.MitchT.EmojiTools.Extraction.Extractors.ExtractionThread;
+import me.MitchT.EmojiTools.Extraction.Extractors.GoogleExtractionThread;
+import me.MitchT.EmojiTools.Extraction.Extractors.StandardExtractionThread;
+import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
+import me.MitchT.EmojiTools.GUI.ExtractionDialog;
 
 import java.io.File;
 import java.io.IOException;

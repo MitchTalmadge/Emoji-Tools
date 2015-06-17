@@ -1,15 +1,15 @@
-package me.MitchT.EmojiExtractor.Extractors;
+package me.MitchT.EmojiTools.Extraction.Extractors;
 
-import me.MitchT.EmojiExtractor.EmojiExtractor;
-import me.MitchT.EmojiExtractor.ExtractionManager;
-import me.MitchT.EmojiExtractor.ExtractionUtilites;
-import me.MitchT.EmojiExtractor.GUI.ExtractionDialog;
+import me.MitchT.EmojiTools.EmojiTools;
+import me.MitchT.EmojiTools.Extraction.ExtractionManager;
+import me.MitchT.EmojiTools.Extraction.ExtractionUtilites;
+import me.MitchT.EmojiTools.GUI.ExtractionDialog;
 
 import java.io.*;
 import java.util.List;
 
 public class AppleExtractionThread extends ExtractionThread {
-    private static final File emojisDir = new File(EmojiExtractor.getRootDirectory() + "/ExtractedEmojis");
+    private static final File emojisDir = new File(EmojiTools.getRootDirectory() + "/ExtractedEmojis");
 
     private List<String> tableNames;
     private List<Integer> tableOffsets;
@@ -146,6 +146,8 @@ public class AppleExtractionThread extends ExtractionThread {
                             extractionDialog.dispose();
                             return;
                         }
+                        updateProgress((int) ((i / (float) (numGlyphs)) * 100));
+
                         if (glyphLengths[i] > 0) {
                             inputStream.skipBytes(4);
                             b = new byte[4];
@@ -153,7 +155,6 @@ public class AppleExtractionThread extends ExtractionThread {
                             if (ExtractionUtilites.getStringFromBytes(b).equals("png ")) {
                                 System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
                                 appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
-                                updateProgress((int) ((i / (float) (numGlyphs) * 100)));
                                 FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, glyphNames[i] + ".png"));
                                 b = new byte[glyphLengths[i] - 8];
                                 inputStream.readFully(b);

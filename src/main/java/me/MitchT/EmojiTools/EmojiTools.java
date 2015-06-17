@@ -1,6 +1,6 @@
-package me.MitchT.EmojiExtractor;
+package me.MitchT.EmojiTools;
 
-import me.MitchT.EmojiExtractor.GUI.EmojiToolsGUI;
+import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
 
 import javax.swing.*;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
  *
  * @author Mitch Talmadge (mitcht@aptitekk.com)
  */
-public class EmojiExtractor {
+public class EmojiTools {
     public static void main(String[] args) {
         String fontName = null;
         if (args.length > 0)
@@ -43,7 +43,7 @@ public class EmojiExtractor {
      */
     public static File getRootDirectory() {
         try {
-            return new File(EmojiExtractor.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getAbsoluteFile();
+            return new File(EmojiTools.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getAbsoluteFile();
         } catch (URISyntaxException e) {
             return null;
         }

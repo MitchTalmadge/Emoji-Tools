@@ -1,4 +1,4 @@
-package me.MitchT.EmojiExtractor.GUI;
+package me.MitchT.EmojiTools.GUI;
 
 import javax.swing.*;
 import java.awt.*;

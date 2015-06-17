@@ -1,4 +1,4 @@
-package me.MitchT.EmojiExtractor.Extractors;
+package me.MitchT.EmojiTools.Extraction.Extractors;
 
 import java.io.File;
 
