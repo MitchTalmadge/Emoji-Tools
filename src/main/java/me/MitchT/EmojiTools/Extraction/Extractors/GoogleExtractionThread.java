@@ -1,6 +1,5 @@
 package me.MitchT.EmojiTools.Extraction.Extractors;
 
-import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.ExtractionManager;
 import me.MitchT.EmojiTools.Extraction.ExtractionUtilites;
 import me.MitchT.EmojiTools.GUI.ExtractionDialog;
@@ -9,7 +8,6 @@ import java.io.*;
 import java.util.List;
 
 public class GoogleExtractionThread extends ExtractionThread {
-    private static final File emojisDir = new File(EmojiTools.getRootDirectory() + "/ExtractedEmojis");
 
     private List<String> tableNames;
     private List<Integer> tableOffsets;
@@ -18,8 +16,8 @@ public class GoogleExtractionThread extends ExtractionThread {
     private ExtractionManager extractionManager;
     private ExtractionDialog extractionDialog;
 
-    public GoogleExtractionThread(File font, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
-        super(font);
+    public GoogleExtractionThread(File font, String exportDirectoryName, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
+        super(font, exportDirectoryName);
 
         this.tableNames = tableNames;
         this.tableOffsets = tableOffsets;
@@ -36,8 +34,8 @@ public class GoogleExtractionThread extends ExtractionThread {
         try {
             RandomAccessFile inputStream = new RandomAccessFile(font, "r");
 
-            if (!emojisDir.exists()) {
-                emojisDir.mkdir();
+            if (!exportDir.exists()) {
+                exportDir.mkdir();
             }
 
             appendToStatus("Searching for Emojis - Please wait until complete!");
@@ -152,7 +150,7 @@ public class GoogleExtractionThread extends ExtractionThread {
                                 System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i + beginGlyphID] + ".png'");
                                 appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i + beginGlyphID] + ".png'");
                                 updateProgress((int) (i / (float) (endGlyphID - beginGlyphID) * 100));
-                                FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, glyphNames[i + beginGlyphID] + ".png"));
+                                FileOutputStream outputStream = new FileOutputStream(new File(exportDir, glyphNames[i + beginGlyphID] + ".png"));
                                 b = new byte[glyphLength];
                                 inputStream.readFully(b);
                                 outputStream.write(b);

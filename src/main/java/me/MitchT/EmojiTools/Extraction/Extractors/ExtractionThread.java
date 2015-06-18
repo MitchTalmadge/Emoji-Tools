@@ -1,5 +1,7 @@
 package me.MitchT.EmojiTools.Extraction.Extractors;
 
+import me.MitchT.EmojiTools.EmojiTools;
+
 import java.io.File;
 
 public class ExtractionThread extends Thread {
@@ -265,10 +267,12 @@ public class ExtractionThread extends Thread {
     };
     boolean running = true;
     File font;
+    File exportDir;
     byte[] b;
 
-    public ExtractionThread(File font) {
+    public ExtractionThread(File font, String exportDirectoryName) {
         this.font = font;
+        this.exportDir = new File(EmojiTools.getRootDirectory(), exportDirectoryName);
     }
 
     public void endExtraction() {

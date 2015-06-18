@@ -76,7 +76,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
 
     public void startExtraction() {
         ExtractionDialog extractionDialog = new ExtractionDialog(this);
-        this.extractionManager = new ExtractionManager(this.font, this, extractionDialog);
+        this.extractionManager = new ExtractionManager(this.font, this.exportDirectoryField.getText(), this, extractionDialog);
         extractionManager.startExtraction();
         extractionDialog.setVisible(true);
     }

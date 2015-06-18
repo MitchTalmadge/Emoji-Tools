@@ -1,6 +1,5 @@
 package me.MitchT.EmojiTools.Extraction.Extractors;
 
-import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.ExtractionManager;
 import me.MitchT.EmojiTools.GUI.ExtractionDialog;
 
@@ -9,7 +8,6 @@ import java.io.*;
 public class StandardExtractionThread extends ExtractionThread {
     private static final int[] prefix = new int[]{0x89, 0x50, 0x4E, 0x47};
     private static final int[] suffix = new int[]{0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82};
-    private static final File emojisDir = new File(EmojiTools.getRootDirectory() + "/ExtractedEmojis");
     private static boolean[] searchBooleans = new boolean[8];
     private long currentBytePos = 0;
     private ExtractionManager extractionManager;
@@ -17,8 +15,8 @@ public class StandardExtractionThread extends ExtractionThread {
 
     private long startTime = 0;
 
-    public StandardExtractionThread(File font, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
-        super(font);
+    public StandardExtractionThread(File font, String exportDirectoryName, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
+        super(font, exportDirectoryName);
         this.extractionManager = extractionManager;
         this.extractionDialog = extractionDialog;
 
@@ -29,8 +27,8 @@ public class StandardExtractionThread extends ExtractionThread {
         try {
             InputStream inputStream = new FileInputStream(this.font);
 
-            if (!emojisDir.exists()) {
-                emojisDir.mkdir();
+            if (!exportDir.exists()) {
+                exportDir.mkdir();
             }
 
             startTime = System.currentTimeMillis();
@@ -81,7 +79,7 @@ public class StandardExtractionThread extends ExtractionThread {
         System.out.println("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
         appendToStatus("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
         try {
-            FileOutputStream outputStream = new FileOutputStream(new File(emojisDir, emojiID + ".png"));
+            FileOutputStream outputStream = new FileOutputStream(new File(exportDir, emojiID + ".png"));
 
             for (int num : prefix)
                 outputStream.write(num);
