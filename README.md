@@ -1,13 +1,19 @@
-# EmojiExtractor
-Extracts Emojis from '.ttf' files used by Android, iOS, etc. into individual '.png' files.
+# EmojiTools
+Multiple useful tools to help Android and iOS/OSX developers with creating and modifying Emoji Font files.
 
-Emojis are extracted VERY quickly with an easy-to-use GUI! They are also named by their Unicode names, not by order of extraction!
-(They will be named like `uE537.png` rather than `1.png`, `2.png`, etc.)
+Features:
+* Extracts Emojis from '.ttf' files used by Android, iOS, and OSX into individual '.png' files.
+  * Takes less than 6 seconds to extract all Emojis! Very quick!
+  * Extracted Emojis are named by Unicode names (Android: `uniE537.png` iOS/OSX: `uE537.png`)
+  * Extracted Emojis can automatically be stripped of their prefixes (`uniE537.png` -> `E537.png`) (Planned)
+  * Extracted iOS CgBI / pincrushed Emojis (which show up black on Windows) can automatically be converted to RGBA. (Planned)
+* Converts from CgBI / pincrushed Emojis to RGBA and vice versa. (Planned)
+* Professional, easy-to-use GUI.
 
 # How to Use:
-1. Clone into IntelliJ and create a Jar out of the sources, or download one of the precompiled Jars from the [downloads page](https://github.com/MitchTalmadge/EmojiExtractor/releases).
-2. Put the jar wherever you'd like. Emojis will be extracted into a new folder which is created in the same directory as the jar file, named `ExtractedEmojis`.
-3. Either double-click the jar and follow the instructions on the GUI, or start the jar from the command line using `java -jar EmojiExtractor.jar yourFileName.ttf`. If the ttf file does not exist, the ttf selection window will be brought up. If it exists, it will automatically start extraction.
+1. Download one of the precompiled Jars from the [downloads page](https://github.com/MitchTalmadge/EmojiTools/releases), or clone into IntelliJ and create a Jar out of the sources.
+2. Put the jar wherever you'd like. Emojis will be extracted into a new folder which is created in the same directory as the jar file. You can choose the name of this folder using the GUI. By default, it is named `ExtractedEmojis`.
+3. Either double-click the jar and follow the instructions on the GUI, or start the jar from the command line using `java -jar EmojiTools.jar yourFileName.ttf`. If the ttf file does not exist, the ttf selection window will be brought up. If it exists, it will automatically start extraction.
 
 # How to Get Help / Make a Suggestion:
 * Make a detailed ticket in the [issue tracker](https://github.com/MitchTalmadge/EmojiExtractor/issues).
