@@ -214,6 +214,7 @@
           <component id="61f5e" class="javax.swing.JLabel">
             <constraints border-constraint="South"/>
             <properties>
+              <font style="2"/>
               <horizontalAlignment value="0"/>
               <horizontalTextPosition value="0"/>
               <text value="Copyright 2015 Mitch Talmadge (https://github.com/MitchTalmadge)"/>

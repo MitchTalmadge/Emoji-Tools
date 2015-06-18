@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="me.MitchT.EmojiTools.GUI.ExtractionDialog">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="me.MitchT.EmojiTools.GUI.ProgressDialog">
   <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
       <xy x="48" y="54" width="324" height="204"/>
@@ -25,7 +25,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="5a2f0" class="javax.swing.JLabel">
+          <component id="5a2f0" class="javax.swing.JLabel" binding="titleLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.0" weighty="0.0"/>
