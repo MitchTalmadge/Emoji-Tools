@@ -112,20 +112,14 @@ public class IPngConverter {
             // Likely a standard PNG: just copy
             byte[] buffer = new byte[1024];
             int bytesRead;
-            InputStream inputStream = new FileInputStream(pngFile);
-            try {
-                OutputStream outputStream = new FileOutputStream(targetFile);
-                try {
+            try (InputStream inputStream = new FileInputStream(pngFile)) {
+                try (OutputStream outputStream = new FileOutputStream(targetFile)) {
                     while ((bytesRead = inputStream.read(buffer)) >= 0) {
                         outputStream.write(buffer, 0, bytesRead);
                     }
                     outputStream.flush();
 
-                } finally {
-                    outputStream.close();
                 }
-            } finally {
-                inputStream.close();
             }
         }
     }
@@ -195,7 +189,7 @@ public class IPngConverter {
         }
     }
 
-    private boolean convertDataTrunk(
+    private void convertDataTrunk(
             PNGIHDRTrunk ihdrTrunk, byte[] conversionBuffer, int nMaxInflateBuffer)
             throws IOException {
         log.fine("converting colors");
@@ -232,12 +226,10 @@ public class IPngConverter {
         firstDataTrunk.m_nCRC[3] = (byte) (lCRCValue & 0xFF);
         firstDataTrunk.m_nSize = (int) deflater.getTotalOut();
 
-        return false;
     }
 
     private void writePng(File newFileName) throws IOException {
-        FileOutputStream outStream = new FileOutputStream(newFileName);
-        try {
+        try (FileOutputStream outStream = new FileOutputStream(newFileName)) {
             byte[] pngHeader = {-119, 80, 78, 71, 13, 10, 26, 10};
             outStream.write(pngHeader);
             boolean dataWritten = false;
@@ -260,14 +252,11 @@ public class IPngConverter {
             }
             outStream.flush();
 
-        } finally {
-            outStream.close();
         }
     }
 
     private void readTrunks(File pngFile) throws IOException {
-        DataInputStream input = new DataInputStream(new FileInputStream(pngFile));
-        try {
+        try (DataInputStream input = new DataInputStream(new FileInputStream(pngFile))) {
             byte[] nPNGHeader = new byte[8];
             input.readFully(nPNGHeader);
 
@@ -288,8 +277,6 @@ public class IPngConverter {
                 }
                 while (!trunk.getName().equalsIgnoreCase("IEND"));
             }
-        } finally {
-            input.close();
         }
     }
 

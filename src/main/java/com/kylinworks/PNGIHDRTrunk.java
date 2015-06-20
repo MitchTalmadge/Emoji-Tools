@@ -8,9 +8,9 @@ package com.kylinworks;
 /**
  * @author Rex
  */
-public class PNGIHDRTrunk extends PNGTrunk {
-    public int m_nWidth;
-    public int m_nHeight;
+class PNGIHDRTrunk extends PNGTrunk {
+    public final int m_nWidth;
+    public final int m_nHeight;
 
     public PNGIHDRTrunk(int nSize, String szName, byte[] nData, byte[] nCRC) {
         super(nSize, szName, nData, nCRC);

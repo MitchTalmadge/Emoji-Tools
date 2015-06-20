@@ -9,12 +9,12 @@ import java.util.List;
 
 public class GoogleExtractionThread extends ExtractionThread {
 
-    private List<String> tableNames;
-    private List<Integer> tableOffsets;
-    private List<Integer> tableLengths;
+    private final List<String> tableNames;
+    private final List<Integer> tableOffsets;
+    private final List<Integer> tableLengths;
 
-    private ExtractionManager extractionManager;
-    private ExtractionDialog extractionDialog;
+    private final ExtractionManager extractionManager;
+    private final ExtractionDialog extractionDialog;
 
     public GoogleExtractionThread(File font, String exportDirectoryName, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
         super(font, exportDirectoryName);

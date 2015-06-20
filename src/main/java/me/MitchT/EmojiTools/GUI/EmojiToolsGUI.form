@@ -166,7 +166,7 @@
                         </constraints>
                         <properties>
                           <columns value="15"/>
-                          <text value="EmojiExtractor"/>
+                          <text value="ExtractedEmojis"/>
                         </properties>
                       </component>
                       <component id="8fafb" class="javax.swing.JLabel">

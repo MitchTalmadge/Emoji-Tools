@@ -1,7 +1,9 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.Conversion.ConversionManager;
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.ExtractionManager;
+import me.MitchT.EmojiTools.OperationManager;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -31,7 +33,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     private JTextField exportDirectoryField;
     private JButton startExtractionButton;
 
-    private ExtractionManager extractionManager;
+    private OperationManager currentOperationManager;
     private File font;
 
     public EmojiToolsGUI(File font) {
@@ -45,8 +47,8 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (extractionManager != null)
-                    extractionManager.stopExtraction();
+                if (currentOperationManager != null)
+                    currentOperationManager.stop();
                 System.exit(0);
             }
         });
@@ -74,11 +76,22 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
         }
     }
 
-    public void startExtraction() {
+    private void startExtraction() {
         ExtractionDialog extractionDialog = new ExtractionDialog(this);
-        this.extractionManager = new ExtractionManager(this.font, this.exportDirectoryField.getText(), this, extractionDialog);
-        extractionManager.startExtraction();
+        this.currentOperationManager = new ExtractionManager(this.font, this.exportDirectoryField.getText(), this, extractionDialog);
+        currentOperationManager.start();
         extractionDialog.setVisible(true);
+
+        if (this.renameRadioButton2.isSelected()) {
+            //TODO: Implement Renaming
+        }
+
+        if (this.convertRadioButton2.isSelected()) {
+            ConversionDialog conversionDialog = new ConversionDialog(this);
+            this.currentOperationManager = new ConversionManager(new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()), this, conversionDialog);
+            currentOperationManager.start();
+            conversionDialog.setVisible(true);
+        }
     }
 
     private void openFileChooser() {
@@ -95,7 +108,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
         updateStartButton();
     }
 
-    public void updateStartButton() {
+    private void updateStartButton() {
         if (this.exportDirectoryField.getText().length() == 0 || this.fileNameField.getText().equals("File Name")) {
             this.startExtractionButton.setEnabled(false);
         } else {
@@ -111,25 +124,13 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.browseButton)) {
             openFileChooser();
-        /*} else if (e.getSource().equals(this.renameRadioButton1)) {
-            this.renameRadioButton1.setSelected(true);
-            this.renameRadioButton2.setSelected(false);
-        } else if (e.getSource().equals(this.renameRadioButton2)) {
-            this.renameRadioButton1.setSelected(false);
-            this.renameRadioButton2.setSelected(true);
-        } else if (e.getSource().equals(this.convertRadioButton1)) {
-            this.convertRadioButton1.setSelected(true);
-            this.convertRadioButton2.setSelected(false);
-        } else if (e.getSource().equals(this.convertRadioButton2)) {
-            this.convertRadioButton1.setSelected(false);
-            this.convertRadioButton2.setSelected(true);*/
         } else if (e.getSource().equals(this.startExtractionButton)) {
             startExtraction();
         }
     }
 
-    public ExtractionManager getExtractionManager() {
-        return this.extractionManager;
+    public OperationManager getCurrentManager() {
+        return currentOperationManager;
     }
 
     class exportDirectoryFilter extends DocumentFilter {
@@ -159,11 +160,6 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
 
             if (textField.getText().length() == 0)
                 gui.updateStartButton();
-        }
-
-        @Override
-        public void insertString(DocumentFilter.FilterBypass fb, int i, String string, AttributeSet as) throws BadLocationException {
-            super.insertString(fb, i, string, as);
         }
     }
 }

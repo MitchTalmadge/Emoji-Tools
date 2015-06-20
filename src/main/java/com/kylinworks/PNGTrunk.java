@@ -9,19 +9,19 @@ import java.io.IOException;
  */
 public class PNGTrunk {
 
-    public static int[] crc_table = null;
-    protected int m_nSize;
-    protected String m_szName;
-    protected byte[] m_nData;
-    protected byte[] m_nCRC;
+    private static int[] crc_table = null;
+    final byte[] m_nCRC;
+    private final String m_szName;
+    int m_nSize;
+    byte[] m_nData;
 
-    protected PNGTrunk(int nSize, String szName, byte[] nCRC) {
+    private PNGTrunk(int nSize, String szName, byte[] nCRC) {
         m_nSize = nSize;
         m_szName = szName;
         m_nCRC = nCRC;
     }
 
-    protected PNGTrunk(int nSize, String szName, byte[] nData, byte[] nCRC) {
+    PNGTrunk(int nSize, String szName, byte[] nData, byte[] nCRC) {
         this(nSize, szName, nCRC);
         m_nData = nData;
     }
@@ -46,20 +46,20 @@ public class PNGTrunk {
         return new PNGTrunk(nSize, szName, nDataBuffer, nCRC);
     }
 
-    public static void writeInt(byte[] nDes, int nPos, int nVal) {
+    private static void writeInt(byte[] nDes, int nPos, int nVal) {
         nDes[nPos] = (byte) ((nVal & 0xff000000) >> 24);
         nDes[nPos + 1] = (byte) ((nVal & 0xff0000) >> 16);
         nDes[nPos + 2] = (byte) ((nVal & 0xff00) >> 8);
         nDes[nPos + 3] = (byte) (nVal & 0xff);
     }
 
-    public static int readPngInt(DataInputStream input) throws IOException {
+    private static int readPngInt(DataInputStream input) throws IOException {
         final byte[] buffer = new byte[4];
         input.readFully(buffer);
         return readInt(buffer, 0);
     }
 
-    public static int readInt(byte[] nDest, int nPos) { //读一个int
+    static int readInt(byte[] nDest, int nPos) { //读一个int
         return ((nDest[nPos++] & 0xFF) << 24)
                 | ((nDest[nPos++] & 0xFF) << 16)
                 | ((nDest[nPos++] & 0xFF) << 8)
@@ -68,11 +68,11 @@ public class PNGTrunk {
 
     public static void writeCRC(byte[] nData, int nPos) {
         int chunklen = readInt(nData, nPos);
-        int sum = CRCChecksum(nData, nPos + 4, 4 + chunklen) ^ 0xffffffff;
+        int sum = ~CRCChecksum(nData, nPos + 4, 4 + chunklen);
         writeInt(nData, nPos + 8 + chunklen, sum);
     }
 
-    public static int CRCChecksum(byte[] nBuffer, int nOffset, int nLength) {
+    private static int CRCChecksum(byte[] nBuffer, int nOffset, int nLength) {
         int c = 0xffffffff;
         int n;
         if (crc_table == null) {

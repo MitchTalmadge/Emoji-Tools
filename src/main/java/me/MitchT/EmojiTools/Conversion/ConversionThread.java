@@ -6,7 +6,7 @@ import me.MitchT.EmojiTools.GUI.ConversionDialog;
 import java.io.File;
 import java.io.IOException;
 
-public class ConversionThread extends Thread {
+class ConversionThread extends Thread {
 
     private final File conversionFile;
     private final File outputDir;
@@ -16,7 +16,6 @@ public class ConversionThread extends Thread {
 
 
     private long startTime = 0;
-    private long currTime = 0;
 
     private int totalFileNum = 0;
     private int currentFileNum = 0;
@@ -63,6 +62,7 @@ public class ConversionThread extends Thread {
 
                 if (file.getName().endsWith(".png")) {
                     System.out.println("Converting " + file.getName());
+                    conversionDialog.appendToStatus("Converting " + file.getName());
 
                     converter = new IPngConverter(file, (outputDir != null) ? new File(outputDir, file.getName()) : file);
                     converter.convert();
@@ -81,9 +81,8 @@ public class ConversionThread extends Thread {
     }
 
     private void updateProgress() {
-        this.currTime = System.currentTimeMillis();
         conversionDialog.setProgress((int) (((double) currentFileNum / totalFileNum) * 100));
-        conversionDialog.setTimeRemaining(currentFileNum, totalFileNum, currTime, startTime);
+        conversionDialog.setTimeRemaining(currentFileNum, totalFileNum, System.currentTimeMillis(), startTime);
     }
 
     public void endConversion() {

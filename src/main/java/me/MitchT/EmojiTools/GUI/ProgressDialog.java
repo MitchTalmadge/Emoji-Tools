@@ -14,7 +14,7 @@ public class ProgressDialog extends JDialog {
     private JScrollPane scrollPane;
     private JLabel titleLabel;
 
-    public ProgressDialog(EmojiToolsGUI gui, String tileText) {
+    ProgressDialog(EmojiToolsGUI gui, String tileText) {
         this.gui = gui;
 
         this.titleLabel.setText(tileText);
@@ -93,7 +93,7 @@ public class ProgressDialog extends JDialog {
     }
 
     private void onCancel() {
-        this.gui.getExtractionManager().stopExtraction();
+        this.gui.getCurrentManager().stop();
         dispose();
     }
 }

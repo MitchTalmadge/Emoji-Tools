@@ -2,32 +2,37 @@ package me.MitchT.EmojiTools.Conversion;
 
 import me.MitchT.EmojiTools.GUI.ConversionDialog;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
+import me.MitchT.EmojiTools.OperationManager;
 
 import java.io.File;
 
-public class ConversionManager {
+public class ConversionManager extends OperationManager {
 
-    private EmojiToolsGUI gui;
+    private final EmojiToolsGUI gui;
 
-    private ConversionThread conversionThread;
+    private final ConversionThread conversionThread;
 
 
     public ConversionManager(File conversionFile, EmojiToolsGUI gui, ConversionDialog conversionDialog) {
         this.gui = gui;
 
-    }
+        this.conversionThread = new ConversionThread(conversionFile, conversionFile, this, conversionDialog);
 
-    public void startConversion() {
-        conversionThread.start();
-    }
-
-    public void stopConversion() {
-        if (conversionThread != null && conversionThread.isAlive()) {
-            conversionThread.endConversion();
-        }
     }
 
     public void showMessageDialog(String message) {
         this.gui.showMessageDialog(message);
+    }
+
+    @Override
+    public void start() {
+        conversionThread.start();
+    }
+
+    @Override
+    public void stop() {
+        if (conversionThread != null && conversionThread.isAlive()) {
+            conversionThread.endConversion();
+        }
     }
 }

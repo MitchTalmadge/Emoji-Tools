@@ -6,6 +6,7 @@ import me.MitchT.EmojiTools.Extraction.Extractors.GoogleExtractionThread;
 import me.MitchT.EmojiTools.Extraction.Extractors.StandardExtractionThread;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
 import me.MitchT.EmojiTools.GUI.ExtractionDialog;
+import me.MitchT.EmojiTools.OperationManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +14,9 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.List;
 
-public class ExtractionManager {
+public class ExtractionManager extends OperationManager {
 
-    private EmojiToolsGUI gui;
+    private final EmojiToolsGUI gui;
 
     private ExtractionThread extractionThread;
 
@@ -69,17 +70,19 @@ public class ExtractionManager {
         }
     }
 
-    public void startExtraction() {
+    public void showMessageDialog(String message) {
+        this.gui.showMessageDialog(message);
+    }
+
+    @Override
+    public void start() {
         extractionThread.start();
     }
 
-    public void stopExtraction() {
+    @Override
+    public void stop() {
         if (extractionThread != null && extractionThread.isAlive()) {
             extractionThread.endExtraction();
         }
-    }
-
-    public void showMessageDialog(String message) {
-        this.gui.showMessageDialog(message);
     }
 }

@@ -265,12 +265,12 @@ public class ExtractionThread extends Thread {
             "ccaron",
             "dcroat" //257
     };
+    final File font;
+    final File exportDir;
     boolean running = true;
-    File font;
-    File exportDir;
     byte[] b;
 
-    public ExtractionThread(File font, String exportDirectoryName) {
+    ExtractionThread(File font, String exportDirectoryName) {
         this.font = font;
         this.exportDir = new File(EmojiTools.getRootDirectory(), exportDirectoryName);
     }
