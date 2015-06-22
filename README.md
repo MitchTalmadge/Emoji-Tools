@@ -13,7 +13,7 @@ Features:
 # How to Use:
 1. Download one of the precompiled Jars from the [downloads page](https://github.com/MitchTalmadge/Emoji-Tools/releases), or clone into IntelliJ and create a Jar out of the sources.
 2. Put the jar wherever you'd like. Emojis will be extracted into a new folder which is created in the same directory as the jar file. You can choose the name of this folder using the GUI. By default, it is named `ExtractedEmojis`.
-3. Either double-click the jar and follow the instructions on the GUI, or start the jar from the command line using `java -jar EmojiTools.jar yourFileName.ttf`. If the ttf file does not exist, the ttf selection window will be brought up. If it exists, it will automatically start extraction.
+3. Either double-click the jar and follow the instructions on the GUI, or start the jar from the command line using `java -jar Emoji-Tools.jar yourFileName.ttf`. If the ttf file does not exist, the ttf selection window will be brought up. If it exists, it will automatically start extraction.
 
 # How to Get Help / Make a Suggestion:
 * Make a detailed ticket in the [issue tracker](https://github.com/MitchTalmadge/Emoji-Tools/issues).
