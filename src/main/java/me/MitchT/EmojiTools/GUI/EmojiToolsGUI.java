@@ -18,10 +18,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 
 public class EmojiToolsGUI extends JFrame implements ActionListener {
 
-    private final String version = "V1.4";
+    private final String version = "V1.5";
     private final Image logo;
 
     private JTabbedPane tabbedPane;
@@ -35,6 +36,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     private JLabel headerLabel;
     private JTextField exportDirectoryField;
     private JButton startExtractionButton;
+    private JButton openRootDirectoryButton;
 
     private OperationManager currentOperationManager;
     private File font;
@@ -74,6 +76,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
         this.exportDirectoryField.addActionListener(this);
 
         this.startExtractionButton.addActionListener(this);
+        this.openRootDirectoryButton.addActionListener(this);
 
         pack();
         this.setLocationRelativeTo(null);
@@ -104,7 +107,8 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
             conversionDialog.setVisible(true);
         }
 
-        this.showMessageDialog("All done! :) Your Emojis are at:\n" + new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()).getAbsolutePath());
+        FinishedDialog finishedDialog = new FinishedDialog(this, logo, new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()));
+        finishedDialog.setVisible(true);
         this.cancelled = false;
     }
 
@@ -140,6 +144,13 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
             openFileChooser();
         } else if (e.getSource().equals(this.startExtractionButton)) {
             startExtraction();
+        } else if (e.getSource().equals(this.openRootDirectoryButton)) {
+            Desktop desktop = Desktop.getDesktop();
+            try {
+                desktop.open(EmojiTools.getRootDirectory());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 

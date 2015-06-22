@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ProgressDialog extends JDialog {
+public class ProgressDialog extends JDialog implements ActionListener {
     private final EmojiToolsGUI gui;
     private JPanel contentPane;
     private JButton cancelButton;
@@ -16,18 +16,15 @@ public class ProgressDialog extends JDialog {
     ProgressDialog(EmojiToolsGUI gui, String tileText, Image logo) {
         this.gui = gui;
 
-        this.setIconImage(logo);
-        this.titleLabel.setText(tileText);
 
+        this.setIconImage(logo);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(cancelButton);
 
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        this.titleLabel.setText(tileText);
+
+        cancelButton.addActionListener(this);
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -72,5 +69,12 @@ public class ProgressDialog extends JDialog {
     private void onCancel() {
         this.gui.cancelOperations();
         dispose();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(cancelButton)) {
+            onCancel();
+        }
     }
 }

@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="me.MitchT.EmojiTools.GUI.EmojiToolsGUI">
   <grid id="27dc6" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="408" height="353"/>
+      <xy x="20" y="20" width="408" height="344"/>
     </constraints>
     <properties>
       <minimumSize width="170" height="67"/>
@@ -33,7 +33,7 @@
                   <gridbag weightx="1.0" weighty="0.2"/>
                 </constraints>
                 <properties/>
-                <border type="etched" title="Emoji Font Location"/>
+                <border type="etched" title="Emoji .ttf Location"/>
                 <children>
                   <component id="515c2" class="javax.swing.JTextField" binding="fileNameField">
                     <constraints>
@@ -63,9 +63,7 @@
                 <rowspec value="center:max(d;4px):noGrow"/>
                 <rowspec value="top:4dlu:noGrow"/>
                 <rowspec value="center:max(d;4px):noGrow"/>
-                <rowspec value="top:4dlu:noGrow"/>
-                <rowspec value="center:max(d;4px):noGrow"/>
-                <colspec value="fill:max(d;4px):noGrow"/>
+                <colspec value="fill:d:noGrow"/>
                 <colspec value="left:4dlu:noGrow"/>
                 <colspec value="fill:max(d;4px):noGrow"/>
                 <constraints>
@@ -148,6 +146,8 @@
                     <rowspec value="top:4dlu:noGrow"/>
                     <rowspec value="center:d:noGrow"/>
                     <colspec value="fill:d:noGrow"/>
+                    <colspec value="left:5dlu:grow"/>
+                    <colspec value="fill:d:noGrow"/>
                     <constraints>
                       <grid row="2" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                       <forms/>
@@ -171,7 +171,7 @@
                       </component>
                       <component id="8fafb" class="javax.swing.JLabel">
                         <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <forms/>
                         </constraints>
                         <properties>
@@ -180,15 +180,28 @@
                       </component>
                     </children>
                   </grid>
-                  <component id="89970" class="javax.swing.JButton" binding="startExtractionButton" default-binding="true">
-                    <constraints>
-                      <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                      <forms/>
-                    </constraints>
+                </children>
+              </grid>
+              <grid id="eb60b" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="ae662" class="javax.swing.JButton" binding="startExtractionButton" default-binding="true">
+                    <constraints border-constraint="Center"/>
                     <properties>
                       <enabled value="false"/>
                       <hideActionText value="false"/>
                       <text value="Start &amp;Extraction"/>
+                    </properties>
+                  </component>
+                  <component id="9262b" class="javax.swing.JButton" binding="openRootDirectoryButton" default-binding="true">
+                    <constraints border-constraint="East"/>
+                    <properties>
+                      <text value="&amp;Open Root Directory"/>
                     </properties>
                   </component>
                 </children>
@@ -208,7 +221,7 @@
               <font size="20"/>
               <horizontalAlignment value="0"/>
               <horizontalTextPosition value="0"/>
-              <text value="Emoji Tools V1.4"/>
+              <text value="Emoji Tools"/>
             </properties>
           </component>
           <component id="61f5e" class="javax.swing.JLabel">

@@ -6,7 +6,7 @@
 
     <groupId>me.MitchT</groupId>
     <artifactId>Emoji-Tools</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 
     <build>
         <plugins>
