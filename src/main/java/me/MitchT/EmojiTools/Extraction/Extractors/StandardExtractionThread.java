@@ -54,9 +54,6 @@ public class StandardExtractionThread extends ExtractionThread {
             }
             inputStream.close();
 
-            System.out.println("No more Emojis to extract! All done! :)");
-            extractionManager.showMessageDialog("No more Emojis to extract! All done! :)");
-
             extractionDialog.dispose();
         } catch (FileNotFoundException e) {
             System.out.println(this.font.getName() + " not found!");

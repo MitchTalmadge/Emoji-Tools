@@ -74,9 +74,6 @@ class ConversionThread extends Thread {
 
         updateProgress();
 
-        System.out.println("No more Emojis to convert! All done! :)");
-        conversionManager.showMessageDialog("No more Emojis to convert! All done! :)");
-
         conversionDialog.dispose();
     }
 

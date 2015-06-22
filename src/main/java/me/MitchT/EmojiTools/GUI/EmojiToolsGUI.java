@@ -4,6 +4,7 @@ import me.MitchT.EmojiTools.Conversion.ConversionManager;
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.ExtractionManager;
 import me.MitchT.EmojiTools.OperationManager;
+import me.MitchT.EmojiTools.Renaming.RenamingManager;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -83,7 +84,10 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
         extractionDialog.setVisible(true);
 
         if (this.renameRadioButton2.isSelected()) {
-            //TODO: Implement Renaming
+            RenamingDialog renamingDialog = new RenamingDialog(this);
+            this.currentOperationManager = new RenamingManager(new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()), this, renamingDialog);
+            currentOperationManager.start();
+            renamingDialog.setVisible(true);
         }
 
         if (this.convertRadioButton2.isSelected()) {
@@ -92,6 +96,8 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
             currentOperationManager.start();
             conversionDialog.setVisible(true);
         }
+
+        this.showMessageDialog("All done! :) Your Emojis are at:\n" + new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()).getAbsolutePath());
     }
 
     private void openFileChooser() {
