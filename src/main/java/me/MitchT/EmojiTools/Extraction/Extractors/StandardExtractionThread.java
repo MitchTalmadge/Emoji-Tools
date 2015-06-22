@@ -12,7 +12,6 @@ public class StandardExtractionThread extends ExtractionThread {
     private final ExtractionManager extractionManager;
     private final ExtractionDialog extractionDialog;
     private long currentBytePos = 0;
-    private long startTime = 0;
 
     public StandardExtractionThread(File font, String exportDirectoryName, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
         super(font, exportDirectoryName);
@@ -29,8 +28,6 @@ public class StandardExtractionThread extends ExtractionThread {
             if (!exportDir.exists()) {
                 exportDir.mkdir();
             }
-
-            startTime = System.currentTimeMillis();
 
             appendToStatus("Searching for Emojis - Please wait until complete!");
 
@@ -149,7 +146,6 @@ public class StandardExtractionThread extends ExtractionThread {
 
     private void updateProgress() {
         extractionDialog.setProgress((int) (((double) currentBytePos / this.font.length()) * 100));
-        extractionDialog.setTimeRemaining(currentBytePos, this.font.length(), System.currentTimeMillis(), startTime);
     }
 
     private void appendToStatus(String message) {

@@ -15,8 +15,6 @@ class ConversionThread extends Thread {
     private boolean running = true;
 
 
-    private long startTime = 0;
-
     private int totalFileNum = 0;
     private int currentFileNum = 0;
 
@@ -34,8 +32,6 @@ class ConversionThread extends Thread {
                 outputDir.mkdir();
             }
         }
-
-        startTime = System.currentTimeMillis();
 
         File[] files;
 
@@ -79,7 +75,6 @@ class ConversionThread extends Thread {
 
     private void updateProgress() {
         conversionDialog.setProgress((int) (((double) currentFileNum / totalFileNum) * 100));
-        conversionDialog.setTimeRemaining(currentFileNum, totalFileNum, System.currentTimeMillis(), startTime);
     }
 
     public void endConversion() {

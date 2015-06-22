@@ -26,8 +26,6 @@ public class AppleExtractionThread extends ExtractionThread {
         this.extractionManager = extractionManager;
         this.extractionDialog = extractionDialog;
 
-        this.extractionDialog.setTimeRemainingVisible(false);
-
     }
 
     @Override

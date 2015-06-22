@@ -13,8 +13,6 @@ class RenamingThread extends Thread {
     private boolean running = true;
 
 
-    private long startTime = 0;
-
     private int totalFileNum = 0;
     private int currentFileNum = 0;
 
@@ -28,8 +26,6 @@ class RenamingThread extends Thread {
     @Override
     public void run() {
 
-        startTime = System.currentTimeMillis();
-
         File[] files;
 
         if (renameFile.isDirectory()) {
@@ -41,6 +37,10 @@ class RenamingThread extends Thread {
         totalFileNum = files.length;
 
         for (File file : files) {
+            if (!running) {
+                this.renamingDialog.dispose();
+                return;
+            }
             this.currentFileNum++;
             String newFileName = "";
 
@@ -63,7 +63,6 @@ class RenamingThread extends Thread {
 
     private void updateProgress() {
         renamingDialog.setProgress((int) (((double) currentFileNum / totalFileNum) * 100));
-        renamingDialog.setTimeRemaining(currentFileNum, totalFileNum, System.currentTimeMillis(), startTime);
     }
 
     public void endRenaming() {

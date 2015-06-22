@@ -12,6 +12,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -21,6 +22,7 @@ import java.io.File;
 public class EmojiToolsGUI extends JFrame implements ActionListener {
 
     private final String version = "V1.4";
+    private final Image logo;
 
     private JTabbedPane tabbedPane;
     private JPanel contentPane;
@@ -36,6 +38,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
 
     private OperationManager currentOperationManager;
     private File font;
+    private boolean cancelled = false;
 
     public EmojiToolsGUI(File font) {
         this.font = font;
@@ -43,6 +46,10 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
         setTitle("Emoji Tools");
         setContentPane(contentPane);
         setResizable(false);
+
+        this.logo = new ImageIcon(getClass().getResource("/Images/EmojiToolsLogo.png")).getImage();
+
+        this.setIconImage(logo);
 
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
@@ -78,26 +85,27 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     }
 
     private void startExtraction() {
-        ExtractionDialog extractionDialog = new ExtractionDialog(this);
+        ExtractionDialog extractionDialog = new ExtractionDialog(this, this.logo);
         this.currentOperationManager = new ExtractionManager(this.font, this.exportDirectoryField.getText(), this, extractionDialog);
         currentOperationManager.start();
         extractionDialog.setVisible(true);
 
-        if (this.renameRadioButton2.isSelected()) {
-            RenamingDialog renamingDialog = new RenamingDialog(this);
+        if (this.renameRadioButton2.isSelected() && !cancelled) {
+            RenamingDialog renamingDialog = new RenamingDialog(this, this.logo);
             this.currentOperationManager = new RenamingManager(new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()), this, renamingDialog);
             currentOperationManager.start();
             renamingDialog.setVisible(true);
         }
 
-        if (this.convertRadioButton2.isSelected()) {
-            ConversionDialog conversionDialog = new ConversionDialog(this);
+        if (this.convertRadioButton2.isSelected() && !cancelled) {
+            ConversionDialog conversionDialog = new ConversionDialog(this, this.logo);
             this.currentOperationManager = new ConversionManager(new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()), this, conversionDialog);
             currentOperationManager.start();
             conversionDialog.setVisible(true);
         }
 
         this.showMessageDialog("All done! :) Your Emojis are at:\n" + new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()).getAbsolutePath());
+        this.cancelled = false;
     }
 
     private void openFileChooser() {
@@ -135,8 +143,9 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
         }
     }
 
-    public OperationManager getCurrentManager() {
-        return currentOperationManager;
+    public void cancelOperations() {
+        this.currentOperationManager.stop();
+        this.cancelled = true;
     }
 
     class exportDirectoryFilter extends DocumentFilter {

@@ -17,7 +17,6 @@ public class RenamingManager extends OperationManager {
         this.gui = gui;
 
         this.renamingThread = new RenamingThread(renameFile, renameFile, this, renamingDialog);
-
     }
 
     public void showMessageDialog(String message) {

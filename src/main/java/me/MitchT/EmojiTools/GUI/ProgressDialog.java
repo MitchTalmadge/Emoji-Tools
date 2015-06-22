@@ -9,14 +9,14 @@ public class ProgressDialog extends JDialog {
     private JPanel contentPane;
     private JButton cancelButton;
     private JProgressBar progressBar;
-    private JLabel timeRemainingLabel;
     private JTextArea statusMessageArea;
     private JScrollPane scrollPane;
     private JLabel titleLabel;
 
-    ProgressDialog(EmojiToolsGUI gui, String tileText) {
+    ProgressDialog(EmojiToolsGUI gui, String tileText, Image logo) {
         this.gui = gui;
 
+        this.setIconImage(logo);
         this.titleLabel.setText(tileText);
 
         setContentPane(contentPane);
@@ -53,10 +53,6 @@ public class ProgressDialog extends JDialog {
         this.setVisible(false);
     }
 
-    public void setTimeRemainingVisible(boolean visible) {
-        this.timeRemainingLabel.setVisible(visible);
-    }
-
     public void setProgress(final int progress) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -68,32 +64,13 @@ public class ProgressDialog extends JDialog {
         });
     }
 
-    public void setTimeRemaining(final long currentBytePos, final long filePathLength, final long currTime, final long startTime) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                long elapsedTime = currTime - startTime;
-                long totalTimeMillis = (long) ((1.0d / ((double) currentBytePos / filePathLength)) * elapsedTime);
-                long timeRemainingMillis = totalTimeMillis - elapsedTime;
-
-                long hour = (timeRemainingMillis / (1000 * 60 * 60)) % 24;
-                long minute = (timeRemainingMillis / (1000 * 60)) % 60;
-                long second = (timeRemainingMillis / 1000) % 60;
-
-                String time = String.format("%02d:%02d:%02d", hour, minute, second);
-
-                timeRemainingLabel.setText("Time Remaining: " + time);
-            }
-        });
-    }
-
     public void appendToStatus(String message) {
         this.statusMessageArea.append(message + "\n");
         this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMaximum());
     }
 
     private void onCancel() {
-        this.gui.getCurrentManager().stop();
+        this.gui.cancelOperations();
         dispose();
     }
 }

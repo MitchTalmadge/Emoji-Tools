@@ -26,7 +26,6 @@ public class GoogleExtractionThread extends ExtractionThread {
         this.extractionManager = extractionManager;
         this.extractionDialog = extractionDialog;
 
-        extractionDialog.setTimeRemainingVisible(false);
     }
 
     @Override
