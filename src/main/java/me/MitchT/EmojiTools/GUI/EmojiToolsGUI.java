@@ -1,6 +1,7 @@
 package me.MitchT.EmojiTools.GUI;
 
 import me.MitchT.EmojiTools.Conversion.ConversionManager;
+import me.MitchT.EmojiTools.Deletion.DeletionManager;
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.ExtractionManager;
 import me.MitchT.EmojiTools.OperationManager;
@@ -34,7 +35,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     private JRadioButton convertRadioButton1;
     private JRadioButton convertRadioButton2;
     private JLabel headerLabel;
-    private JTextField exportDirectoryField;
+    private JTextField extractionDirectoryField;
     private JButton startExtractionButton;
     private JButton openRootDirectoryButton;
 
@@ -72,8 +73,8 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
         this.convertRadioButton1.addActionListener(this);
         this.convertRadioButton2.addActionListener(this);
 
-        ((AbstractDocument) this.exportDirectoryField.getDocument()).setDocumentFilter(new exportDirectoryFilter(this, this.exportDirectoryField));
-        this.exportDirectoryField.addActionListener(this);
+        ((AbstractDocument) this.extractionDirectoryField.getDocument()).setDocumentFilter(new extractionDirectoryFilter(this, this.extractionDirectoryField));
+        this.extractionDirectoryField.addActionListener(this);
 
         this.startExtractionButton.addActionListener(this);
         this.openRootDirectoryButton.addActionListener(this);
@@ -88,26 +89,41 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     }
 
     private void startExtraction() {
+        File extractionDirectory = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryField.getText());
+        if (extractionDirectory.exists()) {
+            OverwriteWarningDialog overwriteWarningDialog = new OverwriteWarningDialog(this, logo, extractionDirectory);
+            overwriteWarningDialog.setVisible(true);
+            if (cancelled) {
+                this.cancelled = false;
+                return;
+            } else {
+                DeletionDialog deletionDialog = new DeletionDialog(this, this.logo);
+                this.currentOperationManager = new DeletionManager(extractionDirectory, this, deletionDialog);
+                currentOperationManager.start();
+                deletionDialog.setVisible(true);
+            }
+        }
+
         ExtractionDialog extractionDialog = new ExtractionDialog(this, this.logo);
-        this.currentOperationManager = new ExtractionManager(this.font, this.exportDirectoryField.getText(), this, extractionDialog);
+        this.currentOperationManager = new ExtractionManager(this.font, extractionDirectory, this, extractionDialog);
         currentOperationManager.start();
         extractionDialog.setVisible(true);
 
         if (this.renameRadioButton2.isSelected() && !cancelled) {
             RenamingDialog renamingDialog = new RenamingDialog(this, this.logo);
-            this.currentOperationManager = new RenamingManager(new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()), this, renamingDialog);
+            this.currentOperationManager = new RenamingManager(extractionDirectory, this, renamingDialog);
             currentOperationManager.start();
             renamingDialog.setVisible(true);
         }
 
         if (this.convertRadioButton2.isSelected() && !cancelled) {
             ConversionDialog conversionDialog = new ConversionDialog(this, this.logo);
-            this.currentOperationManager = new ConversionManager(new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()), this, conversionDialog);
+            this.currentOperationManager = new ConversionManager(extractionDirectory, this, conversionDialog);
             currentOperationManager.start();
             conversionDialog.setVisible(true);
         }
 
-        FinishedDialog finishedDialog = new FinishedDialog(this, logo, new File(EmojiTools.getRootDirectory(), this.exportDirectoryField.getText()));
+        FinishedDialog finishedDialog = new FinishedDialog(this, this.logo, extractionDirectory);
         finishedDialog.setVisible(true);
         this.cancelled = false;
     }
@@ -127,7 +143,7 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     }
 
     private void updateStartButton() {
-        if (this.exportDirectoryField.getText().length() == 0 || this.fileNameField.getText().equals("File Name")) {
+        if (this.extractionDirectoryField.getText().length() == 0 || this.fileNameField.getText().equals("File Name")) {
             this.startExtractionButton.setEnabled(false);
         } else {
             this.startExtractionButton.setEnabled(true);
@@ -155,16 +171,17 @@ public class EmojiToolsGUI extends JFrame implements ActionListener {
     }
 
     public void cancelOperations() {
-        this.currentOperationManager.stop();
+        if (this.currentOperationManager != null)
+            this.currentOperationManager.stop();
         this.cancelled = true;
     }
 
-    class exportDirectoryFilter extends DocumentFilter {
+    class extractionDirectoryFilter extends DocumentFilter {
 
         private final EmojiToolsGUI gui;
         private final JTextField textField;
 
-        public exportDirectoryFilter(EmojiToolsGUI gui, JTextField field) {
+        public extractionDirectoryFilter(EmojiToolsGUI gui, JTextField field) {
             this.gui = gui;
             this.textField = field;
         }

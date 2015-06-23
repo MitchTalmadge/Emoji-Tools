@@ -13,8 +13,8 @@ public class StandardExtractionThread extends ExtractionThread {
     private final ExtractionDialog extractionDialog;
     private long currentBytePos = 0;
 
-    public StandardExtractionThread(File font, String exportDirectoryName, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
-        super(font, exportDirectoryName);
+    public StandardExtractionThread(File font, File extractionDirectory, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
+        super(font, extractionDirectory);
         this.extractionManager = extractionManager;
         this.extractionDialog = extractionDialog;
 
@@ -25,8 +25,8 @@ public class StandardExtractionThread extends ExtractionThread {
         try {
             InputStream inputStream = new FileInputStream(this.font);
 
-            if (!exportDir.exists()) {
-                exportDir.mkdir();
+            if (!extractionDirectory.exists()) {
+                extractionDirectory.mkdir();
             }
 
             appendToStatus("Searching for Emojis - Please wait until complete!");
@@ -72,7 +72,7 @@ public class StandardExtractionThread extends ExtractionThread {
         System.out.println("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
         appendToStatus("Extracting Emoji #" + emojiID + " to '" + emojiID + ".png'");
         try {
-            FileOutputStream outputStream = new FileOutputStream(new File(exportDir, emojiID + ".png"));
+            FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, emojiID + ".png"));
 
             for (int num : prefix)
                 outputStream.write(num);

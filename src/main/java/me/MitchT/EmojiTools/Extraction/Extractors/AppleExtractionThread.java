@@ -16,8 +16,8 @@ public class AppleExtractionThread extends ExtractionThread {
     private final ExtractionManager extractionManager;
     private final ExtractionDialog extractionDialog;
 
-    public AppleExtractionThread(File font, String exportDirectoryName, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
-        super(font, exportDirectoryName);
+    public AppleExtractionThread(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
+        super(font, extractionDirectory);
 
         this.tableNames = tableNames;
         this.tableOffsets = tableOffsets;
@@ -33,8 +33,8 @@ public class AppleExtractionThread extends ExtractionThread {
         try {
             RandomAccessFile inputStream = new RandomAccessFile(font, "r");
 
-            if (!exportDir.exists()) {
-                exportDir.mkdir();
+            if (!extractionDirectory.exists()) {
+                extractionDirectory.mkdir();
             }
 
             appendToStatus("Searching for Emojis - Please wait until complete!");
@@ -151,7 +151,7 @@ public class AppleExtractionThread extends ExtractionThread {
                             if (ExtractionUtilites.getStringFromBytes(b).equals("png ")) {
                                 System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
                                 appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
-                                FileOutputStream outputStream = new FileOutputStream(new File(exportDir, glyphNames[i] + ".png"));
+                                FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, glyphNames[i] + ".png"));
                                 b = new byte[glyphLengths[i] - 8];
                                 inputStream.readFully(b);
                                 outputStream.write(b);

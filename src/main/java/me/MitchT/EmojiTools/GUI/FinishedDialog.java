@@ -24,6 +24,7 @@ public class FinishedDialog extends JDialog implements ActionListener {
         this.extractionLocationField.setText(extractionDirectory.getAbsolutePath());
 
         OKButton.addActionListener(this);
+        openEmojiDirectoryButton.addActionListener(this);
 
         // call onOK() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -39,8 +40,6 @@ public class FinishedDialog extends JDialog implements ActionListener {
                 onOK();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        openEmojiDirectoryButton.addActionListener(this);
 
         pack();
         this.setLocationRelativeTo(gui);

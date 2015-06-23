@@ -21,7 +21,7 @@ public class ExtractionManager extends OperationManager {
     private ExtractionThread extractionThread;
 
 
-    public ExtractionManager(File font, String exportDirectoryName, EmojiToolsGUI gui, ExtractionDialog extractionDialog) {
+    public ExtractionManager(File font, File extractionDirectory, EmojiToolsGUI gui, ExtractionDialog extractionDialog) {
         this.gui = gui;
 
         //Determine which Extraction Method to use
@@ -58,11 +58,11 @@ public class ExtractionManager extends OperationManager {
             }
 
             if (tableNames.contains("sbix"))
-                extractionThread = new AppleExtractionThread(font, exportDirectoryName, tableNames, tableOffsets, tableLengths, this, extractionDialog);
+                extractionThread = new AppleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog);
             else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
-                extractionThread = new GoogleExtractionThread(font, exportDirectoryName, tableNames, tableOffsets, tableLengths, this, extractionDialog);
+                extractionThread = new GoogleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog);
             else
-                extractionThread = new StandardExtractionThread(font, exportDirectoryName, this, extractionDialog);
+                extractionThread = new StandardExtractionThread(font, extractionDirectory, this, extractionDialog);
 
             inputStream.close();
         } catch (IOException e) {
