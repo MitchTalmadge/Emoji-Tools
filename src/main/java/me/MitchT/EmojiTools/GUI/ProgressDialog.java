@@ -1,11 +1,13 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.GUI.Tabs.ExtractionTab;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class ProgressDialog extends JDialog implements ActionListener {
-    private final EmojiToolsGUI gui;
+    private final ExtractionTab gui;
     private JPanel contentPane;
     private JButton cancelButton;
     private JProgressBar progressBar;
@@ -13,7 +15,7 @@ public class ProgressDialog extends JDialog implements ActionListener {
     private JScrollPane scrollPane;
     private JLabel titleLabel;
 
-    ProgressDialog(EmojiToolsGUI gui, String tileText, Image logo) {
+    ProgressDialog(ExtractionTab gui, String tileText, Image logo) {
         this.gui = gui;
 
 
@@ -67,7 +69,7 @@ public class ProgressDialog extends JDialog implements ActionListener {
     }
 
     private void onCancel() {
-        this.gui.cancelOperations();
+        this.gui.stopOperations();
         dispose();
     }
 

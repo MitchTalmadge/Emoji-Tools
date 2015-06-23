@@ -1,18 +1,20 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.GUI.Tabs.ExtractionTab;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
 public class OverwriteWarningDialog extends JDialog implements ActionListener {
-    private final EmojiToolsGUI gui;
+    private final ExtractionTab gui;
     private JPanel contentPane;
     private JButton backButton;
     private JButton continuebutton;
     private JTextField extractionDirectoryField;
 
-    public OverwriteWarningDialog(EmojiToolsGUI gui, Image logo, File extractionDirectory) {
+    public OverwriteWarningDialog(ExtractionTab gui, Image logo, File extractionDirectory) {
 
         this.gui = gui;
 
@@ -46,7 +48,7 @@ public class OverwriteWarningDialog extends JDialog implements ActionListener {
     }
 
     private void onBack() {
-        gui.cancelOperations();
+        gui.stopOperations();
         this.dispose();
     }
 
