@@ -2,6 +2,9 @@ package me.MitchT.EmojiTools.GUI.Tabs;
 
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
+import me.MitchT.EmojiTools.GUI.RenamingDialog;
+import me.MitchT.EmojiTools.OperationManager;
+import me.MitchT.EmojiTools.Renaming.RenamingManager;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -28,7 +31,9 @@ public class RenamingTab extends OperationTab implements ActionListener {
     private JRadioButton prefixesRadioButton4;
     private JCheckBox capitalizationCheckBox1;
 
-    private File fontFile;
+    private File renameFile;
+    private OperationManager currentOperationManager;
+    private boolean cancelled;
 
     public RenamingTab(EmojiToolsGUI gui) {
         this.gui = gui;
@@ -52,12 +57,23 @@ public class RenamingTab extends OperationTab implements ActionListener {
     }
 
     private void startRenaming() {
+        this.cancelled = false;
 
+        RenamingDialog renamingDialog = new RenamingDialog(this, this.gui.getLogo());
+        boolean[] prefixButtons = new boolean[]{this.prefixesRadioButton1.isSelected(), this.prefixesRadioButton2.isSelected(), this.prefixesRadioButton3.isSelected(), this.prefixesRadioButton4.isSelected()};
+        boolean[] capitalizationButtons = new boolean[]{this.captializationRadioButton1.isSelected(), this.captializationRadioButton2.isSelected(), this.captializationRadioButton3.isSelected(), this.capitalizationCheckBox1.isSelected()};
+        this.currentOperationManager = new RenamingManager(renameFile, this.gui, renamingDialog, prefixButtons, capitalizationButtons);
+        currentOperationManager.start();
+        renamingDialog.setVisible(true);
+
+        this.gui.showMessageDialog("Emoji Renaming Complete! All Done! :)");
     }
 
     @Override
     public void stopOperations() {
-
+        if (this.currentOperationManager != null)
+            this.currentOperationManager.stop();
+        this.cancelled = true;
     }
 
     private void openFileChooser() {
@@ -70,7 +86,7 @@ public class RenamingTab extends OperationTab implements ActionListener {
         int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             this.fileNameField.setText(fileChooser.getSelectedFile().getName());
-            this.fontFile = fileChooser.getSelectedFile();
+            this.renameFile = fileChooser.getSelectedFile();
         }
         updateStartButton();
     }
@@ -98,6 +114,8 @@ public class RenamingTab extends OperationTab implements ActionListener {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+        } else if (e.getSource().equals(this.startRenamingButton)) {
+            startRenaming();
         }
         updateStartButton();
     }

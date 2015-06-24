@@ -65,6 +65,8 @@ public class ExtractionTab extends OperationTab implements ActionListener {
     }
 
     private void startExtraction() {
+        this.cancelled = false;
+
         File extractionDirectory = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryField.getText());
         if (extractionDirectory.exists()) {
             OverwriteWarningDialog overwriteWarningDialog = new OverwriteWarningDialog(this, this.gui.getLogo(), extractionDirectory);
@@ -92,7 +94,7 @@ public class ExtractionTab extends OperationTab implements ActionListener {
 
         if (this.renameRadioButton2.isSelected() && !cancelled) {
             RenamingDialog renamingDialog = new RenamingDialog(this, this.gui.getLogo());
-            this.currentOperationManager = new RenamingManager(extractionDirectory, this.gui, renamingDialog);
+            this.currentOperationManager = new RenamingManager(extractionDirectory, this.gui, renamingDialog, new boolean[]{false, true, false, false}, new boolean[]{true, false, false, false});
             currentOperationManager.start();
             renamingDialog.setVisible(true);
         }
@@ -106,7 +108,6 @@ public class ExtractionTab extends OperationTab implements ActionListener {
 
         FinishedDialog finishedDialog = new FinishedDialog(this.gui, this.gui.getLogo(), extractionDirectory);
         finishedDialog.setVisible(true);
-        this.cancelled = false;
     }
 
     @Override

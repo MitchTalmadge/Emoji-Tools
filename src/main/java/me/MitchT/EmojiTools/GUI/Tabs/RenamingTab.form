@@ -62,7 +62,7 @@
         </children>
       </grid>
       <grid id="77895" layout-manager="FormLayout">
-        <rowspec value="center:d:noGrow"/>
+        <rowspec value="center:d:grow"/>
         <colspec value="fill:max(d;4px):grow"/>
         <colspec value="left:4dlu:noGrow"/>
         <colspec value="fill:d:grow"/>
@@ -77,7 +77,7 @@
             <rowspec value="center:25px:noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <forms defaultalign-vert="false"/>
             </constraints>
             <properties/>
@@ -131,7 +131,7 @@
             <rowspec value="center:25px:noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <forms defaultalign-vert="false"/>
             </constraints>
             <properties/>
@@ -144,7 +144,7 @@
                 </constraints>
                 <properties>
                   <selected value="true"/>
-                  <text value="&amp;Do Not Strip Prefixes"/>
+                  <text value="&amp;Do Not Change Prefixes"/>
                 </properties>
               </component>
               <component id="514a8" class="javax.swing.JRadioButton" binding="prefixesRadioButton2">
@@ -162,7 +162,7 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Set &amp;Prefix to &quot;uni&quot;"/>
+                  <text value="Change &amp;Prefix to &quot;uni&quot;"/>
                 </properties>
               </component>
               <component id="1e718" class="javax.swing.JRadioButton" binding="prefixesRadioButton4">
@@ -171,7 +171,7 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Set Prefix &amp;to &quot;u&quot;"/>
+                  <text value="Change Prefix &amp;to &quot;u&quot;"/>
                 </properties>
               </component>
             </children>

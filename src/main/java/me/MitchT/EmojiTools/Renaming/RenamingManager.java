@@ -13,10 +13,10 @@ public class RenamingManager extends OperationManager {
     private final RenamingThread renamingThread;
 
 
-    public RenamingManager(File renameFile, EmojiToolsGUI gui, RenamingDialog renamingDialog) {
+    public RenamingManager(File renameFile, EmojiToolsGUI gui, RenamingDialog renamingDialog, boolean[] prefixButtons, boolean[] capitalizationButtons) {
         this.gui = gui;
 
-        this.renamingThread = new RenamingThread(renameFile, renameFile, this, renamingDialog);
+        this.renamingThread = new RenamingThread(renameFile, this, renamingDialog, prefixButtons, capitalizationButtons);
     }
 
     public void showMessageDialog(String message) {
