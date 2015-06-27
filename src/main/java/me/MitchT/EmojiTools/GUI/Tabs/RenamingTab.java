@@ -30,6 +30,7 @@ public class RenamingTab extends OperationTab implements ActionListener {
     private JRadioButton prefixesRadioButton3;
     private JRadioButton prefixesRadioButton4;
     private JCheckBox capitalizationCheckBox1;
+    private JTextField exampleOutputField;
 
     private File renameFile;
     private OperationManager currentOperationManager;
@@ -39,7 +40,7 @@ public class RenamingTab extends OperationTab implements ActionListener {
         this.gui = gui;
 
         this.setLayout(new BorderLayout());
-        this.add(contentPane, BorderLayout.CENTER);
+        this.add(this.contentPane, BorderLayout.CENTER);
 
         this.browseButton.addActionListener(this);
 
@@ -51,9 +52,12 @@ public class RenamingTab extends OperationTab implements ActionListener {
         this.captializationRadioButton1.addActionListener(this);
         this.captializationRadioButton2.addActionListener(this);
         this.captializationRadioButton3.addActionListener(this);
+        this.capitalizationCheckBox1.addActionListener(this);
 
         this.openRootDirectoryButton.addActionListener(this);
         this.startRenamingButton.addActionListener(this);
+
+        updateExample();
     }
 
     private void startRenaming() {
@@ -99,6 +103,70 @@ public class RenamingTab extends OperationTab implements ActionListener {
             this.startRenamingButton.setEnabled(false);
     }
 
+    private void updateExample() {
+        String uniPrefix = "";
+        String uPrefix = "";
+        int usePrefix = 0; //0 = both, 1 = none, 2 = uni, 3 = u
+
+        if (this.prefixesRadioButton1.isSelected() || this.prefixesRadioButton3.isSelected() || this.prefixesRadioButton4.isSelected()) {
+            usePrefix = 0;
+        } else if (this.prefixesRadioButton2.isSelected()) {
+            usePrefix = 1;
+        }
+
+        if (this.captializationRadioButton1.isSelected()) {
+            if (this.prefixesRadioButton3.isSelected()) {
+                uPrefix = "uni1F60D.png";
+                uniPrefix = "uni1f60d.png";
+            } else if (this.prefixesRadioButton4.isSelected()) {
+                uPrefix = "u1F60D.png";
+                uniPrefix = "u1f60d.png";
+            } else {
+                uPrefix = "u1F60D.png";
+                uniPrefix = "uni1f60d.png";
+            }
+        } else if (this.captializationRadioButton2.isSelected()) {
+            if (usePrefix == 0 && !this.prefixesRadioButton1.isSelected())
+                usePrefix = (this.prefixesRadioButton3.isSelected()) ? 2 : 3;
+
+            if (this.capitalizationCheckBox1.isSelected()) {
+                uPrefix = "u1F60D.png";
+                uniPrefix = "uni1F60D.png";
+            } else {
+                uPrefix = "U1F60D.png";
+                uniPrefix = "UNI1F60D.png";
+            }
+        } else if (this.captializationRadioButton3.isSelected()) {
+            if (usePrefix == 0 && !this.prefixesRadioButton1.isSelected())
+                usePrefix = (this.prefixesRadioButton3.isSelected()) ? 2 : 3;
+
+            uPrefix = "u1f60d.png";
+            uniPrefix = "uni1f60d.png";
+        }
+
+        switch (usePrefix) {
+            case 0:
+                this.exampleOutputField.setText(uniPrefix + " or " + uPrefix);
+                break;
+            case 1:
+                if (this.captializationRadioButton2.isSelected() || this.captializationRadioButton3.isSelected())
+                    this.exampleOutputField.setText(uniPrefix.substring(3, uniPrefix.length()));
+                else
+                    this.exampleOutputField.setText(uniPrefix.substring(3, uniPrefix.length()) + " or " + uPrefix.substring(1, uPrefix.length()));
+                break;
+            case 2:
+                this.exampleOutputField.setText(uniPrefix);
+                break;
+            case 3:
+                this.exampleOutputField.setText(uPrefix);
+                break;
+            default:
+                this.exampleOutputField.setText(uniPrefix + " or " + uPrefix);
+                break;
+        }
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.browseButton))
@@ -118,5 +186,6 @@ public class RenamingTab extends OperationTab implements ActionListener {
             startRenaming();
         }
         updateStartButton();
+        updateExample();
     }
 }

@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="me.MitchT.EmojiTools.GUI.Tabs.ExtractionTab">
   <grid id="27dc6" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="409" height="280"/>
+      <xy x="20" y="20" width="428" height="280"/>
     </constraints>
     <properties>
       <minimumSize width="170" height="67"/>
@@ -81,7 +81,7 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="&amp;Strip &quot;uni&quot; and &quot;u&quot; Prefixes"/>
+                  <text value="&amp;Remove &quot;uni&quot; and &quot;u&quot; Prefixes"/>
                 </properties>
               </component>
             </children>

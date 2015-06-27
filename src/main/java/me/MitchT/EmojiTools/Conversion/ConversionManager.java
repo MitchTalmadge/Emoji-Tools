@@ -16,8 +16,7 @@ public class ConversionManager extends OperationManager {
     public ConversionManager(File conversionFile, EmojiToolsGUI gui, ConversionDialog conversionDialog) {
         this.gui = gui;
 
-        this.conversionThread = new ConversionThread(conversionFile, conversionFile, this, conversionDialog);
-
+        this.conversionThread = new ConversionThread(conversionFile, this, conversionDialog);
     }
 
     public void showMessageDialog(String message) {

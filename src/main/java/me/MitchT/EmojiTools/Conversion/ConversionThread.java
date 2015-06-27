@@ -9,7 +9,6 @@ import java.io.IOException;
 class ConversionThread extends Thread {
 
     private final File conversionFile;
-    private final File outputDir;
     private final ConversionManager conversionManager;
     private final ConversionDialog conversionDialog;
     private boolean running = true;
@@ -18,20 +17,14 @@ class ConversionThread extends Thread {
     private int totalFileNum = 0;
     private int currentFileNum = 0;
 
-    public ConversionThread(File conversionFile, File outputDir, ConversionManager conversionManager, ConversionDialog conversionDialog) {
+    public ConversionThread(File conversionFile, ConversionManager conversionManager, ConversionDialog conversionDialog) {
         this.conversionFile = conversionFile;
-        this.outputDir = outputDir;
         this.conversionManager = conversionManager;
         this.conversionDialog = conversionDialog;
     }
 
     @Override
     public void run() {
-        if (outputDir != null) {
-            if (!outputDir.exists()) {
-                outputDir.mkdir();
-            }
-        }
 
         File[] files;
 
@@ -60,7 +53,7 @@ class ConversionThread extends Thread {
                     System.out.println("Converting " + file.getName());
                     conversionDialog.appendToStatus("Converting " + file.getName());
 
-                    converter = new IPngConverter(file, (outputDir != null) ? new File(outputDir, file.getName()) : file);
+                    converter = new IPngConverter(file, file);
                     converter.convert();
                 }
             }

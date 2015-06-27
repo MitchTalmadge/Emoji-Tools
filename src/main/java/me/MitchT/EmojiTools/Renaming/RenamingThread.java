@@ -47,7 +47,7 @@ class RenamingThread extends Thread {
                 return;
             }
             this.currentFileNum++;
-            String newFileName = "";
+            String newFileName = file.getName();
 
             if (prefixButtons != null) {
                 if (prefixButtons[1])
