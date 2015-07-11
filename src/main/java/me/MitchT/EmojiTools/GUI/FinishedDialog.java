@@ -19,6 +19,7 @@ public class FinishedDialog extends JDialog implements ActionListener {
         this.setIconImage(logo);
         setContentPane(contentPane);
         setModal(true);
+        setResizable(false);
         getRootPane().setDefaultButton(OKButton);
 
         this.extractionLocationField.setText(extractionDirectory.getAbsolutePath());

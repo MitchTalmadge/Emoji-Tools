@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="me.MitchT.EmojiTools.GUI.ErrorDetailsDialog">
+  <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="48" y="54" width="400" height="309"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="cfccc" class="javax.swing.JLabel">
+        <constraints border-constraint="North"/>
+        <properties>
+          <font size="16"/>
+          <horizontalAlignment value="0"/>
+          <text value="Error Report Details"/>
+        </properties>
+      </component>
+      <grid id="8d8ba" layout-manager="FormLayout">
+        <rowspec value="center:d:noGrow"/>
+        <rowspec value="top:4dlu:noGrow"/>
+        <rowspec value="center:200px:noGrow"/>
+        <colspec value="fill:400px:noGrow"/>
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="1b70e" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <text value="&lt;html&gt;An error report has been generated for you below. What you see below, along with any optional information you have entered on the previous screen, is all the information that we will recieve.&lt;/html&gt;"/>
+            </properties>
+          </component>
+          <scrollpane id="94e1">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-horz="false" defaultalign-vert="false"/>
+            </constraints>
+            <properties>
+              <horizontalScrollBarPolicy value="32"/>
+              <verticalScrollBarPolicy value="22"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="9f3b1" class="javax.swing.JTextArea" binding="exceptionArea">
+                <constraints/>
+                <properties>
+                  <editable value="false"/>
+                  <wrapStyleWord value="false"/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
+        </children>
+      </grid>
+      <grid id="c9390" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="665c1" class="javax.swing.JButton" binding="OKButton" default-binding="true">
+            <constraints border-constraint="South"/>
+            <properties>
+              <text value="&amp;OK"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

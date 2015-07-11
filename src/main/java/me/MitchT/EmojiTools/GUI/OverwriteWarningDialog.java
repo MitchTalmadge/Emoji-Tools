@@ -21,6 +21,7 @@ public class OverwriteWarningDialog extends JDialog implements ActionListener {
         this.setIconImage(logo);
         setContentPane(contentPane);
         setModal(true);
+        setResizable(false);
         getRootPane().setDefaultButton(backButton);
 
         this.extractionDirectoryField.setText(extractionDirectory.getName());

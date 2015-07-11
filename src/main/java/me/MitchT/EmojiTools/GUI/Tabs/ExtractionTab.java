@@ -67,6 +67,12 @@ public class ExtractionTab extends OperationTab implements ActionListener {
     private void startExtraction() {
         this.cancelled = false;
 
+        /*try {
+            BufferedImage image = ImageIO.read(getClass().getResourceAsStream("test"));
+        } catch (Exception e) {
+            new ErrorReportDialog(this, this.gui.getLogo(), new ErrorReport(e)).setVisible(true);
+        }*/
+
         File extractionDirectory = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryField.getText());
         if (extractionDirectory.exists()) {
             OverwriteWarningDialog overwriteWarningDialog = new OverwriteWarningDialog(this, this.gui.getLogo(), extractionDirectory);

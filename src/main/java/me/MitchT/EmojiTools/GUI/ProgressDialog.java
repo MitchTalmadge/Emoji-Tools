@@ -21,6 +21,7 @@ public class ProgressDialog extends JDialog implements ActionListener {
         this.setIconImage(logo);
         setContentPane(contentPane);
         setModal(true);
+        setResizable(false);
         getRootPane().setDefaultButton(cancelButton);
 
         this.titleLabel.setText(tileText);
