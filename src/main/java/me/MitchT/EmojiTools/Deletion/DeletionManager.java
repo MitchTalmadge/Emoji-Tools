@@ -31,7 +31,7 @@ public class DeletionManager extends OperationManager {
     @Override
     public void stop() {
         if (deletionThread != null && deletionThread.isAlive()) {
-            deletionThread.endRenaming();
+            deletionThread.endDeletion();
         }
     }
 }

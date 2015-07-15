@@ -13,6 +13,8 @@ import java.net.URISyntaxException;
  */
 public class EmojiTools {
     public static void main(String[] args) {
+        System.setProperty("python.cachedir.skip", "false");
+
         String fontName = null;
         if (args.length > 0)
             fontName = args[0];
@@ -35,12 +37,6 @@ public class EmojiTools {
         });
     }
 
-
-    /**
-     * Gets the root directory of the running jar. (The place where it was executed; for example, the Desktop).
-     *
-     * @return File containing absolute path to the root directory of the running jar.
-     */
     public static File getRootDirectory() {
         try {
             return new File(EmojiTools.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getAbsoluteFile();
@@ -48,4 +44,5 @@ public class EmojiTools {
             return null;
         }
     }
+
 }

@@ -7,7 +7,7 @@ import java.io.File;
 class DeletionThread extends Thread {
 
     private final File extractionDirectory;
-    private final DeletionManager conversionManager;
+    private final DeletionManager deletionManager;
     private final DeletionDialog deletionDialog;
     private boolean running = true;
 
@@ -15,9 +15,9 @@ class DeletionThread extends Thread {
     private int totalFileNum = 0;
     private int currentFileNum = 0;
 
-    public DeletionThread(File extractionDirectory, DeletionManager conversionManager, DeletionDialog deletionDialog) {
+    public DeletionThread(File extractionDirectory, DeletionManager deletionManager, DeletionDialog deletionDialog) {
         this.extractionDirectory = extractionDirectory;
-        this.conversionManager = conversionManager;
+        this.deletionManager = deletionManager;
         this.deletionDialog = deletionDialog;
     }
 
@@ -51,7 +51,7 @@ class DeletionThread extends Thread {
         deletionDialog.setProgress((int) (((double) currentFileNum / totalFileNum) * 100));
     }
 
-    public void endRenaming() {
+    public void endDeletion() {
         running = false;
     }
 }

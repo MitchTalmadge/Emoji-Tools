@@ -1,5 +1,6 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.ConsoleManager;
 import me.MitchT.EmojiTools.GUI.Tabs.ConversionTab;
 import me.MitchT.EmojiTools.GUI.Tabs.ExtractionTab;
 import me.MitchT.EmojiTools.GUI.Tabs.OperationTab;
@@ -15,7 +16,7 @@ public class EmojiToolsGUI extends JFrame {
 
     private final String version = "V1.5";
     private final Image logo;
-
+    private final ConsoleManager consoleManager;
     private JTabbedPane tabbedPane;
     private JPanel contentPane;
     private JLabel headerLabel;
@@ -51,10 +52,11 @@ public class EmojiToolsGUI extends JFrame {
         this.tabbedPane.addTab("Converter", new ConversionTab(this));
         this.tabbedPane.setSelectedIndex(0);
 
+        this.consoleManager = new ConsoleManager();
+
         pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-
     }
 
     public Image getLogo() {
@@ -63,5 +65,9 @@ public class EmojiToolsGUI extends JFrame {
 
     public void showMessageDialog(String message) {
         JOptionPane.showMessageDialog(this, message);
+    }
+
+    public ConsoleManager getConsoleManager() {
+        return this.consoleManager;
     }
 }

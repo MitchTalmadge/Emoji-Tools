@@ -7,7 +7,7 @@ import java.io.File;
 class RenamingThread extends Thread {
 
     private final File renameFile;
-    private final RenamingManager conversionManager;
+    private final RenamingManager renamingManager;
     private final RenamingDialog renamingDialog;
 
     private final boolean[] prefixButtons;
@@ -19,9 +19,9 @@ class RenamingThread extends Thread {
     private int totalFileNum = 0;
     private int currentFileNum = 0;
 
-    public RenamingThread(File renameFile, RenamingManager conversionManager, RenamingDialog renamingDialog, boolean[] prefixButtons, boolean[] capitalizationButtons) {
+    public RenamingThread(File renameFile, RenamingManager renamingManager, RenamingDialog renamingDialog, boolean[] prefixButtons, boolean[] capitalizationButtons) {
         this.renameFile = renameFile;
-        this.conversionManager = conversionManager;
+        this.renamingManager = renamingManager;
         this.renamingDialog = renamingDialog;
 
         this.prefixButtons = prefixButtons;
@@ -60,7 +60,7 @@ class RenamingThread extends Thread {
 
             if (capitalizationButtons != null) {
                 if (capitalizationButtons[1]) {
-                    newFileName = capitalize((newFileName.equals("")) ? file.getName() : newFileName, (prefixButtons != null && prefixButtons[1]) ? true : !capitalizationButtons[3]);
+                    newFileName = capitalize((newFileName.equals("")) ? file.getName() : newFileName, (prefixButtons != null && prefixButtons[1]) || !capitalizationButtons[3]);
                 } else if (capitalizationButtons[2]) {
                     newFileName = newFileName.toLowerCase();
                 }

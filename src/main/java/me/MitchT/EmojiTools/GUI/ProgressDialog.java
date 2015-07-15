@@ -52,6 +52,10 @@ public class ProgressDialog extends JDialog implements ActionListener {
         this.setVisible(false);
     }
 
+    public void setIndeterminate(boolean indeterminate) {
+        this.progressBar.setIndeterminate(indeterminate);
+    }
+
     public void setProgress(final int progress) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -61,6 +65,11 @@ public class ProgressDialog extends JDialog implements ActionListener {
                 progressBar.updateUI();
             }
         });
+    }
+
+    public void writeToStatus(String message) {
+        this.statusMessageArea.append(message);
+        this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMaximum());
     }
 
     public void appendToStatus(String message) {
