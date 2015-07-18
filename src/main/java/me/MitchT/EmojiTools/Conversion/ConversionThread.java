@@ -1,26 +1,27 @@
 package me.MitchT.EmojiTools.Conversion;
 
-import com.kylinworks.IPngConverter;
+import me.MitchT.EmojiTools.Conversion.Converter.Converter;
 import me.MitchT.EmojiTools.GUI.ConversionDialog;
 
 import java.io.File;
-import java.io.IOException;
 
 class ConversionThread extends Thread {
 
     private final File conversionFile;
     private final ConversionManager conversionManager;
     private final ConversionDialog conversionDialog;
+    private final boolean CgBItoRGBA;
     private boolean running = true;
 
 
     private int totalFileNum = 0;
     private int currentFileNum = 0;
 
-    public ConversionThread(File conversionFile, ConversionManager conversionManager, ConversionDialog conversionDialog) {
+    public ConversionThread(File conversionFile, ConversionManager conversionManager, ConversionDialog conversionDialog, boolean CgBItoRGBA) {
         this.conversionFile = conversionFile;
         this.conversionManager = conversionManager;
         this.conversionDialog = conversionDialog;
+        this.CgBItoRGBA = CgBItoRGBA;
     }
 
     @Override
@@ -36,29 +37,24 @@ class ConversionThread extends Thread {
 
         totalFileNum = files.length;
 
-        IPngConverter converter;
+        Converter converter = new Converter();
 
-        try {
-            for (File file : files) {
-                if (!running) {
-                    conversionDialog.dispose();
-                    return;
-                }
-
-                updateProgress();
-
-                currentFileNum++;
-
-                if (file.getName().endsWith(".png")) {
-                    System.out.println("Converting " + file.getName());
-                    conversionDialog.appendToStatus("Converting " + file.getName());
-
-                    converter = new IPngConverter(file, file);
-                    converter.convert();
-                }
+        for (File file : files) {
+            if (!running) {
+                conversionDialog.dispose();
+                return;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            updateProgress();
+
+            currentFileNum++;
+
+            if (file.getName().endsWith(".png")) {
+                System.out.println("Converting " + file.getName());
+                conversionDialog.appendToStatus("Converting " + file.getName());
+
+                converter.convertFile(file, CgBItoRGBA);
+            }
         }
 
         updateProgress();

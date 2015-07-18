@@ -13,10 +13,10 @@ public class ConversionManager extends OperationManager {
     private final ConversionThread conversionThread;
 
 
-    public ConversionManager(File conversionFile, EmojiToolsGUI gui, ConversionDialog conversionDialog) {
+    public ConversionManager(File conversionFile, EmojiToolsGUI gui, ConversionDialog conversionDialog, boolean CgBItoRGBA) {
         this.gui = gui;
 
-        this.conversionThread = new ConversionThread(conversionFile, this, conversionDialog);
+        this.conversionThread = new ConversionThread(conversionFile, this, conversionDialog, CgBItoRGBA);
     }
 
     public void showMessageDialog(String message) {

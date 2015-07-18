@@ -47,7 +47,7 @@ public class ConversionTab extends OperationTab implements ActionListener {
         this.cancelled = false;
 
         ConversionDialog conversionDialog = new ConversionDialog(this, this.gui.getLogo());
-        this.currentOperationManager = new ConversionManager(this.conversionFile, this.gui, conversionDialog);
+        this.currentOperationManager = new ConversionManager(this.conversionFile, this.gui, conversionDialog, this.conversionRadioButton1.isSelected());
         currentOperationManager.start();
         conversionDialog.setVisible(true);
 

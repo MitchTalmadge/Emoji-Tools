@@ -107,7 +107,7 @@ public class ExtractionTab extends OperationTab implements ActionListener {
 
         if (this.convertRadioButton2.isSelected() && !cancelled) {
             ConversionDialog conversionDialog = new ConversionDialog(this, this.gui.getLogo());
-            this.currentOperationManager = new ConversionManager(extractionDirectory, this.gui, conversionDialog);
+            this.currentOperationManager = new ConversionManager(extractionDirectory, this.gui, conversionDialog, true);
             currentOperationManager.start();
             conversionDialog.setVisible(true);
         }

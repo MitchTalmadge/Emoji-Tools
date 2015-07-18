@@ -95,8 +95,8 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <enabled value="false"/>
-                  <text value="&amp;RGBA to CgBI (Normal to Pincrushed) -- WORK IN PROGRESS"/>
+                  <enabled value="true"/>
+                  <text value="&amp;RGBA to CgBI (Normal to Pincrushed)"/>
                 </properties>
               </component>
             </children>
@@ -113,7 +113,7 @@
             <properties>
               <enabled value="false"/>
               <hideActionText value="false"/>
-              <text value="Start C&amp;onversion"/>
+              <text value="&amp;Start Conversion"/>
             </properties>
           </component>
           <component id="40cca" class="javax.swing.JButton" binding="openRootDirectoryButton">
