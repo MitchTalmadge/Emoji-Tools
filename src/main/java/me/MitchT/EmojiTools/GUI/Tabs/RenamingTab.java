@@ -16,7 +16,7 @@ import java.io.IOException;
 
 public class RenamingTab extends OperationTab implements ActionListener {
     private final EmojiToolsGUI gui;
-
+    private final String defaultFileNameFieldText = "File/Folder Name";
     private JPanel contentPane;
     private JTextField fileNameField;
     private JButton browseButton;
@@ -31,10 +31,9 @@ public class RenamingTab extends OperationTab implements ActionListener {
     private JRadioButton prefixesRadioButton4;
     private JCheckBox capitalizationCheckBox1;
     private JTextField exampleOutputField;
-
-    private File renameFile;
     private OperationManager currentOperationManager;
     private boolean cancelled;
+    private File renameFile;
 
     public RenamingTab(EmojiToolsGUI gui) {
         this.gui = gui;
@@ -63,6 +62,13 @@ public class RenamingTab extends OperationTab implements ActionListener {
     private void startRenaming() {
         this.cancelled = false;
 
+        if (!this.renameFile.exists()) {
+            this.renameFile = null;
+            this.fileNameField.setText(defaultFileNameFieldText);
+            this.updateStartButton();
+            return;
+        }
+
         RenamingDialog renamingDialog = new RenamingDialog(this, this.gui.getLogo());
         boolean[] prefixButtons = new boolean[]{this.prefixesRadioButton1.isSelected(), this.prefixesRadioButton2.isSelected(), this.prefixesRadioButton3.isSelected(), this.prefixesRadioButton4.isSelected()};
         boolean[] capitalizationButtons = new boolean[]{this.captializationRadioButton1.isSelected(), this.captializationRadioButton2.isSelected(), this.captializationRadioButton3.isSelected(), this.capitalizationCheckBox1.isSelected()};
@@ -81,7 +87,7 @@ public class RenamingTab extends OperationTab implements ActionListener {
     }
 
     private void openFileChooser() {
-        this.fileNameField.setText("File Name");
+        this.fileNameField.setText(defaultFileNameFieldText);
 
         JFileChooser fileChooser = new JFileChooser(EmojiTools.getRootDirectory());
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Folder or PNG File (*.png)", "png");
@@ -97,7 +103,7 @@ public class RenamingTab extends OperationTab implements ActionListener {
 
     private void updateStartButton() {
         if ((!this.prefixesRadioButton1.isSelected() || !this.captializationRadioButton1.isSelected()) &&
-                !this.fileNameField.getText().equals("File Name"))
+                !this.fileNameField.getText().equals(defaultFileNameFieldText))
             this.startRenamingButton.setEnabled(true);
         else
             this.startRenamingButton.setEnabled(false);

@@ -133,7 +133,11 @@ public class GoogleExtractionThread extends ExtractionThread {
                             return;
                         }
 
-                        for (int i = 0; i < endGlyphID - beginGlyphID; i++) {
+                        System.out.println("# Glyphs: " + numGlyphs);
+                        System.out.println("# New Glyphs: " + numNewGlyphs);
+                        System.out.println("# Emojis to Extract: " + (endGlyphID - beginGlyphID));
+
+                        for (int i = beginGlyphID; i <= endGlyphID; i++) {
                             if (!running) {
                                 inputStream.close();
                                 extractionDialog.dispose();
@@ -146,10 +150,10 @@ public class GoogleExtractionThread extends ExtractionThread {
                             int glyphLength = ExtractionUtilites.getIntFromBytes(b);
                             if (glyphLength > 0) {
                                 b = new byte[glyphLength];
-                                System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i + beginGlyphID] + ".png'");
-                                appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i + beginGlyphID] + ".png'");
-                                updateProgress((int) (i / (float) (endGlyphID - beginGlyphID) * 100));
-                                FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, glyphNames[i + beginGlyphID] + ".png"));
+                                System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
+                                appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
+                                updateProgress((int) ((i - beginGlyphID) / (float) (endGlyphID - beginGlyphID) * 100));
+                                FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, glyphNames[i] + ".png"));
                                 b = new byte[glyphLength];
                                 inputStream.readFully(b);
                                 outputStream.write(b);

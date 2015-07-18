@@ -23,6 +23,7 @@ import java.io.IOException;
 public class ExtractionTab extends OperationTab implements ActionListener {
 
     private final EmojiToolsGUI gui;
+    private final String defaultFileNameFieldText = "File Name";
     private JPanel contentPane;
     private JRadioButton renameRadioButton1;
     private JRadioButton renameRadioButton2;
@@ -33,10 +34,8 @@ public class ExtractionTab extends OperationTab implements ActionListener {
     private JTextField extractionDirectoryField;
     private JButton startExtractionButton;
     private JButton openRootDirectoryButton;
-
     private OperationManager currentOperationManager;
     private boolean cancelled = false;
-
     private File fontFile;
 
     public ExtractionTab(EmojiToolsGUI gui, File fontFile) {
@@ -67,11 +66,12 @@ public class ExtractionTab extends OperationTab implements ActionListener {
     private void startExtraction() {
         this.cancelled = false;
 
-        /*try {
-            BufferedImage image = ImageIO.read(getClass().getResourceAsStream("test"));
-        } catch (Exception e) {
-            new ErrorReportDialog(this, this.gui.getLogo(), new ErrorReport(e)).setVisible(true);
-        }*/
+        if (!this.fontFile.exists()) {
+            this.fontFile = null;
+            this.fileNameField.setText(defaultFileNameFieldText);
+            this.updateStartButton();
+            return;
+        }
 
         File extractionDirectory = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryField.getText());
         if (extractionDirectory.exists()) {
@@ -124,7 +124,7 @@ public class ExtractionTab extends OperationTab implements ActionListener {
     }
 
     private void openFileChooser() {
-        this.fileNameField.setText("File Name");
+        this.fileNameField.setText(defaultFileNameFieldText);
 
         JFileChooser fileChooser = new JFileChooser(EmojiTools.getRootDirectory());
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Emoji Font File (*.ttf)", "ttf");
@@ -138,7 +138,7 @@ public class ExtractionTab extends OperationTab implements ActionListener {
     }
 
     private void updateStartButton() {
-        if (this.extractionDirectoryField.getText().length() > 0 && this.fileNameField.getText().equals("File Name"))
+        if (this.extractionDirectoryField.getText().length() > 0 && this.fileNameField.getText().equals(defaultFileNameFieldText))
             this.startExtractionButton.setEnabled(true);
         else
             this.startExtractionButton.setEnabled(true);

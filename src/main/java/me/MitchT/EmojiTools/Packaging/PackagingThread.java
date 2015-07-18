@@ -5,6 +5,7 @@ import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.FileUtils;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
 import me.MitchT.EmojiTools.GUI.PackagingDialog;
+import me.MitchT.EmojiTools.GUI.Tabs.PackagingTab;
 import org.python.core.PyList;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
@@ -21,127 +22,141 @@ class PackagingThread extends Thread implements ConsoleManager.ConsoleListener {
     private final File pngDirectory;
     private final PackagingManager packagingManager;
     private final PackagingDialog packagingDialog;
+    private final int outputType;
     private boolean running = true;
 
-    public PackagingThread(EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog) {
+    public PackagingThread(EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog, int outputType) {
         this.gui = gui;
         this.pngDirectory = pngDirectory;
         this.packagingManager = packagingManager;
         this.packagingDialog = packagingDialog;
+        this.outputType = outputType;
     }
 
     @Override
     public void run() {
+        if (outputType == PackagingTab.ANDROID) { //TODO: Implement iOS and OSX Emoji Fonts
+            gui.getConsoleManager().addConsoleListener(this);
 
-        gui.getConsoleManager().addConsoleListener(this);
+            File outputDirectory = new File(EmojiTools.getRootDirectory(), "Output");
+            if (!outputDirectory.exists())
+                outputDirectory.mkdir();
 
-        File outputDirectory = new File(EmojiTools.getRootDirectory(), "Output");
-        if (!outputDirectory.exists())
-            outputDirectory.mkdir();
+            packagingDialog.setIndeterminate(true);
 
-        packagingDialog.setIndeterminate(true);
+            packagingDialog.appendToStatus("Compiling Scripts... (This can take a minute. Please Wait...)");
 
-        packagingDialog.appendToStatus("Compiling Scripts... Please Wait...");
+            PySystemState systemState = new PySystemState();
+            PythonInterpreter pythonInterpreter = new PythonInterpreter(null, systemState);
 
-        PySystemState systemState = new PySystemState();
-        PythonInterpreter pythonInterpreter = new PythonInterpreter(null, systemState);
+            //Set Outputs
+            pythonInterpreter.setOut(System.out);
+            pythonInterpreter.setErr(System.err);
 
-        //Set Outputs
-        pythonInterpreter.setOut(System.out);
-        pythonInterpreter.setErr(System.err);
+            try {
+                packagingDialog.setIndeterminate(false);
 
-        try {
-            packagingDialog.appendToStatus("Extracting Scripts...");
+                packagingDialog.appendToStatus("Extracting Scripts...");
 
-            File tempFolder = extractToTemp();
+                File tempFolder = extractToTemp();
 
-            //Set sys.path
-            String pythonScriptsPath;
+                //Set sys.path
+                String pythonScriptsPath;
 
-            pythonScriptsPath = tempFolder.getAbsolutePath() + "/PythonScripts";
+                pythonScriptsPath = tempFolder.getAbsolutePath() + "/PythonScripts";
 
-            systemState.path.append(new PyString(pythonScriptsPath));
+                systemState.path.append(new PyString(pythonScriptsPath));
 
-            //Options.verbose = Py.DEBUG;
+                //Options.verbose = Py.DEBUG;
 
-            //---- add_glyphs.py ----//
+                //---- add_glyphs.py ----//
 
-            packagingDialog.appendToStatus("Running add_glyphs.py...");
+                packagingDialog.setProgress(25);
 
-            //Set sys.argv
-            String fontTemplatePath;
-            fontTemplatePath = tempFolder.getAbsolutePath() + "/FontTemplates/NotoColorEmoji.tmpl.ttx";
+                packagingDialog.appendToStatus("Running add_glyphs.py...");
 
-            ArrayList<String> argvList = new ArrayList<>();
-            argvList.add("add_glyphs.py");                                      //Python Script Name
-            argvList.add(fontTemplatePath);                                     //Template Path
-            argvList.add(tempFolder.getAbsolutePath() + "/NotoColorEmoji.ttx"); //Output ttx path
-            argvList.add(pngDirectory.getAbsolutePath() + "/uni");              //Prefix Path
+                //Set sys.argv
+                String fontTemplatePath;
+                fontTemplatePath = tempFolder.getAbsolutePath() + "/FontTemplates/NotoColorEmoji.tmpl.ttx";
 
-            systemState.argv = new PyList(PyType.fromClass(String.class), argvList);
+                ArrayList<String> argvList = new ArrayList<>();
+                argvList.add("add_glyphs.py");                                      //Python Script Name
+                argvList.add(fontTemplatePath);                                     //Template Path
+                argvList.add(tempFolder.getAbsolutePath() + "/NotoColorEmoji.ttx"); //Output ttx path
+                argvList.add(pngDirectory.getAbsolutePath() + "/uni");              //Prefix Path
 
-            pythonInterpreter.exec("import sys\n" +
-                    "print sys.path\n" +
-                    "print sys.argv");
+                systemState.argv = new PyList(PyType.fromClass(String.class), argvList);
 
-            //Execute
-            pythonInterpreter.execfile(tempFolder.getAbsolutePath() + "/PythonScripts/add_glyphs.py");
+                /*pythonInterpreter.exec("import sys\n" +
+                        "print sys.path\n" +
+                        "print sys.argv");*/
 
-            //---- package.py ----//
+                if (!running)
+                    return;
 
-            packagingDialog.appendToStatus("Running package.py...");
+                //Execute
+                pythonInterpreter.execfile(tempFolder.getAbsolutePath() + "/PythonScripts/add_glyphs.py");
 
-            //Set sys.argv
-            argvList = new ArrayList<>();
-            argvList.add("package.py");                                                 //Python Script Name
-            argvList.add("-o");                                                         //Output flag
-            argvList.add(tempFolder.getAbsolutePath() + "/NotoColorEmoji.empty.ttf");   //Output empty ttf path
-            argvList.add(tempFolder.getAbsolutePath() + "/NotoColorEmoji.ttx");         //ttx path
+                //---- package.py ----//
 
-            systemState.argv = new PyList(PyType.fromClass(String.class), argvList);
+                packagingDialog.setProgress(50);
 
-            pythonInterpreter.exec("import sys\n" +
-                    "print sys.path\n" +
-                    "print sys.argv");
+                packagingDialog.appendToStatus("Running package.py...");
 
-            //Execute
-            pythonInterpreter.execfile(tempFolder.getAbsolutePath() + "/PythonScripts/package.py");
+                //Set sys.argv
+                argvList = new ArrayList<>();
+                argvList.add("package.py");                                                 //Python Script Name
+                argvList.add("-o");                                                         //Output flag
+                argvList.add(tempFolder.getAbsolutePath() + "/NotoColorEmoji.empty.ttf");   //Output empty ttf path
+                argvList.add(tempFolder.getAbsolutePath() + "/NotoColorEmoji.ttx");         //ttx path
 
-            //---- emoji_builder.py.py ----//
+                systemState.argv = new PyList(PyType.fromClass(String.class), argvList);
 
-            packagingDialog.appendToStatus("Running emoji_builder.py...");
+                if (!running)
+                    return;
 
-            //Set sys.argv
-            argvList = new ArrayList<>();
-            argvList.add("emoji_builder.py");                                           //Python Script Name
-            argvList.add(tempFolder.getAbsolutePath() + "/NotoColorEmoji.empty.ttf");   //Empty ttf path
-            argvList.add(outputDirectory.getAbsolutePath() + "/NotoColorEmoji.ttf");    //Output ttf path
-            argvList.add(pngDirectory.getAbsolutePath() + "/uni");                      //Prefix Path
+                //Execute
+                pythonInterpreter.execfile(tempFolder.getAbsolutePath() + "/PythonScripts/package.py");
 
-            systemState.argv = new PyList(PyType.fromClass(String.class), argvList);
+                //---- emoji_builder.py.py ----//
 
-            pythonInterpreter.exec("import sys\n" +
-                    "print sys.path\n" +
-                    "print sys.argv");
+                packagingDialog.setProgress(75);
 
-            //Execute
-            pythonInterpreter.execfile(tempFolder.getAbsolutePath() + "/PythonScripts/emoji_builder.py");
+                packagingDialog.appendToStatus("Running emoji_builder.py...");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            pythonInterpreter.close();
-            gui.getConsoleManager().removeConsoleListener(this);
+                //Set sys.argv
+                argvList = new ArrayList<>();
+                argvList.add("emoji_builder.py");                                           //Python Script Name
+                argvList.add(tempFolder.getAbsolutePath() + "/NotoColorEmoji.empty.ttf");   //Empty ttf path
+                argvList.add(outputDirectory.getAbsolutePath() + "/NotoColorEmoji.ttf");    //Output ttf path
+                argvList.add(pngDirectory.getAbsolutePath() + "/uni");                      //Prefix Path
 
-            if (new File(EmojiTools.getRootDirectory(), "tmp").exists()) {
-                try {
-                    org.apache.commons.io.FileUtils.deleteDirectory(new File(EmojiTools.getRootDirectory(), "tmp"));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                systemState.argv = new PyList(PyType.fromClass(String.class), argvList);
+
+                if (!running)
+                    return;
+
+                //Execute
+                pythonInterpreter.execfile(tempFolder.getAbsolutePath() + "/PythonScripts/emoji_builder.py");
+
+                packagingDialog.setProgress(100);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                pythonInterpreter.close();
+                gui.getConsoleManager().removeConsoleListener(this);
+
+                if (new File(EmojiTools.getRootDirectory(), "tmp").exists()) {
+                    try {
+                        org.apache.commons.io.FileUtils.deleteDirectory(new File(EmojiTools.getRootDirectory(), "tmp"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
 
-            packagingDialog.dispose();
+                packagingDialog.dispose();
+            }
         }
     }
 

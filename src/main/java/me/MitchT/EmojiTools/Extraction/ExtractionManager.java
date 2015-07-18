@@ -20,7 +20,6 @@ public class ExtractionManager extends OperationManager {
 
     private ExtractionThread extractionThread;
 
-
     public ExtractionManager(File font, File extractionDirectory, EmojiToolsGUI gui, ExtractionDialog extractionDialog) {
         this.gui = gui;
 

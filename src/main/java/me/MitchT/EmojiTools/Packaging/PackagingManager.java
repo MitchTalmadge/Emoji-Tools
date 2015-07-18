@@ -13,11 +13,11 @@ public class PackagingManager extends OperationManager {
     private final PackagingThread packagingThread;
     private final PackagingDialog packagingDialog;
 
-    public PackagingManager(EmojiToolsGUI gui, File pngDirectory, PackagingDialog packagingDialog) {
+    public PackagingManager(EmojiToolsGUI gui, File pngDirectory, PackagingDialog packagingDialog, int outputType) {
         this.gui = gui;
         this.packagingDialog = packagingDialog;
 
-        this.packagingThread = new PackagingThread(gui, pngDirectory, this, packagingDialog);
+        this.packagingThread = new PackagingThread(gui, pngDirectory, this, packagingDialog, outputType);
     }
 
     @Override

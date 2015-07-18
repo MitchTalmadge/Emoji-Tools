@@ -1,34 +1,38 @@
 package me.MitchT.EmojiTools.GUI.Tabs;
 
-import me.MitchT.EmojiTools.Conversion.ConversionManager;
 import me.MitchT.EmojiTools.EmojiTools;
-import me.MitchT.EmojiTools.GUI.ConversionDialog;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
+import me.MitchT.EmojiTools.GUI.PackagingDialog;
 import me.MitchT.EmojiTools.OperationManager;
+import me.MitchT.EmojiTools.Packaging.PackagingManager;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
-public class ConversionTab extends OperationTab implements ActionListener {
+public class PackagingTab extends OperationTab implements ActionListener {
+    //Output Type Finals
+    public static final int ANDROID = 0;
+    public static final int IOS = 1;
+    public static final int OSX = 2;
     private final EmojiToolsGUI gui;
-    private final String defaultFileNameFieldText = "File/Folder Name";
+    private final String defaultFileNameFieldText = "Folder Name";
     private JPanel contentPane;
     private JTextField fileNameField;
     private JButton browseButton;
-    private JRadioButton conversionRadioButton1;
-    private JRadioButton conversionRadioButton2;
-    private JButton startConvertingButton;
+    private JRadioButton outputRadioButton1;
+    private JRadioButton outputRadioButton2;
+    private JButton startPackagingButton;
     private JButton openRootDirectoryButton;
+    private JRadioButton outputRadioButton3;
     private OperationManager currentOperationManager;
     private boolean cancelled;
-    private File conversionFile;
+    private File packagingFile;
 
-    public ConversionTab(EmojiToolsGUI gui) {
+    public PackagingTab(EmojiToolsGUI gui) {
         this.gui = gui;
 
         this.setLayout(new BorderLayout());
@@ -36,29 +40,37 @@ public class ConversionTab extends OperationTab implements ActionListener {
 
         this.browseButton.addActionListener(this);
 
-        this.conversionRadioButton1.addActionListener(this);
-        this.conversionRadioButton1.addActionListener(this);
+        this.outputRadioButton1.addActionListener(this);
+        this.outputRadioButton1.addActionListener(this);
 
         this.openRootDirectoryButton.addActionListener(this);
-        this.startConvertingButton.addActionListener(this);
+        this.startPackagingButton.addActionListener(this);
     }
 
-    private void startConversion() {
+    private void startPackaging() {
         this.cancelled = false;
 
-        if (!this.conversionFile.exists()) {
-            this.conversionFile = null;
+        if (!this.packagingFile.exists()) {
+            this.packagingFile = null;
             this.fileNameField.setText(defaultFileNameFieldText);
             this.updateStartButton();
             return;
         }
 
-        ConversionDialog conversionDialog = new ConversionDialog(this, this.gui.getLogo());
-        this.currentOperationManager = new ConversionManager(this.conversionFile, this.gui, conversionDialog, this.conversionRadioButton1.isSelected());
-        currentOperationManager.start();
-        conversionDialog.setVisible(true);
+        int outputType;
+        if (this.outputRadioButton1.isSelected())
+            outputType = ANDROID;
+        else if (this.outputRadioButton2.isSelected())
+            outputType = IOS;
+        else
+            outputType = OSX;
 
-        this.gui.showMessageDialog("Emoji Conversion Complete! All Done! :)");
+        PackagingDialog packagingDialog = new PackagingDialog(this, this.gui.getLogo());
+        this.currentOperationManager = new PackagingManager(this.gui, this.packagingFile, packagingDialog, outputType);
+        currentOperationManager.start();
+        packagingDialog.setVisible(true);
+
+        this.gui.showMessageDialog("Emoji Packaging Complete! All Done! :)");
     }
 
     @Override
@@ -72,22 +84,20 @@ public class ConversionTab extends OperationTab implements ActionListener {
         this.fileNameField.setText(defaultFileNameFieldText);
 
         JFileChooser fileChooser = new JFileChooser(EmojiTools.getRootDirectory());
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Folder or PNG File (*.png)", "png");
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        fileChooser.setFileFilter(filter);
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             this.fileNameField.setText(fileChooser.getSelectedFile().getName());
-            this.conversionFile = fileChooser.getSelectedFile();
+            this.packagingFile = fileChooser.getSelectedFile();
         }
         updateStartButton();
     }
 
     private void updateStartButton() {
         if (!this.fileNameField.getText().equals(defaultFileNameFieldText))
-            this.startConvertingButton.setEnabled(true);
+            this.startPackagingButton.setEnabled(true);
         else
-            this.startConvertingButton.setEnabled(false);
+            this.startPackagingButton.setEnabled(false);
     }
 
     @Override
@@ -101,8 +111,8 @@ public class ConversionTab extends OperationTab implements ActionListener {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-        } else if (e.getSource().equals(this.startConvertingButton)) {
-            startConversion();
+        } else if (e.getSource().equals(this.startPackagingButton)) {
+            startPackaging();
         }
         updateStartButton();
     }

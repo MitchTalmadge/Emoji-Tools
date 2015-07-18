@@ -12,7 +12,6 @@ public class ConversionManager extends OperationManager {
 
     private final ConversionThread conversionThread;
 
-
     public ConversionManager(File conversionFile, EmojiToolsGUI gui, ConversionDialog conversionDialog, boolean CgBItoRGBA) {
         this.gui = gui;
 
