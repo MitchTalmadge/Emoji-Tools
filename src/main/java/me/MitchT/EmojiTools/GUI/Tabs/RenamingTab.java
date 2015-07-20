@@ -2,8 +2,8 @@ package me.MitchT.EmojiTools.GUI.Tabs;
 
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
+import me.MitchT.EmojiTools.GUI.FinishedDialog;
 import me.MitchT.EmojiTools.GUI.RenamingDialog;
-import me.MitchT.EmojiTools.OperationManager;
 import me.MitchT.EmojiTools.Renaming.RenamingManager;
 
 import javax.swing.*;
@@ -31,8 +31,6 @@ public class RenamingTab extends OperationTab implements ActionListener {
     private JRadioButton prefixesRadioButton4;
     private JCheckBox capitalizationCheckBox1;
     private JTextField exampleOutputField;
-    private OperationManager currentOperationManager;
-    private boolean cancelled;
     private File renameFile;
 
     public RenamingTab(EmojiToolsGUI gui) {
@@ -76,7 +74,7 @@ public class RenamingTab extends OperationTab implements ActionListener {
         currentOperationManager.start();
         renamingDialog.setVisible(true);
 
-        this.gui.showMessageDialog("Emoji Renaming Complete! All Done! :)");
+        new FinishedDialog(this.gui, this.gui.getLogo(), "Emoji Renaming Complete!", "Your Renamed Emojis can be found in:", renameFile).setVisible(true);
     }
 
     @Override

@@ -1,9 +1,18 @@
 package me.MitchT.EmojiTools.GUI.Tabs;
 
+import me.MitchT.EmojiTools.OperationManager;
+
 import javax.swing.*;
 
-public abstract class OperationTab extends JPanel {
+public class OperationTab extends JPanel {
 
-    public abstract void stopOperations();
+    OperationManager currentOperationManager;
+    boolean cancelled;
+
+    public void stopOperations() {
+        if (this.currentOperationManager != null)
+            this.currentOperationManager.stop();
+        this.cancelled = true;
+    }
 
 }

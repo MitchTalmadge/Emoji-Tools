@@ -2,9 +2,11 @@ package me.MitchT.EmojiTools.GUI.Tabs;
 
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
+import me.MitchT.EmojiTools.GUI.FinishedDialog;
 import me.MitchT.EmojiTools.GUI.PackagingDialog;
-import me.MitchT.EmojiTools.OperationManager;
+import me.MitchT.EmojiTools.GUI.RenamingDialog;
 import me.MitchT.EmojiTools.Packaging.PackagingManager;
+import me.MitchT.EmojiTools.Renaming.RenamingManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,8 +30,6 @@ public class PackagingTab extends OperationTab implements ActionListener {
     private JButton startPackagingButton;
     private JButton openRootDirectoryButton;
     private JRadioButton outputRadioButton3;
-    private OperationManager currentOperationManager;
-    private boolean cancelled;
     private File packagingFile;
 
     public PackagingTab(EmojiToolsGUI gui) {
@@ -65,12 +65,19 @@ public class PackagingTab extends OperationTab implements ActionListener {
         else
             outputType = OSX;
 
-        PackagingDialog packagingDialog = new PackagingDialog(this, this.gui.getLogo());
-        this.currentOperationManager = new PackagingManager(this.gui, this.packagingFile, packagingDialog, outputType);
+        RenamingDialog renamingDialog = new RenamingDialog(this, this.gui.getLogo());
+        this.currentOperationManager = new RenamingManager(this.packagingFile, this.gui, renamingDialog, new boolean[]{false, false, true, false}, new boolean[]{false, false, true, true});
         currentOperationManager.start();
-        packagingDialog.setVisible(true);
+        renamingDialog.setVisible(true);
 
-        this.gui.showMessageDialog("Emoji Packaging Complete! All Done! :)");
+        if (!cancelled) {
+            PackagingDialog packagingDialog = new PackagingDialog(this, this.gui.getLogo());
+            this.currentOperationManager = new PackagingManager(this.gui, this.packagingFile, packagingDialog, outputType);
+            currentOperationManager.start();
+            packagingDialog.setVisible(true);
+        }
+
+        new FinishedDialog(this.gui, this.gui.getLogo(), "Emoji Packaging Complete!", "Your Packaged Emoji Font can be found in:", new File(EmojiTools.getRootDirectory(), "Output")).setVisible(true);
     }
 
     @Override

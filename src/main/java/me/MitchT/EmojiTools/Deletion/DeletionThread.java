@@ -24,27 +24,49 @@ class DeletionThread extends Thread {
     @Override
     public void run() {
 
-        File[] files = extractionDirectory.listFiles();
+        totalFileNum = countFilesRecursive(totalFileNum, extractionDirectory);
 
-        totalFileNum = files.length;
+        System.out.println(totalFileNum);
 
-        for (File file : files) {
+        if (!running) {
+            this.deletionDialog.dispose();
+            return;
+        }
+
+        deleteFilesRecursive(extractionDirectory);
+
+        deletionDialog.dispose();
+    }
+
+    private int countFilesRecursive(int fileCount, File dir) {
+        fileCount += dir.listFiles().length;
+        for (File file : dir.listFiles()) {
+            if (!running)
+                return 0;
+            if (file.isDirectory())
+                fileCount = countFilesRecursive(fileCount, file);
+        }
+        return fileCount;
+    }
+
+    private void deleteFilesRecursive(File dir) {
+        for (File file : dir.listFiles()) {
             if (!running) {
-                this.deletionDialog.dispose();
                 return;
             }
             this.currentFileNum++;
 
-            file.delete();
+            if (file.isDirectory())
+                deleteFilesRecursive(file);
 
-            System.out.println("Deleting " + file.getName());
+            if (!file.equals(extractionDirectory))
+                file.delete();
+
+            //System.out.println("Deleting " + file.getName());
             deletionDialog.appendToStatus("Deleting " + file.getName());
             updateProgress();
         }
-
         updateProgress();
-
-        deletionDialog.dispose();
     }
 
     private void updateProgress() {

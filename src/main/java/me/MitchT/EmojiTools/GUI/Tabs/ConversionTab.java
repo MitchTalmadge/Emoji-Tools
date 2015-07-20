@@ -4,7 +4,7 @@ import me.MitchT.EmojiTools.Conversion.ConversionManager;
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.GUI.ConversionDialog;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
-import me.MitchT.EmojiTools.OperationManager;
+import me.MitchT.EmojiTools.GUI.FinishedDialog;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -24,8 +24,6 @@ public class ConversionTab extends OperationTab implements ActionListener {
     private JRadioButton conversionRadioButton2;
     private JButton startConvertingButton;
     private JButton openRootDirectoryButton;
-    private OperationManager currentOperationManager;
-    private boolean cancelled;
     private File conversionFile;
 
     public ConversionTab(EmojiToolsGUI gui) {
@@ -58,7 +56,7 @@ public class ConversionTab extends OperationTab implements ActionListener {
         currentOperationManager.start();
         conversionDialog.setVisible(true);
 
-        this.gui.showMessageDialog("Emoji Conversion Complete! All Done! :)");
+        new FinishedDialog(this.gui, this.gui.getLogo(), "Emoji Conversion Complete!", "Your Converted Emojis can be found in:", conversionFile).setVisible(true);
     }
 
     @Override

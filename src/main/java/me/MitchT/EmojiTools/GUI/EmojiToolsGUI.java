@@ -1,6 +1,7 @@
 package me.MitchT.EmojiTools.GUI;
 
 import me.MitchT.EmojiTools.ConsoleManager;
+import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.GUI.Tabs.*;
 
 import javax.swing.*;
@@ -11,7 +12,6 @@ import java.io.File;
 
 public class EmojiToolsGUI extends JFrame {
 
-    private final String version = "V1.5";
     private final Image logo;
     private final ConsoleManager consoleManager;
     private JTabbedPane tabbedPane;
@@ -42,7 +42,7 @@ public class EmojiToolsGUI extends JFrame {
             }
         });
 
-        this.headerLabel.setText("Emoji Tools " + version);
+        this.headerLabel.setText("Emoji Tools " + EmojiTools.version);
 
         this.tabbedPane.addTab("Extractor", new ExtractionTab(this, fontFile));
         this.tabbedPane.addTab("Renamer", new RenamingTab(this));

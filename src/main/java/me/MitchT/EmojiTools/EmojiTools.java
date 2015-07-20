@@ -12,6 +12,9 @@ import java.net.URISyntaxException;
  * @author Mitch Talmadge (mitcht@aptitekk.com)
  */
 public class EmojiTools {
+
+    public static final String version = "V1.6";
+
     public static void main(String[] args) {
         System.setProperty("python.cachedir.skip", "false");
 

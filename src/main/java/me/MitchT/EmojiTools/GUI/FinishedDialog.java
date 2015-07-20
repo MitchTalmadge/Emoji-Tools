@@ -7,14 +7,16 @@ import java.io.File;
 import java.io.IOException;
 
 public class FinishedDialog extends JDialog implements ActionListener {
-    private final File extractionDirectory;
+    private final File outputDirectory;
     private JPanel contentPane;
+    private JLabel headerField;
+    private JLabel descriptionField;
+    private JTextField locationField;
     private JButton OKButton;
-    private JButton openEmojiDirectoryButton;
-    private JTextField extractionLocationField;
+    private JButton openOutputDirectoryButton;
 
-    public FinishedDialog(EmojiToolsGUI gui, Image logo, File extractionDirectory) {
-        this.extractionDirectory = extractionDirectory;
+    public FinishedDialog(EmojiToolsGUI gui, Image logo, String headerText, String descriptionText, File outputDirectory) {
+        this.outputDirectory = outputDirectory;
 
         this.setIconImage(logo);
         setContentPane(contentPane);
@@ -22,10 +24,13 @@ public class FinishedDialog extends JDialog implements ActionListener {
         setResizable(false);
         getRootPane().setDefaultButton(OKButton);
 
-        this.extractionLocationField.setText(extractionDirectory.getAbsolutePath());
+        this.headerField.setText(headerText);
+        this.descriptionField.setText(descriptionText);
+
+        this.locationField.setText(this.outputDirectory.getAbsolutePath());
 
         OKButton.addActionListener(this);
-        openEmojiDirectoryButton.addActionListener(this);
+        openOutputDirectoryButton.addActionListener(this);
 
         // call onOK() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -54,9 +59,9 @@ public class FinishedDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(OKButton)) {
             onOK();
-        } else if (e.getSource().equals(openEmojiDirectoryButton)) {
+        } else if (e.getSource().equals(openOutputDirectoryButton)) {
             try {
-                Desktop.getDesktop().open(extractionDirectory);
+                Desktop.getDesktop().open(outputDirectory);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

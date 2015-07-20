@@ -5,7 +5,6 @@ import me.MitchT.EmojiTools.Deletion.DeletionManager;
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.ExtractionManager;
 import me.MitchT.EmojiTools.GUI.*;
-import me.MitchT.EmojiTools.OperationManager;
 import me.MitchT.EmojiTools.Renaming.RenamingManager;
 
 import javax.swing.*;
@@ -34,8 +33,6 @@ public class ExtractionTab extends OperationTab implements ActionListener {
     private JTextField extractionDirectoryField;
     private JButton startExtractionButton;
     private JButton openRootDirectoryButton;
-    private OperationManager currentOperationManager;
-    private boolean cancelled = false;
     private File fontFile;
 
     public ExtractionTab(EmojiToolsGUI gui, File fontFile) {
@@ -112,8 +109,7 @@ public class ExtractionTab extends OperationTab implements ActionListener {
             conversionDialog.setVisible(true);
         }
 
-        FinishedDialog finishedDialog = new FinishedDialog(this.gui, this.gui.getLogo(), extractionDirectory);
-        finishedDialog.setVisible(true);
+        new FinishedDialog(this.gui, this.gui.getLogo(), "Emoji Extraction Complete!", "Your Extracted Emojis can be found in:", extractionDirectory).setVisible(true);
     }
 
     @Override
