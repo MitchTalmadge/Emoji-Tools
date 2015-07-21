@@ -264,13 +264,14 @@ public class ExtractionThread extends Thread {
             "dcroat" //257
     };
     final File font;
-        final File extractionDirectory;
+    final File extractionDirectory;
     boolean running = true;
     byte[] b;
 
-        ExtractionThread(File font, File extractionDirectory) {
+    ExtractionThread(File font, File extractionDirectory, String threadName) {
+        super(threadName);
         this.font = font;
-                this.extractionDirectory = extractionDirectory;
+        this.extractionDirectory = extractionDirectory;
     }
 
     public void endExtraction() {

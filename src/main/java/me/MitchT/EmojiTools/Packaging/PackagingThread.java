@@ -26,6 +26,7 @@ class PackagingThread extends Thread implements ConsoleManager.ConsoleListener {
     private boolean running = true;
 
     public PackagingThread(EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog, int outputType) {
+        super("PackagingThread");
         this.gui = gui;
         this.pngDirectory = pngDirectory;
         this.packagingManager = packagingManager;
@@ -142,7 +143,7 @@ class PackagingThread extends Thread implements ConsoleManager.ConsoleListener {
                 packagingDialog.setProgress(100);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                EmojiTools.submitError(Thread.currentThread(), e);
             } finally {
                 pythonInterpreter.close();
                 gui.getConsoleManager().removeConsoleListener(this);
@@ -151,7 +152,7 @@ class PackagingThread extends Thread implements ConsoleManager.ConsoleListener {
                     try {
                         org.apache.commons.io.FileUtils.deleteDirectory(new File(EmojiTools.getRootDirectory(), "tmp"));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        EmojiTools.submitError(Thread.currentThread(), e);
                     }
                 }
 

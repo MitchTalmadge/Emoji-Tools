@@ -18,6 +18,7 @@ class ConversionThread extends Thread {
     private int currentFileNum = 0;
 
     public ConversionThread(File conversionFile, ConversionManager conversionManager, ConversionDialog conversionDialog, boolean CgBItoRGBA) {
+        super("ConversionThread");
         this.conversionFile = conversionFile;
         this.conversionManager = conversionManager;
         this.conversionDialog = conversionDialog;

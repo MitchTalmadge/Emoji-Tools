@@ -12,7 +12,6 @@ import java.io.File;
 
 public class EmojiToolsGUI extends JFrame {
 
-    private final Image logo;
     private final ConsoleManager consoleManager;
     private JTabbedPane tabbedPane;
     private JPanel contentPane;
@@ -24,9 +23,7 @@ public class EmojiToolsGUI extends JFrame {
         setContentPane(contentPane);
         setResizable(false);
 
-        this.logo = new ImageIcon(getClass().getResource("/Images/EmojiToolsLogo.png")).getImage();
-
-        this.setIconImage(logo);
+        this.setIconImage(EmojiTools.getLogoImage());
 
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
@@ -55,10 +52,6 @@ public class EmojiToolsGUI extends JFrame {
         pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-    }
-
-    public Image getLogo() {
-        return this.logo;
     }
 
     public void showMessageDialog(String message) {

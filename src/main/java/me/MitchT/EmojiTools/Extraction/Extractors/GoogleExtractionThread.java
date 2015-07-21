@@ -1,5 +1,6 @@
 package me.MitchT.EmojiTools.Extraction.Extractors;
 
+import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.ExtractionManager;
 import me.MitchT.EmojiTools.Extraction.ExtractionUtilites;
 import me.MitchT.EmojiTools.GUI.ExtractionDialog;
@@ -17,7 +18,7 @@ public class GoogleExtractionThread extends ExtractionThread {
     private final ExtractionDialog extractionDialog;
 
     public GoogleExtractionThread(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
-        super(font, extractionDirectory);
+        super(font, extractionDirectory, "GoogleExtractionThread");
 
         this.tableNames = tableNames;
         this.tableOffsets = tableOffsets;
@@ -186,7 +187,7 @@ public class GoogleExtractionThread extends ExtractionThread {
             System.out.println(this.font.getName() + " not found!");
             extractionManager.showMessageDialog(this.font.getName() + " not found!");
         } catch (IOException e) {
-            e.printStackTrace();
+            EmojiTools.submitError(Thread.currentThread(), e);
         }
     }
 

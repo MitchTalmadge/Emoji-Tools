@@ -72,13 +72,13 @@ public class ExtractionTab extends OperationTab implements ActionListener {
 
         File extractionDirectory = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryField.getText());
         if (extractionDirectory.exists()) {
-            OverwriteWarningDialog overwriteWarningDialog = new OverwriteWarningDialog(this, this.gui.getLogo(), extractionDirectory);
+            OverwriteWarningDialog overwriteWarningDialog = new OverwriteWarningDialog(this, extractionDirectory);
             overwriteWarningDialog.setVisible(true);
             if (cancelled) {
                 this.cancelled = false;
                 return;
             } else {
-                DeletionDialog deletionDialog = new DeletionDialog(this, this.gui.getLogo());
+                DeletionDialog deletionDialog = new DeletionDialog(this);
                 this.currentOperationManager = new DeletionManager(extractionDirectory, this.gui, deletionDialog);
                 currentOperationManager.start();
                 deletionDialog.setVisible(true);
@@ -86,7 +86,7 @@ public class ExtractionTab extends OperationTab implements ActionListener {
         }
 
         if (!cancelled) {
-            ExtractionDialog extractionDialog = new ExtractionDialog(this, this.gui.getLogo());
+            ExtractionDialog extractionDialog = new ExtractionDialog(this);
             this.currentOperationManager = new ExtractionManager(this.fontFile, extractionDirectory, this.gui, extractionDialog);
             currentOperationManager.start();
             extractionDialog.setVisible(true);
@@ -96,20 +96,20 @@ public class ExtractionTab extends OperationTab implements ActionListener {
         }
 
         if (this.renameRadioButton2.isSelected() && !cancelled) {
-            RenamingDialog renamingDialog = new RenamingDialog(this, this.gui.getLogo());
+            RenamingDialog renamingDialog = new RenamingDialog(this);
             this.currentOperationManager = new RenamingManager(extractionDirectory, this.gui, renamingDialog, new boolean[]{false, true, false, false}, new boolean[]{true, false, false, false});
             currentOperationManager.start();
             renamingDialog.setVisible(true);
         }
 
         if (this.convertRadioButton2.isSelected() && !cancelled) {
-            ConversionDialog conversionDialog = new ConversionDialog(this, this.gui.getLogo());
+            ConversionDialog conversionDialog = new ConversionDialog(this);
             this.currentOperationManager = new ConversionManager(extractionDirectory, this.gui, conversionDialog, true);
             currentOperationManager.start();
             conversionDialog.setVisible(true);
         }
 
-        new FinishedDialog(this.gui, this.gui.getLogo(), "Emoji Extraction Complete!", "Your Extracted Emojis can be found in:", extractionDirectory).setVisible(true);
+        new FinishedDialog(this.gui, "Emoji Extraction Complete!", "Your Extracted Emojis can be found in:", extractionDirectory).setVisible(true);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class ExtractionTab extends OperationTab implements ActionListener {
             try {
                 desktop.open(EmojiTools.getRootDirectory());
             } catch (IOException e1) {
-                e1.printStackTrace();
+                EmojiTools.submitError(Thread.currentThread(), e1);
             }
         }
     }

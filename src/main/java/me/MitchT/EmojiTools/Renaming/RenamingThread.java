@@ -20,6 +20,7 @@ class RenamingThread extends Thread {
     private int currentFileNum = 0;
 
     public RenamingThread(File renameFile, RenamingManager renamingManager, RenamingDialog renamingDialog, boolean[] prefixButtons, boolean[] capitalizationButtons) {
+        super("RenamingThread");
         this.renameFile = renameFile;
         this.renamingManager = renamingManager;
         this.renamingDialog = renamingDialog;
@@ -42,10 +43,15 @@ class RenamingThread extends Thread {
         totalFileNum = files.length;
 
         for (File file : files) {
+            if (file.isDirectory())
+                continue;
+            if (!file.getName().toLowerCase().endsWith(".png"))
+                continue;
             if (!running) {
                 this.renamingDialog.dispose();
                 return;
             }
+
             this.currentFileNum++;
             String newFileName = file.getName();
 

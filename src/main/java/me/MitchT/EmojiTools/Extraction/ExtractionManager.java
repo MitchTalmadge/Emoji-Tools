@@ -1,5 +1,6 @@
 package me.MitchT.EmojiTools.Extraction;
 
+import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.Extractors.AppleExtractionThread;
 import me.MitchT.EmojiTools.Extraction.Extractors.ExtractionThread;
 import me.MitchT.EmojiTools.Extraction.Extractors.GoogleExtractionThread;
@@ -65,7 +66,7 @@ public class ExtractionManager extends OperationManager {
 
             inputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            EmojiTools.submitError(Thread.currentThread(), e);
         }
     }
 

@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="me.MitchT.EmojiTools.GUI.ErrorDetailsDialog">
   <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="48" y="54" width="400" height="309"/>
+      <xy x="48" y="54" width="600" height="373"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -18,8 +18,8 @@
       <grid id="8d8ba" layout-manager="FormLayout">
         <rowspec value="center:d:noGrow"/>
         <rowspec value="top:4dlu:noGrow"/>
-        <rowspec value="center:200px:noGrow"/>
-        <colspec value="fill:400px:noGrow"/>
+        <rowspec value="top:d:noGrow"/>
+        <colspec value="fill:600px:noGrow"/>
         <constraints border-constraint="Center"/>
         <properties/>
         <border type="none"/>
@@ -30,7 +30,9 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="&lt;html&gt;An error report has been generated for you below. What you see below, along with any optional information you have entered on the previous screen, is all the information that we will recieve.&lt;/html&gt;"/>
+              <horizontalAlignment value="2"/>
+              <horizontalTextPosition value="2"/>
+              <text value="&lt;html&gt;&lt;center&gt;An error report has been generated for you below. What you see below, along with any optional information you have entered on the previous screen, is all the information that we will receive.&lt;/center&gt;&lt;/html&gt;"/>
             </properties>
           </component>
           <scrollpane id="94e1">
@@ -47,7 +49,9 @@
               <component id="9f3b1" class="javax.swing.JTextArea" binding="exceptionArea">
                 <constraints/>
                 <properties>
+                  <columns value="15"/>
                   <editable value="false"/>
+                  <rows value="12"/>
                   <wrapStyleWord value="false"/>
                 </properties>
               </component>

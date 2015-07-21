@@ -3,6 +3,7 @@ package me.MitchT.EmojiTools;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.net.URISyntaxException;
 
@@ -14,9 +15,13 @@ import java.net.URISyntaxException;
 public class EmojiTools {
 
     public static final String version = "V1.6";
+    private static final Image logoImage = new ImageIcon(EmojiTools.class.getResource("/Images/EmojiToolsLogo.png")).getImage();
+    private static final ErrorHandler errorHandler = new ErrorHandler();
 
     public static void main(String[] args) {
         System.setProperty("python.cachedir.skip", "false");
+
+        Thread.setDefaultUncaughtExceptionHandler(errorHandler);
 
         String fontName = null;
         if (args.length > 0)
@@ -28,7 +33,7 @@ public class EmojiTools {
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
+            submitError(Thread.currentThread(), e);
         }
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -40,10 +45,19 @@ public class EmojiTools {
         });
     }
 
+    public static Image getLogoImage() {
+        return logoImage;
+    }
+
+    public static void submitError(Thread thread, Throwable throwable) {
+        errorHandler.uncaughtException(thread, throwable);
+    }
+
     public static File getRootDirectory() {
         try {
             return new File(EmojiTools.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getAbsoluteFile();
         } catch (URISyntaxException e) {
+            submitError(Thread.currentThread(), e);
             return null;
         }
     }

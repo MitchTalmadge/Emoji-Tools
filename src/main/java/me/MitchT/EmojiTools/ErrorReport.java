@@ -5,12 +5,12 @@ import java.io.StringWriter;
 
 public class ErrorReport {
 
-    private final Exception exception;
+    private final Throwable exception;
     private String description;
     private String name;
     private String email;
 
-    public ErrorReport(Exception exception) {
+    public ErrorReport(Throwable exception) {
         this.exception = exception;
     }
 

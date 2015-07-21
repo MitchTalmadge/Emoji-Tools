@@ -1,9 +1,9 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.GUI.Tabs.ExtractionTab;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
@@ -14,11 +14,11 @@ public class OverwriteWarningDialog extends JDialog implements ActionListener {
     private JButton continuebutton;
     private JTextField extractionDirectoryField;
 
-    public OverwriteWarningDialog(ExtractionTab gui, Image logo, File extractionDirectory) {
+    public OverwriteWarningDialog(ExtractionTab gui, File extractionDirectory) {
 
         this.gui = gui;
 
-        this.setIconImage(logo);
+        this.setIconImage(EmojiTools.getLogoImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);

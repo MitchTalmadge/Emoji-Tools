@@ -1,5 +1,6 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.GUI.Tabs.OperationTab;
 
 import javax.swing.*;
@@ -15,10 +16,10 @@ public class ProgressDialog extends JDialog implements ActionListener {
     private JScrollPane scrollPane;
     private JLabel titleLabel;
 
-    ProgressDialog(OperationTab gui, String tileText, Image logo) {
+    ProgressDialog(OperationTab gui, String tileText) {
         this.gui = gui;
 
-        this.setIconImage(logo);
+        this.setIconImage(EmojiTools.getLogoImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);

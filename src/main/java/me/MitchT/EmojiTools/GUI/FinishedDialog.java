@@ -1,5 +1,7 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.EmojiTools;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -15,10 +17,10 @@ public class FinishedDialog extends JDialog implements ActionListener {
     private JButton OKButton;
     private JButton openOutputDirectoryButton;
 
-    public FinishedDialog(EmojiToolsGUI gui, Image logo, String headerText, String descriptionText, File outputDirectory) {
+    public FinishedDialog(EmojiToolsGUI gui, String headerText, String descriptionText, File outputDirectory) {
         this.outputDirectory = outputDirectory;
 
-        this.setIconImage(logo);
+        this.setIconImage(EmojiTools.getLogoImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);
@@ -63,7 +65,7 @@ public class FinishedDialog extends JDialog implements ActionListener {
             try {
                 Desktop.getDesktop().open(outputDirectory);
             } catch (IOException e1) {
-                e1.printStackTrace();
+                EmojiTools.submitError(Thread.currentThread(), e1);
             }
             this.dispose();
         }

@@ -65,19 +65,19 @@ public class PackagingTab extends OperationTab implements ActionListener {
         else
             outputType = OSX;
 
-        RenamingDialog renamingDialog = new RenamingDialog(this, this.gui.getLogo());
+        RenamingDialog renamingDialog = new RenamingDialog(this);
         this.currentOperationManager = new RenamingManager(this.packagingFile, this.gui, renamingDialog, new boolean[]{false, false, true, false}, new boolean[]{false, false, true, true});
         currentOperationManager.start();
         renamingDialog.setVisible(true);
 
         if (!cancelled) {
-            PackagingDialog packagingDialog = new PackagingDialog(this, this.gui.getLogo());
+            PackagingDialog packagingDialog = new PackagingDialog(this);
             this.currentOperationManager = new PackagingManager(this.gui, this.packagingFile, packagingDialog, outputType);
             currentOperationManager.start();
             packagingDialog.setVisible(true);
         }
 
-        new FinishedDialog(this.gui, this.gui.getLogo(), "Emoji Packaging Complete!", "Your Packaged Emoji Font can be found in:", new File(EmojiTools.getRootDirectory(), "Output")).setVisible(true);
+        new FinishedDialog(this.gui, "Emoji Packaging Complete!", "Your Packaged Emoji Font can be found in:", new File(EmojiTools.getRootDirectory(), "Output")).setVisible(true);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class PackagingTab extends OperationTab implements ActionListener {
             try {
                 desktop.open(EmojiTools.getRootDirectory());
             } catch (IOException e1) {
-                e1.printStackTrace();
+                EmojiTools.submitError(Thread.currentThread(), e1);
             }
         } else if (e.getSource().equals(this.startPackagingButton)) {
             startPackaging();

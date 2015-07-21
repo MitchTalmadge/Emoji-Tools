@@ -4,6 +4,7 @@ import com.jcraft.jzlib.Deflater;
 import com.jcraft.jzlib.GZIPException;
 import com.jcraft.jzlib.Inflater;
 import com.jcraft.jzlib.JZlib;
+import me.MitchT.EmojiTools.EmojiTools;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -80,7 +81,7 @@ public class Converter {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                EmojiTools.submitError(Thread.currentThread(), e);
             }
         }
     }
@@ -103,7 +104,7 @@ public class Converter {
                 while (!chunk.getName().equalsIgnoreCase("IEND"));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            EmojiTools.submitError(Thread.currentThread(), e);
         }
     }
 

@@ -51,12 +51,12 @@ public class ConversionTab extends OperationTab implements ActionListener {
             return;
         }
 
-        ConversionDialog conversionDialog = new ConversionDialog(this, this.gui.getLogo());
+        ConversionDialog conversionDialog = new ConversionDialog(this);
         this.currentOperationManager = new ConversionManager(this.conversionFile, this.gui, conversionDialog, this.conversionRadioButton1.isSelected());
         currentOperationManager.start();
         conversionDialog.setVisible(true);
 
-        new FinishedDialog(this.gui, this.gui.getLogo(), "Emoji Conversion Complete!", "Your Converted Emojis can be found in:", conversionFile).setVisible(true);
+        new FinishedDialog(this.gui, "Emoji Conversion Complete!", "Your Converted Emojis can be found in:", conversionFile).setVisible(true);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ConversionTab extends OperationTab implements ActionListener {
             try {
                 desktop.open(EmojiTools.getRootDirectory());
             } catch (IOException e1) {
-                e1.printStackTrace();
+                EmojiTools.submitError(Thread.currentThread(), e1);
             }
         } else if (e.getSource().equals(this.startConvertingButton)) {
             startConversion();

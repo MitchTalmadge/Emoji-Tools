@@ -16,6 +16,7 @@ class DeletionThread extends Thread {
     private int currentFileNum = 0;
 
     public DeletionThread(File extractionDirectory, DeletionManager deletionManager, DeletionDialog deletionDialog) {
+        super("DeletionThread");
         this.extractionDirectory = extractionDirectory;
         this.deletionManager = deletionManager;
         this.deletionDialog = deletionDialog;
@@ -62,7 +63,7 @@ class DeletionThread extends Thread {
             if (!file.equals(extractionDirectory))
                 file.delete();
 
-            //System.out.println("Deleting " + file.getName());
+            System.out.println("Deleting " + file.getName());
             deletionDialog.appendToStatus("Deleting " + file.getName());
             updateProgress();
         }

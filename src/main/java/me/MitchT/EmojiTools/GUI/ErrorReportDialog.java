@@ -1,10 +1,10 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.ErrorReport;
 import me.MitchT.EmojiTools.GUI.Tabs.OperationTab;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 
 public class ErrorReportDialog extends JDialog implements ActionListener {
@@ -16,15 +16,14 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
     private JTextField nameField;
     private JTextField emailAddressField;
     private JButton viewDetailsButton;
-    private JTextArea textArea1;
     private JTextArea descriptionArea;
 
-    public ErrorReportDialog(OperationTab gui, Image logo, ErrorReport report) {
+    public ErrorReportDialog(OperationTab gui, ErrorReport report) {
 
         this.gui = gui;
         this.report = report;
 
-        setIconImage(logo);
+        setIconImage(EmojiTools.getLogoImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);
@@ -54,6 +53,9 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
     }
 
     private void onSendReport() {
+        if (gui != null)
+            gui.stopOperations();
+
         this.report.setDescription(this.descriptionArea.getText());
         this.report.setName(this.nameField.getText());
         this.report.setEmail(this.emailAddressField.getText());
@@ -64,7 +66,8 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
     }
 
     private void onDontSendReport() {
-        gui.stopOperations();
+        if (gui != null)
+            gui.stopOperations();
         this.dispose();
         System.exit(0);
     }

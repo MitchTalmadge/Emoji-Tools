@@ -67,14 +67,14 @@ public class RenamingTab extends OperationTab implements ActionListener {
             return;
         }
 
-        RenamingDialog renamingDialog = new RenamingDialog(this, this.gui.getLogo());
+        RenamingDialog renamingDialog = new RenamingDialog(this);
         boolean[] prefixButtons = new boolean[]{this.prefixesRadioButton1.isSelected(), this.prefixesRadioButton2.isSelected(), this.prefixesRadioButton3.isSelected(), this.prefixesRadioButton4.isSelected()};
         boolean[] capitalizationButtons = new boolean[]{this.captializationRadioButton1.isSelected(), this.captializationRadioButton2.isSelected(), this.captializationRadioButton3.isSelected(), this.capitalizationCheckBox1.isSelected()};
         this.currentOperationManager = new RenamingManager(renameFile, this.gui, renamingDialog, prefixButtons, capitalizationButtons);
         currentOperationManager.start();
         renamingDialog.setVisible(true);
 
-        new FinishedDialog(this.gui, this.gui.getLogo(), "Emoji Renaming Complete!", "Your Renamed Emojis can be found in:", renameFile).setVisible(true);
+        new FinishedDialog(this.gui, "Emoji Renaming Complete!", "Your Renamed Emojis can be found in:", renameFile).setVisible(true);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class RenamingTab extends OperationTab implements ActionListener {
             try {
                 desktop.open(EmojiTools.getRootDirectory());
             } catch (IOException e1) {
-                e1.printStackTrace();
+                EmojiTools.submitError(Thread.currentThread(), e1);
             }
         } else if (e.getSource().equals(this.startRenamingButton)) {
             startRenaming();
