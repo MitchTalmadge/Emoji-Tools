@@ -39,7 +39,7 @@ public class EmojiToolsGUI extends JFrame {
             }
         });
 
-        this.headerLabel.setText("Emoji Tools " + EmojiTools.version);
+        this.headerLabel.setText("Emoji Tools " + EmojiTools.VERSION_STRING);
 
         this.tabbedPane.addTab("Extractor", new ExtractionTab(this, fontFile));
         this.tabbedPane.addTab("Renamer", new RenamingTab(this));

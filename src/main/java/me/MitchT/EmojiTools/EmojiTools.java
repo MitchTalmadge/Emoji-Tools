@@ -14,7 +14,9 @@ import java.net.URISyntaxException;
  */
 public class EmojiTools {
 
-    public static final String version = "V1.6";
+    public static final String VERSION_STRING = "V1.6";
+    public static final int PROJECT_ID = 1; //Used in AptiAPI
+
     private static final Image logoImage = new ImageIcon(EmojiTools.class.getResource("/Images/EmojiToolsLogo.png")).getImage();
     private static final ErrorHandler errorHandler = new ErrorHandler();
 

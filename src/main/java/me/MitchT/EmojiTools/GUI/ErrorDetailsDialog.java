@@ -1,30 +1,31 @@
 package me.MitchT.EmojiTools.GUI;
 
+import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.ErrorReport;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 
 public class ErrorDetailsDialog extends JDialog implements ActionListener {
     private final ErrorReportDialog dialog;
     private final ErrorReport report;
     private JPanel contentPane;
-    private JTextArea exceptionArea;
+    private JTextPane exceptionArea;
     private JButton OKButton;
+    private JScrollPane scrollPane;
 
-    public ErrorDetailsDialog(ErrorReportDialog dialog, Image logo, ErrorReport report) {
+    public ErrorDetailsDialog(ErrorReportDialog dialog, ErrorReport report) {
 
         this.dialog = dialog;
         this.report = report;
 
-        setIconImage(logo);
+        setIconImage(EmojiTools.getLogoImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);
         getRootPane().setDefaultButton(OKButton);
 
-        this.exceptionArea.setText(report.getStackTrace());
+        this.exceptionArea.setText("<html>" + report.generateReport().replaceAll("\n", "<br>").replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</html>");
 
         this.OKButton.addActionListener(this);
 
@@ -43,6 +44,10 @@ public class ErrorDetailsDialog extends JDialog implements ActionListener {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         pack();
+
+        this.scrollPane.getVerticalScrollBar().setValue(0);
+        this.scrollPane.getHorizontalScrollBar().setValue(0);
+
         setLocationRelativeTo(dialog);
     }
 

@@ -1,6 +1,7 @@
 package me.MitchT.EmojiTools.GUI;
 
 import me.MitchT.EmojiTools.EmojiTools;
+import me.MitchT.EmojiTools.ErrorHandler;
 import me.MitchT.EmojiTools.ErrorReport;
 import me.MitchT.EmojiTools.GUI.Tabs.OperationTab;
 
@@ -10,6 +11,7 @@ import java.awt.event.*;
 public class ErrorReportDialog extends JDialog implements ActionListener {
     private final OperationTab gui;
     private final ErrorReport report;
+    private final ErrorHandler errorHandler;
     private JPanel contentPane;
     private JButton sendReportButton;
     private JButton dontSendButton;
@@ -18,8 +20,9 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
     private JButton viewDetailsButton;
     private JTextArea descriptionArea;
 
-    public ErrorReportDialog(OperationTab gui, ErrorReport report) {
+    public ErrorReportDialog(ErrorHandler errorHandler, OperationTab gui, ErrorReport report) {
 
+        this.errorHandler = errorHandler;
         this.gui = gui;
         this.report = report;
 
@@ -59,7 +62,7 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
         this.report.setDescription(this.descriptionArea.getText());
         this.report.setName(this.nameField.getText());
         this.report.setEmail(this.emailAddressField.getText());
-        this.report.sendReport();
+        this.errorHandler.sendErrorReport(report);
 
         this.dispose();
         System.exit(0);
@@ -73,7 +76,10 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
     }
 
     private void onViewDetails() {
-        new ErrorDetailsDialog(this, this.getIconImages().get(0), report).setVisible(true);
+        this.report.setDescription(this.descriptionArea.getText());
+        this.report.setName(this.nameField.getText());
+        this.report.setEmail(this.emailAddressField.getText());
+        new ErrorDetailsDialog(this, report).setVisible(true);
     }
 
     @Override
