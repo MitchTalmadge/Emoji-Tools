@@ -43,6 +43,22 @@
           </component>
         </children>
       </grid>
+      <grid id="8ee22" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="6d886" class="javax.swing.JLabel" binding="donateLabel">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="11"/>
+              <icon value="Images/heart.png"/>
+              <text value="&lt;html&gt;&lt;u&gt;This tool is free. College is not. Please donate :)&lt;/u&gt;&lt;/html&gt;"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
   <buttonGroups>

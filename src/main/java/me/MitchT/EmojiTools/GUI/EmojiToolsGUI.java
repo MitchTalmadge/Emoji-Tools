@@ -6,16 +6,22 @@ import me.MitchT.EmojiTools.GUI.Tabs.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public class EmojiToolsGUI extends JFrame {
+public class EmojiToolsGUI extends JFrame implements MouseListener {
 
     private final ConsoleManager consoleManager;
     private JTabbedPane tabbedPane;
     private JPanel contentPane;
     private JLabel headerLabel;
+    private JLabel donateLabel;
 
     public EmojiToolsGUI(File fontFile) {
 
@@ -47,6 +53,9 @@ public class EmojiToolsGUI extends JFrame {
         this.tabbedPane.addTab("Packager", new PackagingTab(this));
         this.tabbedPane.setSelectedIndex(0);
 
+        this.donateLabel.addMouseListener(this);
+        this.donateLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         this.consoleManager = new ConsoleManager();
 
         pack();
@@ -60,5 +69,31 @@ public class EmojiToolsGUI extends JFrame {
 
     public ConsoleManager getConsoleManager() {
         return this.consoleManager;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.getSource().equals(this.donateLabel))
+            try {
+                Desktop.getDesktop().browse(new URI("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=C4BS4EUTLUA9U&lc=US&item_name=Mitch%20Talmadge%20Code%20Donations&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"));
+            } catch (IOException | URISyntaxException e1) {
+                e1.printStackTrace();
+            }
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
     }
 }
