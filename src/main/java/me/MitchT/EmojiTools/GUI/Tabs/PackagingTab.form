@@ -15,7 +15,7 @@
         <colspec value="fill:max(d;4px):noGrow"/>
         <constraints border-constraint="North"/>
         <properties/>
-        <border type="etched" title="Folder or .png Location"/>
+        <border type="etched" title="Folder Location"/>
         <children>
           <component id="a9ef" class="javax.swing.JTextField" binding="fileNameField">
             <constraints>
