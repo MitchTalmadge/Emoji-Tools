@@ -4,11 +4,12 @@ Multiple useful tools to help Android and iOS/OSX developers with creating and m
 Features:
 * Extracts Emojis from '.ttf' files used by Android, iOS, and OSX into individual '.png' files.
   * Takes less than 6 seconds to extract all Emojis! Very quick!
-  * Extracted Emojis are named by Unicode names (Android: `uniE537.png` iOS/OSX: `uE537.png`)
-  * Extracted Emojis can automatically be stripped of their prefixes (`uniE537.png` -> `E537.png`)
+  * Extracted Emojis are named by Unicode names (Android: `unie537.png` iOS/OSX: `uE537.png`)
+  * Extracted Emojis can automatically be stripped of their prefixes (`unie537.png` -> `E537.png`)
   * Extracted iOS CgBI (pincrushed) Emojis (which show up black on Windows) can automatically be converted to RGBA.
 * Renamer tool which makes renaming Emojis very easy! You can change prefixes, capitalise/lowercase, etc.
-* Converts from CgBI (pincrushed) Emojis to RGBA and vice versa. (Planned)
+* Converts from CgBI (pincrushed) Emojis to RGBA and vice versa.
+* Ability to Re-Package Emojis into NotoColorEmoji.ttf (Android) Emoji Font. (Apple support coming soon!)
 * Professional, easy-to-use GUI.
 
 # How to Use:
