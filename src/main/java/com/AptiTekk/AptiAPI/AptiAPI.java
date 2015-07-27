@@ -28,7 +28,7 @@ public class AptiAPI {
         try {
 
             //Step 1 -- Generate Token
-            String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectIDf=" + projectID);
+            String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectID=" + projectID);
 
             if (tokenResponse == null) {
                 displayError("Could not generate token -- Null response!");

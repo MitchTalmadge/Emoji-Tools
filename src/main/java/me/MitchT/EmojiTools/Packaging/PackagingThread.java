@@ -50,6 +50,11 @@ class PackagingThread extends Thread implements ConsoleManager.ConsoleListener {
             PySystemState systemState = new PySystemState();
             PythonInterpreter pythonInterpreter = new PythonInterpreter(null, systemState);
 
+            pythonInterpreter.exec("import sys\n" +
+                    "reload(sys)\n" +
+                    "sys.setdefaultencoding('UTF8')\n" +
+                    "print('Encoding: '+sys.getdefaultencoding())"); //Set encoding to UTF8
+
             //Set Outputs
             pythonInterpreter.setOut(System.out);
             pythonInterpreter.setErr(System.err);

@@ -22,6 +22,7 @@ public class EmojiTools {
 
     public static void main(String[] args) {
         System.setProperty("python.cachedir.skip", "false");
+        System.setProperty("python.console.encoding", "UTF-8");
 
         Thread.setDefaultUncaughtExceptionHandler(errorHandler);
 
