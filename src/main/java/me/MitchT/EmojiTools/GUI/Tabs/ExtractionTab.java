@@ -9,17 +9,14 @@ import me.MitchT.EmojiTools.Renaming.RenamingManager;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
-public class ExtractionTab extends OperationTab implements ActionListener {
+public class ExtractionTab extends OperationTab implements ActionListener, TextFilter.TextFilterListener {
 
     private final EmojiToolsGUI gui;
     private final String defaultFileNameFieldText = "File Name";
@@ -49,7 +46,7 @@ public class ExtractionTab extends OperationTab implements ActionListener {
         this.convertRadioButton1.addActionListener(this);
         this.convertRadioButton2.addActionListener(this);
 
-        ((AbstractDocument) this.extractionDirectoryField.getDocument()).setDocumentFilter(new extractionDirectoryFilter(this, this.extractionDirectoryField));
+        TextFilter.assignFilter(this.extractionDirectoryField, 50, TextFilter.FILENAME, this);
 
         this.openRootDirectoryButton.addActionListener(this);
         this.startExtractionButton.addActionListener(this);
@@ -156,33 +153,8 @@ public class ExtractionTab extends OperationTab implements ActionListener {
         }
     }
 
-    class extractionDirectoryFilter extends DocumentFilter {
-
-        private final ExtractionTab gui;
-        private final JTextField textField;
-
-        public extractionDirectoryFilter(ExtractionTab gui, JTextField field) {
-            this.gui = gui;
-            this.textField = field;
-        }
-
-        @Override
-        public void replace(FilterBypass fb, int i, int i1, String string, AttributeSet as) throws BadLocationException {
-            for (int n = string.length(); n > 0; n--) {
-                char c = string.charAt(n - 1);
-                if ((Character.isAlphabetic(c) || Character.isDigit(c) || c == '_' || c == '-') && this.textField.getText().length() < 50)
-                    super.replace(fb, i, i1, String.valueOf(c), as);
-                if (textField.getText().length() == 1)
-                    gui.updateStartButton();
-            }
-        }
-
-        @Override
-        public void remove(FilterBypass fb, int i, int i1) throws BadLocationException {
-            super.remove(fb, i, i1);
-
-            if (textField.getText().length() == 0)
-                gui.updateStartButton();
-        }
+    @Override
+    public void lengthChanged(int newLength, JTextComponent sourceComponent) {
+        updateStartButton();
     }
 }

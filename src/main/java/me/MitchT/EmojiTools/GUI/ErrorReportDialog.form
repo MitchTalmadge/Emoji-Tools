@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="me.MitchT.EmojiTools.GUI.ErrorReportDialog">
   <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="48" y="54" width="412" height="437"/>
+      <xy x="48" y="54" width="412" height="425"/>
     </constraints>
     <properties>
       <inheritsPopupMenu value="false"/>
@@ -53,17 +53,17 @@
       </component>
       <grid id="8897f" layout-manager="FormLayout">
         <rowspec value="center:16px:noGrow"/>
-        <rowspec value="top:4dlu:noGrow"/>
+        <rowspec value="center:4dlu:grow"/>
         <rowspec value="center:50px:noGrow"/>
-        <rowspec value="top:4dlu:noGrow"/>
-        <rowspec value="center:46px:noGrow"/>
-        <rowspec value="top:4dlu:noGrow"/>
-        <rowspec value="top:d:noGrow"/>
-        <rowspec value="top:4dlu:noGrow"/>
+        <rowspec value="center:4dlu:grow"/>
+        <rowspec value="center:47px:noGrow"/>
+        <rowspec value="center:4dlu:grow"/>
+        <rowspec value="top:100px:noGrow"/>
+        <rowspec value="center:4dlu:grow"/>
+        <rowspec value="center:35px:noGrow"/>
+        <rowspec value="center:4dlu:grow"/>
         <rowspec value="center:max(d;4px):noGrow"/>
-        <rowspec value="top:4dlu:noGrow"/>
-        <rowspec value="center:max(d;4px):noGrow"/>
-        <colspec value="fill:min(d;440px):noGrow"/>
+        <colspec value="fill:min(d;400px):noGrow"/>
         <constraints border-constraint="Center"/>
         <properties/>
         <border type="empty">
@@ -165,7 +165,7 @@
               <component id="12990" class="javax.swing.JLabel">
                 <constraints border-constraint="North"/>
                 <properties>
-                  <labelFor value="30e89"/>
+                  <labelFor value="893a"/>
                   <text value="&amp;Please describe what happened just before this dialog appeared: (optional)"/>
                 </properties>
               </component>
@@ -181,7 +181,7 @@
                   <component id="30e89" class="javax.swing.JTextArea" binding="descriptionArea">
                     <constraints/>
                     <properties>
-                      <columns value="10"/>
+                      <columns value="8"/>
                       <lineWrap value="true"/>
                       <rows value="5"/>
                       <wrapStyleWord value="true"/>
@@ -191,6 +191,36 @@
               </scrollpane>
             </children>
           </grid>
+          <vspacer id="8b5c0">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-vert="false"/>
+            </constraints>
+          </vspacer>
+          <vspacer id="3593a">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-vert="false"/>
+            </constraints>
+          </vspacer>
+          <vspacer id="3393a">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-vert="false"/>
+            </constraints>
+          </vspacer>
+          <vspacer id="da6cf">
+            <constraints>
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-vert="false"/>
+            </constraints>
+          </vspacer>
+          <vspacer id="c1587">
+            <constraints>
+              <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-vert="false"/>
+            </constraints>
+          </vspacer>
         </children>
       </grid>
     </children>

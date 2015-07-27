@@ -25,50 +25,55 @@ public class AptiAPI {
 
     public void sendErrorReport(String report) {
 
-        //Step 1 -- Generate Token
-        String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectID=" + projectID);
+        try {
 
-        if (tokenResponse == null) {
-            displayError("Could not generate token -- Null response!");
-            return;
-        }
+            //Step 1 -- Generate Token
+            String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectID=" + projectID);
 
-        System.out.println("Response: " + tokenResponse);
+            if (tokenResponse == null) {
+                displayError("Could not generate token -- Null response!");
+                return;
+            }
 
-        String[] responseSplit = tokenResponse.split(":");
-        if (responseSplit.length < 3) {
-            displayError("Token response length is < 3!");
-            return;
-        }
+            System.out.println("Response: " + tokenResponse);
 
-        if (responseSplit[1].equals("FAILURE")) {
-            displayError(responseSplit[2]);
-            return;
-        }
+            String[] responseSplit = tokenResponse.split(":");
+            if (responseSplit.length < 3) {
+                displayError("Token response length is < 3!");
+                return;
+            }
 
-        String token = responseSplit[2];
+            if (responseSplit[1].equals("FAILURE")) {
+                displayError(responseSplit[2]);
+                return;
+            }
 
-        //Step 2 -- Submit Report
-        //TODO: Encrypt Report
-        String errorReportResponse = POSTData(API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + projectID + "&token=" + token + "&report=" + report);
+            String token = responseSplit[2];
 
-        if (errorReportResponse == null) {
-            displayError("Could not submit report -- Null response!");
-        }
+            String encryptedReport = new AptiCrypto(token.substring(0, 16)).encrypt(report);
 
-        System.out.println("Response: " + errorReportResponse);
+            //Step 2 -- Submit Report
+            String errorReportResponse = POSTData(API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + projectID + "&token=" + token + "&report=" + encryptedReport);
 
-        responseSplit = tokenResponse.split(":");
-        if (responseSplit.length < 2) {
-            displayError("Token response length is < 2!");
-            return;
-        }
+            if (errorReportResponse == null) {
+                displayError("Could not submit report -- Null response!");
+            }
 
-        if (responseSplit[1].equals("FAILURE")) {
-            displayError(responseSplit[2]);
+            System.out.println("Response: " + errorReportResponse);
+
+            responseSplit = tokenResponse.split(":");
+            if (responseSplit.length < 2) {
+                displayError("Token response length is < 2!");
+                return;
+            }
+
+            if (responseSplit[1].equals("FAILURE")) {
+                displayError(responseSplit[2]);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
 
     public void addAPIListener(AptiAPIListener listener) {
         if (!APIListeners.contains(listener))

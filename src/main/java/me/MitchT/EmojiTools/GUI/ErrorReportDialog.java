@@ -36,6 +36,10 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
         this.dontSendButton.addActionListener(this);
         this.viewDetailsButton.addActionListener(this);
 
+        TextFilter.assignFilter(this.descriptionArea, 255, TextFilter.NO_HTML, null);
+        TextFilter.assignFilter(this.nameField, 70, TextFilter.ALPHA_SPACE, null);
+        TextFilter.assignFilter(this.emailAddressField, 100, TextFilter.EMAIL, null);
+
         // call onDontSendReport() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {

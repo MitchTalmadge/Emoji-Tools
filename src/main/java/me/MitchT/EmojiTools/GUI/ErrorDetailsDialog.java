@@ -7,17 +7,12 @@ import javax.swing.*;
 import java.awt.event.*;
 
 public class ErrorDetailsDialog extends JDialog implements ActionListener {
-    private final ErrorReportDialog dialog;
-    private final ErrorReport report;
     private JPanel contentPane;
-    private JTextPane exceptionArea;
+    private JTextPane reportArea;
     private JButton OKButton;
     private JScrollPane scrollPane;
 
     public ErrorDetailsDialog(ErrorReportDialog dialog, ErrorReport report) {
-
-        this.dialog = dialog;
-        this.report = report;
 
         setIconImage(EmojiTools.getLogoImage());
         setContentPane(contentPane);
@@ -25,7 +20,7 @@ public class ErrorDetailsDialog extends JDialog implements ActionListener {
         setResizable(false);
         getRootPane().setDefaultButton(OKButton);
 
-        this.exceptionArea.setText("<html>" + report.generateReport().replaceAll("\n", "<br>").replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</html>");
+        this.reportArea.setText("<html>" + report.generateReport().replaceAll("\n", "<br>").replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</html>");
 
         this.OKButton.addActionListener(this);
 
@@ -45,8 +40,7 @@ public class ErrorDetailsDialog extends JDialog implements ActionListener {
 
         pack();
 
-        this.scrollPane.getVerticalScrollBar().setValue(0);
-        this.scrollPane.getHorizontalScrollBar().setValue(0);
+        this.reportArea.setCaretPosition(0);
 
         setLocationRelativeTo(dialog);
     }
