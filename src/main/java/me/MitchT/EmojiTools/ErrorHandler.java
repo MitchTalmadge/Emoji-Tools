@@ -4,12 +4,15 @@ import com.AptiTekk.AptiAPI.AptiAPI;
 import com.AptiTekk.AptiAPI.AptiAPIListener;
 import me.MitchT.EmojiTools.GUI.ErrorReportDialog;
 
+import javax.swing.*;
+
 public class ErrorHandler implements Thread.UncaughtExceptionHandler, AptiAPIListener {
 
     private final AptiAPI aptiAPI;
 
     public ErrorHandler() {
         this.aptiAPI = new AptiAPI(EmojiTools.PROJECT_ID);
+        this.aptiAPI.addAPIListener(this);
     }
 
     @Override
@@ -28,13 +31,13 @@ public class ErrorHandler implements Thread.UncaughtExceptionHandler, AptiAPILis
     }
 
     @Override
-    public void displayInfo(String message) {
-
+    public void displayInfo(final String message) {
+        JOptionPane.showMessageDialog(null, message, "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
-    public void displayError(String message) {
-
+    public void displayError(final String message) {
+        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     @Override

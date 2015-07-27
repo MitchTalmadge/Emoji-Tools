@@ -28,7 +28,7 @@ public class AptiAPI {
         try {
 
             //Step 1 -- Generate Token
-            String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectID=" + projectID);
+            String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectIDf=" + projectID);
 
             if (tokenResponse == null) {
                 displayError("Could not generate token -- Null response!");
@@ -44,7 +44,7 @@ public class AptiAPI {
             }
 
             if (responseSplit[1].equals("FAILURE")) {
-                displayError(responseSplit[2]);
+                displayError("Could not submit report: " + responseSplit[2]);
                 return;
             }
 
@@ -56,19 +56,19 @@ public class AptiAPI {
             String errorReportResponse = POSTData(API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + projectID + "&token=" + token + "&report=" + encryptedReport);
 
             if (errorReportResponse == null) {
-                displayError("Could not submit report -- Null response!");
+                displayError("Could not submit report: Null response");
             }
 
             System.out.println("Response: " + errorReportResponse);
 
             responseSplit = tokenResponse.split(":");
             if (responseSplit.length < 2) {
-                displayError("Token response length is < 2!");
+                displayError("Could not submit report: Token response length is < 2");
                 return;
             }
 
             if (responseSplit[1].equals("FAILURE")) {
-                displayError(responseSplit[2]);
+                displayError("Could not submit report: " + responseSplit[2]);
             }
         } catch (Exception e) {
             e.printStackTrace();
