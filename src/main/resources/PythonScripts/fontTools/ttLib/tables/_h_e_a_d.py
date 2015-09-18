@@ -3,8 +3,6 @@ from fontTools.misc.py23 import *
 from fontTools.misc import sstruct
 from fontTools.misc.textTools import safeEval, num2binary, binary2num
 from . import DefaultTable
-import time
-import calendar
 
 headFormat = """
 		>	# big endian
@@ -14,8 +12,6 @@ headFormat = """
 		magicNumber:        I
 		flags:              H
 		unitsPerEm:         H
-		created:            Q
-		modified:           Q
 		xMin:               h
 		yMin:               h
 		xMax:               h
@@ -38,8 +34,6 @@ class table__h_e_a_d(DefaultTable.DefaultTable):
             assert rest == "\0\0"
 
     def compile(self, ttFont):
-        if ttFont.recalcTimestamp:
-            self.modified = int(time.time() - mac_epoch_diff)
         data = sstruct.pack(headFormat, self)
         return data
 
@@ -49,11 +43,6 @@ class table__h_e_a_d(DefaultTable.DefaultTable):
         formatstring, names, fixes = sstruct.getformat(headFormat)
         for name in names:
             value = getattr(self, name)
-            if name in ("created", "modified"):
-                try:
-                    value = time.asctime(time.gmtime(max(0, value + mac_epoch_diff)))
-                except ValueError:
-                    value = time.asctime(time.gmtime(0))
             if name in ("magicNumber", "checkSumAdjustment"):
                 if value < 0:
                     value = value + 0x100000000
@@ -67,13 +56,8 @@ class table__h_e_a_d(DefaultTable.DefaultTable):
 
     def fromXML(self, name, attrs, content, ttFont):
         value = attrs["value"]
-        if name in ("created", "modified"):
-            value = calendar.timegm(time.strptime(value)) - mac_epoch_diff
-        elif name in ("macStyle", "flags"):
+        if name in ("macStyle", "flags"):
             value = binary2num(value)
         else:
             value = safeEval(value)
         setattr(self, name, value)
-
-# Difference between the original Mac epoch (1904) to the epoch on this machine.
-mac_epoch_diff = calendar.timegm((1904, 1, 1, 0, 0, 0, 0, 0, 0))

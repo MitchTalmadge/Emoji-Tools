@@ -199,8 +199,6 @@ ttLib.getTableClass('head').mergeMap = {
     'magicNumber': equal,
     'flags': mergeBits(headFlagsMergeBitMap),
     'unitsPerEm': equal,
-    'created': current_time,
-    'modified': current_time,
     'xMin': min,
     'yMin': min,
     'xMax': max,
