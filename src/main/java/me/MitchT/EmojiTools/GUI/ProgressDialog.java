@@ -53,8 +53,13 @@ public class ProgressDialog extends JDialog implements ActionListener {
         this.setVisible(false);
     }
 
-    public void setIndeterminate(boolean indeterminate) {
-        this.progressBar.setIndeterminate(indeterminate);
+    public void setIndeterminate(final boolean indeterminate) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setIndeterminate(indeterminate);
+            }
+        });
     }
 
     public void setProgress(final int progress) {
@@ -68,14 +73,24 @@ public class ProgressDialog extends JDialog implements ActionListener {
         });
     }
 
-    public void writeToStatus(String message) {
-        this.statusMessageArea.append(message);
-        this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMaximum());
+    public void writeToStatus(final String message) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                statusMessageArea.append(message);
+                scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+            }
+        });
     }
 
-    public void appendToStatus(String message) {
-        this.statusMessageArea.append(message + "\n");
-        this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMaximum());
+    public void appendToStatus(final String message) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                statusMessageArea.append(message + "\n");
+                scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+            }
+        });
     }
 
     private void onCancel() {
