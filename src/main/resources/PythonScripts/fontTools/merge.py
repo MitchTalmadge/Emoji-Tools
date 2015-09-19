@@ -8,7 +8,7 @@
 from __future__ import print_function, division, absolute_import
 from fontTools.misc.py23 import *
 from fontTools import ttLib
-from fontTools.ttLib.tables import otTables, _h_e_a_d
+from fontTools.ttLib.tables import otTables
 from fontTools.ttLib.tables.DefaultTable import DefaultTable
 from functools import reduce
 import sys
@@ -52,7 +52,7 @@ def recalculate(lst):
 
 
 def current_time(lst):
-    return int(time.time() - _h_e_a_d.mac_epoch_diff)
+    return int(time.time())
 
 
 def bitwise_and(lst):
@@ -199,6 +199,8 @@ ttLib.getTableClass('head').mergeMap = {
     'magicNumber': equal,
     'flags': mergeBits(headFlagsMergeBitMap),
     'unitsPerEm': equal,
+    'created': current_time,
+    'modified': current_time,
     'xMin': min,
     'yMin': min,
     'xMax': max,

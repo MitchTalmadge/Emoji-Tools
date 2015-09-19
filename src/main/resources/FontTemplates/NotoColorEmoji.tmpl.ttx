@@ -14,6 +14,8 @@
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00001011"/>
     <unitsPerEm value="2048"/>
+    <created value="Thu Jan 01 00:00:00 2015"/>
+    <modified value="Thu Jan 01 00:00:00 2015"/>
     <xMin value="0"/>
     <yMin value="-500"/>
     <xMax value="2550"/>

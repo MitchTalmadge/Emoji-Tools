@@ -12,6 +12,8 @@ headFormat = """
 		magicNumber:        I
 		flags:              H
 		unitsPerEm:         H
+		created:            Q
+		modified:           Q
 		xMin:               h
 		yMin:               h
 		xMax:               h
@@ -56,7 +58,9 @@ class table__h_e_a_d(DefaultTable.DefaultTable):
 
     def fromXML(self, name, attrs, content, ttFont):
         value = attrs["value"]
-        if name in ("macStyle", "flags"):
+        if name in ("created", "modified"):
+            value = 0
+        elif name in ("macStyle", "flags"):
             value = binary2num(value)
         else:
             value = safeEval(value)
