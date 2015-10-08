@@ -23,6 +23,7 @@ class PackagingThread extends Thread implements ConsoleManager.ConsoleListener {
     private final PackagingManager packagingManager;
     private final PackagingDialog packagingDialog;
     private final int outputType;
+    String[] vowels = {"a", "e", "i", "o", "u"};
     private boolean running = true;
 
     public PackagingThread(EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog, int outputType) {

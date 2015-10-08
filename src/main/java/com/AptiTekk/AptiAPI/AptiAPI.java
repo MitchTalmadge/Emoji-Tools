@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class AptiAPI {
@@ -125,7 +126,7 @@ public class AptiAPI {
             System.out.println("Response Code : " + responseCode);
 
             BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
             StringBuilder response = new StringBuilder();
 

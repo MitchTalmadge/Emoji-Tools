@@ -15,8 +15,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class ConversionTab extends OperationTab implements ActionListener {
+    private final static String defaultFileNameFieldText = "File/Folder Name";
     private final EmojiToolsGUI gui;
-    private final String defaultFileNameFieldText = "File/Folder Name";
     private JPanel contentPane;
     private JTextField fileNameField;
     private JButton browseButton;

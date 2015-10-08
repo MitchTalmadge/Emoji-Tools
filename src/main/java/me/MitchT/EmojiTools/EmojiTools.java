@@ -10,11 +10,11 @@ import java.net.URISyntaxException;
 /**
  * Extracts Emojis from '.ttf' files used by Android, iOS, etc. into individual '.png' files.
  *
- * @author Mitch Talmadge (mitcht@aptitekk.com)
+ * @author Mitch Talmadge (mitcht@liveforcode.net)
  */
 public class EmojiTools {
 
-    public static final String VERSION_STRING = "V1.6.5";
+    public static final String VERSION_STRING = "V1.7";
     public static final int PROJECT_ID = 1; //Used in AptiAPI
 
     private static final Image logoImage = new ImageIcon(EmojiTools.class.getResource("/Images/EmojiToolsLogo.png")).getImage();

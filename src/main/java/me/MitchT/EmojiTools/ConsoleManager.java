@@ -5,6 +5,7 @@ import com.sun.istack.internal.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 public class ConsoleManager {
@@ -68,8 +69,12 @@ public class ConsoleManager {
             }
         };
 
-        System.setOut(new PrintStream(this.outStream, true));
-        System.setErr(new PrintStream(this.errStream, true));
+        try {
+            System.setOut(new PrintStream(this.outStream, true, "UTF-8"));
+            System.setErr(new PrintStream(this.errStream, true, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addConsoleListener(ConsoleListener listener) {

@@ -3,6 +3,7 @@ package com.AptiTekk.AptiAPI;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 
 public class AptiCrypto {
     //iv length should be 16 bytes
@@ -25,7 +26,7 @@ public class AptiCrypto {
         } else {
             this.key = this.key.substring(0, 16);
         }
-        this.keySpec = new SecretKeySpec(this.key.getBytes(), "AES");
+        this.keySpec = new SecretKeySpec(this.key.getBytes(StandardCharsets.UTF_8), "AES");
         this.ivSpec = new IvParameterSpec(iv.getBytes());
         this.cipher = Cipher.getInstance("AES/CBC/NoPadding");
     }
@@ -34,15 +35,14 @@ public class AptiCrypto {
         if (data == null) {
             return null;
         } else {
-            int len = data.length;
-            String str = "";
+            StringBuilder stringBuilder = new StringBuilder();
             for (byte aData : data) {
                 if ((aData & 0xFF) < 16)
-                    str = str + "0" + Integer.toHexString(aData & 0xFF);
+                    stringBuilder.append("0").append(Integer.toHexString(aData & 0xFF));
                 else
-                    str = str + Integer.toHexString(aData & 0xFF);
+                    stringBuilder.append(Integer.toHexString(aData & 0xFF));
             }
-            return str;
+            return stringBuilder.toString();
         }
     }
 
@@ -52,12 +52,13 @@ public class AptiCrypto {
         int len = plainData.length();
         int q = len / 16;
         int addSpaces = ((q + 1) * 16) - len;
+        StringBuilder stringBuilder = new StringBuilder(plainData);
         for (int i = 0; i < addSpaces; i++) {
-            plainData = plainData + " ";
+            stringBuilder.append(" ");
         }
 
         this.cipher.init(Cipher.ENCRYPT_MODE, this.keySpec, this.ivSpec);
-        byte[] encrypted = cipher.doFinal(plainData.getBytes());
+        byte[] encrypted = cipher.doFinal(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
 
         return bytesToHex(encrypted);
     }
