@@ -49,20 +49,14 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
 
                 inputStream.seek(cmapOffset);
 
-                b = new byte[4];
-                inputStream.readFully(b);
-
-                if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01)) {
+                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01)) {
                     extractionManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 1)");
                     inputStream.close();
                     extractionDialog.dispose();
                     return;
                 }
 
-                b = new byte[4];
-                inputStream.readFully(b);
-
-                if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x03, (byte) 0x00, (byte) 0x0A)) {
+                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x03, (byte) 0x00, (byte) 0x0A)) {
                     extractionManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 2)");
                     inputStream.close();
                     extractionDialog.dispose();
@@ -71,10 +65,7 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
 
                 inputStream.skipBytes(4);
 
-                b = new byte[2];
-                inputStream.readFully(b);
-
-                if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x0C)) {
+                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x0C)) {
                     extractionManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 3)");
                     inputStream.close();
                     extractionDialog.dispose();
@@ -83,20 +74,14 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
 
                 inputStream.skipBytes(10);
 
-                b = new byte[4];
-                inputStream.readFully(b);
-
-                int numGroupings = ExtractionUtilites.getIntFromBytes(b);
+                int numGroupings = inputStream.readInt();
                 HashMap<Integer, String> unicodeNameMap = new HashMap<>(); //Key: GlyphID, Value: Unicode Name String (i.e. uni00a9)
 
                 //Iterate over each grouping and build unicode name table
                 for (int i = 0; i < numGroupings; i++) {
-                    inputStream.readFully(b);
-                    int startCharCode = ExtractionUtilites.getIntFromBytes(b);
-                    inputStream.readFully(b);
-                    int endCharCode = ExtractionUtilites.getIntFromBytes(b);
-                    inputStream.readFully(b);
-                    int startGlyphID = ExtractionUtilites.getIntFromBytes(b);
+                    int startCharCode = inputStream.readInt();
+                    int endCharCode = inputStream.readInt();
+                    int startGlyphID = inputStream.readInt();
                     for (int j = 0; j < (endCharCode - startCharCode) + 1; j++) {
                         String unicode = Integer.toHexString(startCharCode + j);
                         if (unicode.length() < 4)
@@ -117,9 +102,7 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
 
                     inputStream.seek(CBLCOffset);
 
-                    b = new byte[4];
-                    inputStream.readFully(b);
-                    if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
+                    if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
                         extractionManager.showMessageDialog("Invalid 'CBLC' table! Contact developer for help.");
                         inputStream.close();
                         return;
@@ -127,12 +110,9 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
 
                     inputStream.skipBytes(44);
 
-                    b = new byte[2];
-                    inputStream.readFully(b);
-                    short beginGlyphID = ExtractionUtilites.getShortFromBytes(b);
+                    short beginGlyphID = inputStream.readShort();
 
-                    inputStream.readFully(b);
-                    short endGlyphID = ExtractionUtilites.getShortFromBytes(b);
+                    short endGlyphID = inputStream.readShort();
 
                     int GSUBIndex = tableNames.indexOf("GSUB");
                     if (GSUBIndex > -1) {
@@ -141,9 +121,7 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
 
                         inputStream.seek(GSUBOffset);
 
-                        b = new byte[4];
-                        inputStream.readFully(b);
-                        if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
+                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
                             extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 1)");
                             inputStream.close();
                             return;
@@ -151,78 +129,60 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
 
                         inputStream.skipBytes(4); //Skip ScriptList and FeatureList offsets
 
-                        b = new byte[2];
-                        inputStream.readFully(b); //Get offset of LookupList
-                        int lookupListOffset = GSUBOffset + ExtractionUtilites.getShortFromBytes(b);
+                        int lookupListOffset = GSUBOffset + inputStream.readShort(); //Get offset of LookupList
                         inputStream.seek(lookupListOffset); //Navigate to LookupList
 
                         System.out.println(GSUBOffset);
                         System.out.println(lookupListOffset);
 
-                        inputStream.readFully(b); //Get LookupCount
-                        if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x01)) {
+                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01)) { //Get LookupCount
                             extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 2)");
                             inputStream.close();
                             return;
                         }
 
-                        inputStream.readFully(b); //Get first LookupTable Offset
-                        int lookupTableOffset = lookupListOffset + ExtractionUtilites.getShortFromBytes(b);
+                        int lookupTableOffset = lookupListOffset + inputStream.readShort(); //Get first LookupTable Offset
                         inputStream.seek(lookupTableOffset); //Navigate to first LookupTable
 
-                        b = new byte[6];
-                        inputStream.readFully(b); //Get LookupType, LookupFlag, and SubTableCount.
-                        if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01)) {
+                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01)) { //Get LookupType, LookupFlag, and SubTableCount.
                             extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 3)");
                             inputStream.close();
                             return;
                         }
 
-                        b = new byte[2];
-                        inputStream.readFully(b); //Get offset of Ligature Substitution Subtable
-                        int ligatureTableOffset = lookupTableOffset + ExtractionUtilites.getShortFromBytes(b);
+                        int ligatureTableOffset = lookupTableOffset + inputStream.readShort(); //Get offset of Ligature Substitution Subtable
                         inputStream.seek(ligatureTableOffset); //Navigate to Ligature Substitution Subtable
 
-                        b = new byte[2];
-                        inputStream.readFully(b); //Get SubstFormat
-                        if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x01)) {
+                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01)) { //Get SubstFormat
                             extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 4)");
                             inputStream.close();
                             return;
                         }
 
-                        inputStream.readFully(b); //Get Coverage Offset
-                        int coverageOffset = ligatureTableOffset + ExtractionUtilites.getShortFromBytes(b);
+                        int coverageOffset = ligatureTableOffset + inputStream.readShort(); //Get Coverage Offset
 
-                        inputStream.readFully(b); //Get LigSetCount
-                        short ligSetCount = ExtractionUtilites.getShortFromBytes(b);
+                        short ligSetCount = inputStream.readShort(); //Get LigSetCount
 
                         int[] ligSetOffsets = new int[ligSetCount];
 
                         for (int i = 0; i < ligSetCount; i++) {
-                            inputStream.readFully(b);
-                            ligSetOffsets[i] = ligatureTableOffset + ExtractionUtilites.getShortFromBytes(b);
+                            ligSetOffsets[i] = ligatureTableOffset + inputStream.readShort();
                         }
 
                         /* Coverage Table */
                         inputStream.seek(coverageOffset);
-                        inputStream.readFully(b);
-                        if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02)) {
+                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02)) {
                             extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 5)");
                             inputStream.close();
                             return;
                         }
 
-                        inputStream.readFully(b);
-                        short rangeCount = ExtractionUtilites.getShortFromBytes(b);
+                        short rangeCount = inputStream.readShort();
                         short[] coverageGlyphIDs = new short[ligSetCount]; //Array of Glyph IDs to be replaced, as specified by the coverage table
                         for (int i = 0; i < rangeCount; i++) {
-                            inputStream.readFully(b);
-                            short startGlyph = ExtractionUtilites.getShortFromBytes(b);
-                            inputStream.readFully(b);
-                            short endGlyph = ExtractionUtilites.getShortFromBytes(b);
-                            inputStream.readFully(b);
-                            short startCoverageIndex = ExtractionUtilites.getShortFromBytes(b);
+                            short startGlyph = inputStream.readShort();
+                            short endGlyph = inputStream.readShort();
+                            short startCoverageIndex = inputStream.readShort();
                             for (int j = 0; j <= endGlyph - startGlyph; j++) {
                                 coverageGlyphIDs[j + startCoverageIndex] = (short) (startGlyph + j);
                             }
@@ -232,25 +192,20 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
                         for (int i = 0; i < ligSetCount; i++) {
                             inputStream.seek(ligSetOffsets[i]);
 
-                            inputStream.readFully(b);
-                            short ligatureCount = ExtractionUtilites.getShortFromBytes(b);
+                            short ligatureCount = inputStream.readShort();
                             int[] ligatureOffsets = new int[ligatureCount];
                             /* Ligature Tables */
                             for (int j = 0; j < ligatureCount; j++) {
-                                inputStream.readFully(b);
-                                ligatureOffsets[j] = ligSetOffsets[i] + ExtractionUtilites.getShortFromBytes(b);
+                                ligatureOffsets[j] = ligSetOffsets[i] + inputStream.readShort();
                             }
                             for (int j = 0; j < ligatureCount; j++) {
                                 inputStream.seek(ligatureOffsets[j]);
-                                inputStream.readFully(b);
-                                short ligGlyph = ExtractionUtilites.getShortFromBytes(b);
-                                inputStream.readFully(b);
-                                short compCount = ExtractionUtilites.getShortFromBytes(b);
+                                short ligGlyph = inputStream.readShort();
+                                short compCount = inputStream.readShort();
                                 StringBuilder stringBuilder = new StringBuilder(unicodeNameMap.get((int) coverageGlyphIDs[i]));
                                 if (compCount > 1) {
                                     for (int k = 0; k < compCount - 1; k++) {
-                                        inputStream.readFully(b);
-                                        stringBuilder.append("_").append(unicodeNameMap.get((int) ExtractionUtilites.getShortFromBytes(b)));
+                                        stringBuilder.append("_").append(unicodeNameMap.get((int) inputStream.readShort()));
                                     }
                                 }
                                 appendToStatus("Added substituted glyph name " + stringBuilder.toString() + " for glyphID " + ligGlyph);
@@ -269,9 +224,7 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
 
                         inputStream.seek(CBDTOffset);
 
-                        b = new byte[4];
-                        inputStream.readFully(b);
-                        if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
+                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
                             extractionManager.showMessageDialog("Invalid 'CBDT' table! Contact developer for help.");
                             inputStream.close();
                             return;
@@ -287,17 +240,15 @@ public class GoogleExtractionThread_1_6_5 extends ExtractionThread {
                                 return;
                             }
                             inputStream.skipBytes(5);
-                            b = new byte[4];
-                            inputStream.readFully(b);
 
-                            int glyphLength = ExtractionUtilites.getIntFromBytes(b);
+                            int glyphLength = inputStream.readInt();
                             if (glyphLength > 0) {
-                                b = new byte[glyphLength];
+                                byte[] b = new byte[glyphLength];
                                 if (unicodeNameMap.get(i) != null) {
-                                    inputStream.readFully(b);
                                     System.out.println("Extracting Emoji #" + i + " to '" + unicodeNameMap.get(i) + ".png'");
                                     appendToStatus("Extracting Emoji #" + i + " to '" + unicodeNameMap.get(i) + ".png'");
                                     FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, unicodeNameMap.get(i) + ".png"));
+                                    inputStream.readFully(b);
                                     outputStream.write(b);
                                     outputStream.close();
                                 } else

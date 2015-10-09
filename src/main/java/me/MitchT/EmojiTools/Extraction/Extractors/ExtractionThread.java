@@ -266,7 +266,6 @@ public class ExtractionThread extends Thread {
     final File font;
     final File extractionDirectory;
     boolean running = true;
-    byte[] b;
 
     ExtractionThread(File font, File extractionDirectory, String threadName) {
         super(threadName);

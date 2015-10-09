@@ -48,10 +48,7 @@ public class GoogleExtractionThread extends ExtractionThread {
 
                 inputStream.seek(postOffset);
 
-                b = new byte[4];
-                inputStream.readFully(b);
-
-                if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
+                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
                     extractionManager.showMessageDialog("Invalid 'post' table format! Contact developer for help.");
                     inputStream.close();
                     extractionDialog.dispose();
@@ -59,17 +56,14 @@ public class GoogleExtractionThread extends ExtractionThread {
                 }
 
                 inputStream.skipBytes(28);
-                b = new byte[2];
-                inputStream.readFully(b);
 
-                short numGlyphs = ExtractionUtilites.getShortFromBytes(b);
+                short numGlyphs = inputStream.readShort();
                 short[] ordinalNumbers = new short[numGlyphs];
 
                 short numNewGlyphs = 0;
 
                 for (int i = 0; i < numGlyphs; i++) {
-                    inputStream.readFully(b);
-                    ordinalNumbers[i] = ExtractionUtilites.getShortFromBytes(b);
+                    ordinalNumbers[i] = inputStream.readShort();
                     if (ordinalNumbers[i] > 257)
                         numNewGlyphs++;
                 }
@@ -79,9 +73,7 @@ public class GoogleExtractionThread extends ExtractionThread {
                 for (int i = 0; i < numNewGlyphs; i++) {
 
                     short nameLen = (short) inputStream.read();
-                    b = new byte[nameLen];
-                    inputStream.readFully(b);
-                    extraNames[i] = ExtractionUtilites.getStringFromBytes(b);
+                    extraNames[i] = ExtractionUtilites.getByteString(inputStream, nameLen);
                 }
 
                 //Build list of names for GlyphIDs
@@ -101,9 +93,7 @@ public class GoogleExtractionThread extends ExtractionThread {
 
                     inputStream.seek(CBLCOffset);
 
-                    b = new byte[4];
-                    inputStream.readFully(b);
-                    if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
+                    if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
                         extractionManager.showMessageDialog("Invalid 'CBLC' table! Contact developer for help.");
                         inputStream.close();
                         return;
@@ -111,12 +101,9 @@ public class GoogleExtractionThread extends ExtractionThread {
 
                     inputStream.skipBytes(44);
 
-                    b = new byte[2];
-                    inputStream.readFully(b);
-                    short beginGlyphID = ExtractionUtilites.getShortFromBytes(b);
+                    short beginGlyphID = inputStream.readShort();
 
-                    inputStream.readFully(b);
-                    short endGlyphID = ExtractionUtilites.getShortFromBytes(b);
+                    short endGlyphID = inputStream.readShort();
 
                     //Get number of strikes, and scan for PNG files.
                     int CBDTIndex = tableNames.indexOf("CBDT");
@@ -126,9 +113,7 @@ public class GoogleExtractionThread extends ExtractionThread {
 
                         inputStream.seek(CBDTOffset);
 
-                        b = new byte[4];
-                        inputStream.readFully(b);
-                        if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
+                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
                             extractionManager.showMessageDialog("Invalid 'CBDT' table! Contact developer for help.");
                             inputStream.close();
                             return;
@@ -145,17 +130,14 @@ public class GoogleExtractionThread extends ExtractionThread {
                                 return;
                             }
                             inputStream.skipBytes(5);
-                            b = new byte[4];
-                            inputStream.readFully(b);
 
-                            int glyphLength = ExtractionUtilites.getIntFromBytes(b);
+                            int glyphLength = inputStream.readInt();
                             if (glyphLength > 0) {
-                                b = new byte[glyphLength];
                                 System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
                                 appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
                                 updateProgress((int) ((i - beginGlyphID) / (float) (endGlyphID - beginGlyphID) * 100));
                                 FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, glyphNames[i] + ".png"));
-                                b = new byte[glyphLength];
+                                byte[] b = new byte[glyphLength];
                                 inputStream.readFully(b);
                                 outputStream.write(b);
                                 outputStream.close();

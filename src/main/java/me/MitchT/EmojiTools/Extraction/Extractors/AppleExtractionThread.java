@@ -48,10 +48,8 @@ public class AppleExtractionThread extends ExtractionThread {
 
                 inputStream.seek(postOffset);
 
-                b = new byte[4];
-                inputStream.readFully(b);
 
-                if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
+                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
                     extractionManager.showMessageDialog("Invalid 'post' table format! Contact developer for help.");
                     inputStream.close();
                     extractionDialog.dispose();
@@ -59,17 +57,14 @@ public class AppleExtractionThread extends ExtractionThread {
                 }
 
                 inputStream.skipBytes(28);
-                b = new byte[2];
-                inputStream.readFully(b);
 
-                short numGlyphs = ExtractionUtilites.getShortFromBytes(b);
+                short numGlyphs = inputStream.readShort();
                 short[] ordinalNumbers = new short[numGlyphs];
 
                 short numNewGlyphs = 0;
 
                 for (int i = 0; i < numGlyphs; i++) {
-                    inputStream.readFully(b);
-                    ordinalNumbers[i] = ExtractionUtilites.getShortFromBytes(b);
+                    ordinalNumbers[i] = inputStream.readShort();
                     if (ordinalNumbers[i] > 257)
                         numNewGlyphs++;
                 }
@@ -79,9 +74,7 @@ public class AppleExtractionThread extends ExtractionThread {
                 for (int i = 0; i < numNewGlyphs; i++) {
 
                     short nameLen = (short) inputStream.read();
-                    b = new byte[nameLen];
-                    inputStream.readFully(b);
-                    extraNames[i] = ExtractionUtilites.getStringFromBytes(b);
+                    extraNames[i] = ExtractionUtilites.getByteString(inputStream, nameLen);
                 }
 
                 //Build list of names for GlyphIDs
@@ -104,14 +97,10 @@ public class AppleExtractionThread extends ExtractionThread {
 
                     inputStream.skipBytes(4);
 
-                    b = new byte[4];
-                    inputStream.readFully(b);
-
-                    int numStrikes = ExtractionUtilites.getIntFromBytes(b);
+                    int numStrikes = inputStream.readInt();
                     int[] strikeOffsets = new int[numStrikes];
                     for (int i = 0; i < numStrikes; i++) {
-                        inputStream.readFully(b);
-                        strikeOffsets[i] = ExtractionUtilites.getIntFromBytes(b);
+                        strikeOffsets[i] = inputStream.readInt();
                     }
 
                     //TODO: Figure out how to convert rgbl to png.. for now, use last strike..
@@ -120,11 +109,9 @@ public class AppleExtractionThread extends ExtractionThread {
 
                     int[] glyphOffsets = new int[numGlyphs];
                     int[] glyphLengths = new int[numGlyphs];
-                    b = new byte[4];
 
                     for (int i = 0; i < numGlyphs; i++) {
-                        inputStream.readFully(b);
-                        glyphOffsets[i] = ExtractionUtilites.getIntFromBytes(b);
+                        glyphOffsets[i] = inputStream.readInt();
                     }
 
                     for (int i = 0; i < numGlyphs; i++) {
@@ -147,13 +134,11 @@ public class AppleExtractionThread extends ExtractionThread {
 
                         if (glyphLengths[i] > 0) {
                             inputStream.skipBytes(4);
-                            b = new byte[4];
-                            inputStream.readFully(b);
-                            if (ExtractionUtilites.getStringFromBytes(b).equals("png ")) {
+                            if (ExtractionUtilites.getByteString(inputStream, 4).equals("png ")) {
                                 System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
                                 appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
                                 FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, glyphNames[i] + ".png"));
-                                b = new byte[glyphLengths[i] - 8];
+                                byte[] b = new byte[glyphLengths[i] - 8];
                                 inputStream.readFully(b);
                                 outputStream.write(b);
                                 outputStream.close();

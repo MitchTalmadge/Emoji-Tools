@@ -28,33 +28,23 @@ public class ExtractionManager extends OperationManager {
         try {
             RandomAccessFile inputStream = new RandomAccessFile(font, "r");
 
-            byte[] b = new byte[4];
-            inputStream.readFully(b);
-
-            if (!ExtractionUtilites.compareBytes(b, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
+            if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
                 showMessageDialog("Selected Font is not a valid True Type Font! (*.ttf)");
                 inputStream.close();
                 return;
             }
 
-            b = new byte[2];
-            inputStream.readFully(b);
-
-            short numTables = ExtractionUtilites.getShortFromBytes(b);
+            short numTables = inputStream.readShort();
             List<String> tableNames = Arrays.asList(new String[numTables]);
             List<Integer> tableOffsets = Arrays.asList(new Integer[numTables]);
             List<Integer> tableLengths = Arrays.asList(new Integer[numTables]);
 
             inputStream.seek(12);
-            b = new byte[4];
             for (int i = 0; i < numTables; i++) {
-                inputStream.readFully(b);
-                tableNames.set(i, ExtractionUtilites.getStringFromBytes(b));
+                tableNames.set(i, ExtractionUtilites.getByteString(inputStream, 4));
                 inputStream.skipBytes(4);
-                inputStream.readFully(b);
-                tableOffsets.set(i, ExtractionUtilites.getIntFromBytes(b));
-                inputStream.readFully(b);
-                tableLengths.set(i, ExtractionUtilites.getIntFromBytes(b));
+                tableOffsets.set(i, inputStream.readInt());
+                tableLengths.set(i, inputStream.readInt());
             }
 
             if (tableNames.contains("sbix"))
