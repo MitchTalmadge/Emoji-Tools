@@ -34,6 +34,8 @@ img_files = {}
 glb = "%s*.png" % img_prefix
 print "Looking for images matching '%s'." % glb
 for img_file in glob.glob(glb):
+    if "_" in img_file[len(img_prefix):-4]:
+        continue
     u = int(img_file[len(img_prefix):-4], 16)
     img_files[u] = img_file
 if not img_files:

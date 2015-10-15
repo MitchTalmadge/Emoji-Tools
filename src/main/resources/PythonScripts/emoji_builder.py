@@ -444,6 +444,8 @@ By default they are dropped.
         glb = "%s*.png" % img_prefix
         print "Looking for images matching '%s'." % glb
         for img_file in glob.glob(glb):
+            if "_" in img_file[len(img_prefix):-4]:
+                continue
             uchar = int(img_file[len(img_prefix):-4], 16)
             img_files[uchar] = img_file
         if not img_files:

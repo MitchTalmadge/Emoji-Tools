@@ -3,7 +3,7 @@ package me.MitchT.EmojiTools.Extraction;
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.Extraction.Extractors.AppleExtractionThread;
 import me.MitchT.EmojiTools.Extraction.Extractors.ExtractionThread;
-import me.MitchT.EmojiTools.Extraction.Extractors.GoogleExtractionThread_1_6_5;
+import me.MitchT.EmojiTools.Extraction.Extractors.GoogleExtractionThread;
 import me.MitchT.EmojiTools.Extraction.Extractors.StandardExtractionThread;
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
 import me.MitchT.EmojiTools.GUI.ExtractionDialog;
@@ -50,7 +50,7 @@ public class ExtractionManager extends OperationManager {
             if (tableNames.contains("sbix"))
                 extractionThread = new AppleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog);
             else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
-                extractionThread = new GoogleExtractionThread_1_6_5(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog);
+                extractionThread = new GoogleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog);
             else
                 extractionThread = new StandardExtractionThread(font, extractionDirectory, this, extractionDialog);
 
