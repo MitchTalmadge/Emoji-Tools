@@ -57,6 +57,18 @@ public class PackagingTab extends OperationTab implements ActionListener {
             return;
         }
 
+        boolean containsPngs = false;
+
+        for (String fileName : this.packagingFile.list()) {
+            if (fileName.contains(".png"))
+                containsPngs = true;
+        }
+
+        if (!containsPngs) {
+            gui.showMessageDialog("The selected directory does not contain any Emojis!");
+            return;
+        }
+
         int outputType;
         if (this.outputRadioButton1.isSelected())
             outputType = ANDROID;
