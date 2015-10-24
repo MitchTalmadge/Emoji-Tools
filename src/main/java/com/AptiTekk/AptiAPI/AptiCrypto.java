@@ -46,6 +46,22 @@ public class AptiCrypto {
         }
     }
 
+    public byte[] hexToBytes(String str) {
+        if (str == null) {
+            return null;
+        } else if (str.length() < 2) {
+            return null;
+        } else {
+            int len = str.length() / 2;
+            byte[] buffer = new byte[len];
+            for (int i = 0; i < len; i++) {
+                buffer[i] = (byte) Integer.parseInt(
+                        str.substring(i * 2, i * 2 + 2), 16);
+            }
+            return buffer;
+        }
+    }
+
     public String encrypt(String plainData) throws Exception {
 
         // Make sure the plainData length should be multiple with 16
@@ -61,6 +77,14 @@ public class AptiCrypto {
         byte[] encrypted = cipher.doFinal(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
 
         return bytesToHex(encrypted);
+    }
+
+    public String decrypt(String encrData) throws Exception {
+        this.cipher.init(Cipher.DECRYPT_MODE, this.keySpec, this.ivSpec);
+        byte[] outText = this.cipher.doFinal(hexToBytes(encrData));
+
+        String decrData = new String(outText).trim();
+        return decrData;
     }
 
 }

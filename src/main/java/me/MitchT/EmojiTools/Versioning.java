@@ -18,14 +18,13 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package me.MitchT.EmojiTools.GUI;
+package me.MitchT.EmojiTools;
 
-import me.MitchT.EmojiTools.GUI.Tabs.OperationTab;
+public class Versioning {
 
-public class PackagingDialog extends ProgressDialog {
-
-    public PackagingDialog(OperationTab gui) {
-        super(gui, "Packaging Emojis to NotoColorEmoji.ttf");
-    }
+    public static final String VERSION_STRING = "1.7";
+    public static final String PROGRAM_NAME = "Emoji Tools";
+    public static final String PROGRAM_NAME_WITH_VERSION = PROGRAM_NAME + " V" + VERSION_STRING;
+    public static final int APTIAPI_PROJECT_ID = 1;
 
 }

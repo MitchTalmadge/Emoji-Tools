@@ -1,3 +1,23 @@
+/*
+ * Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
+ * Copyright (C) 2015 Mitch Talmadge
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact Mitch Talmadge at mitcht@liveforcode.net
+ */
+
 package me.MitchT.EmojiTools;
 
 import me.MitchT.EmojiTools.GUI.EmojiToolsGUI;
@@ -7,15 +27,7 @@ import java.awt.*;
 import java.io.File;
 import java.net.URISyntaxException;
 
-/**
- * Extracts Emojis from '.ttf' files used by Android, iOS, etc. into individual '.png' files.
- *
- * @author Mitch Talmadge (mitcht@liveforcode.net)
- */
 public class EmojiTools {
-
-    public static final String VERSION_STRING = "V1.7";
-    public static final int PROJECT_ID = 1; //Used in AptiAPI
 
     private static final Image logoImage = new ImageIcon(EmojiTools.class.getResource("/Images/EmojiToolsLogo.png")).getImage();
     private static final ErrorHandler errorHandler = new ErrorHandler();

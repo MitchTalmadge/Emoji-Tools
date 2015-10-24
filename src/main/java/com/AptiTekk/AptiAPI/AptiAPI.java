@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
@@ -15,16 +16,14 @@ public class AptiAPI {
     private static final String API_VERSION = "V1";
     private static final String TOKEN_GENERATOR = "TokenGenerator.php";
     private static final String ERROR_REPORTER = "ErrorReporter.php";
-
+    protected final ArrayList<AptiAPIListener> APIListeners = new ArrayList<>();
     private final int projectID;
-
-    private final ArrayList<AptiAPIListener> APIListeners = new ArrayList<>();
 
     public AptiAPI(int projectID) {
         this.projectID = projectID;
     }
 
-    public void sendErrorReport(String report) {
+    public boolean sendErrorReport(String report) {
 
         try {
 
@@ -33,7 +32,7 @@ public class AptiAPI {
 
             if (tokenResponse == null) {
                 displayError("Could not generate token -- Null response!");
-                return;
+                return false;
             }
 
             System.out.println("Response: " + tokenResponse);
@@ -41,12 +40,12 @@ public class AptiAPI {
             String[] responseSplit = tokenResponse.split(":");
             if (responseSplit.length < 3) {
                 displayError("Token response length is < 3!");
-                return;
+                return false;
             }
 
             if (responseSplit[1].equals("FAILURE")) {
                 displayError("Could not submit report: " + responseSplit[2]);
-                return;
+                return false;
             }
 
             String token = responseSplit[2];
@@ -60,20 +59,20 @@ public class AptiAPI {
                 displayError("Could not submit report: Null response");
             }
 
-            System.out.println("Response: " + errorReportResponse);
-
             responseSplit = tokenResponse.split(":");
             if (responseSplit.length < 2) {
                 displayError("Could not submit report: Token response length is < 2");
-                return;
+                return false;
             }
 
             if (responseSplit[1].equals("FAILURE")) {
                 displayError("Could not submit report: " + responseSplit[2]);
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return true;
     }
 
     public void addAPIListener(AptiAPIListener listener) {
@@ -120,11 +119,6 @@ public class AptiAPI {
             wr.flush();
             wr.close();
 
-            int responseCode = con.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Post parameters : " + data);
-            System.out.println("Response Code : " + responseCode);
-
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
@@ -136,6 +130,9 @@ public class AptiAPI {
             in.close();
 
             return response.toString();
+        } catch (UnknownHostException e) {
+            displayError("Could not connect to Error Reporter. Is your Internet working?");
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
         }

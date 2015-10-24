@@ -1,8 +1,29 @@
+/*
+ * Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
+ * Copyright (C) 2015 Mitch Talmadge
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact Mitch Talmadge at mitcht@liveforcode.net
+ */
+
 package me.MitchT.EmojiTools.GUI;
 
 import me.MitchT.EmojiTools.ConsoleManager;
 import me.MitchT.EmojiTools.EmojiTools;
 import me.MitchT.EmojiTools.GUI.Tabs.*;
+import me.MitchT.EmojiTools.Versioning;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +46,7 @@ public class EmojiToolsGUI extends JFrame implements MouseListener {
 
     public EmojiToolsGUI(File fontFile) {
 
-        setTitle("Emoji Tools");
+        setTitle(Versioning.PROGRAM_NAME);
         setContentPane(contentPane);
         setResizable(false);
 
@@ -45,7 +66,7 @@ public class EmojiToolsGUI extends JFrame implements MouseListener {
             }
         });
 
-        this.headerLabel.setText("Emoji Tools " + EmojiTools.VERSION_STRING);
+        this.headerLabel.setText(Versioning.PROGRAM_NAME_WITH_VERSION);
 
         this.tabbedPane.addTab("Extractor", new ExtractionTab(this, fontFile));
         this.tabbedPane.addTab("Renamer", new RenamingTab(this));
