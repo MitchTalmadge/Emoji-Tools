@@ -1,5 +1,6 @@
 package com.AptiTekk.AptiAPI;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,15 +19,21 @@ public class AptiAPI {
     private static final String ERROR_REPORTER = "ErrorReporter.php";
     protected final ArrayList<AptiAPIListener> APIListeners = new ArrayList<>();
     private final int projectID;
+    private final ErrorHandler errorHandler;
+    private Image imageIcon;
 
-    public AptiAPI(int projectID) {
+    public AptiAPI(int projectID, Image imageIcon) {
         this.projectID = projectID;
+        this.imageIcon = imageIcon;
+        this.errorHandler = new ErrorHandler(this);
     }
 
-    public boolean sendErrorReport(String report) {
+    protected boolean sendErrorReport(ErrorReport report) {
+
+        ErrorReportProgressDialog progressDialog = new ErrorReportProgressDialog(this, imageIcon);
+        progressDialog.setVisible(true);
 
         try {
-
             //Step 1 -- Generate Token
             String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectID=" + projectID);
 
@@ -34,8 +41,6 @@ public class AptiAPI {
                 displayError("Could not generate token -- Null response!");
                 return false;
             }
-
-            System.out.println("Response: " + tokenResponse);
 
             String[] responseSplit = tokenResponse.split(":");
             if (responseSplit.length < 3) {
@@ -50,13 +55,14 @@ public class AptiAPI {
 
             String token = responseSplit[2];
 
-            String encryptedReport = new AptiCrypto(token.substring(0, 16)).encrypt(report);
+            String encryptedReport = new AptiCrypto(token.substring(0, 16)).encrypt(report.generateReport());
 
             //Step 2 -- Submit Report
             String errorReportResponse = POSTData(API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + projectID + "&token=" + token + "&report=" + encryptedReport);
 
             if (errorReportResponse == null) {
                 displayError("Could not submit report: Null response");
+                return false;
             }
 
             responseSplit = tokenResponse.split(":");
@@ -75,6 +81,10 @@ public class AptiAPI {
         return true;
     }
 
+    public ErrorHandler getErrorHandler() {
+        return errorHandler;
+    }
+
     public void addAPIListener(AptiAPIListener listener) {
         if (!APIListeners.contains(listener))
             APIListeners.add(listener);
@@ -85,19 +95,20 @@ public class AptiAPI {
             APIListeners.remove(listener);
     }
 
-    private void displayInfo(String message) {
+
+    protected void displayInfo(String message) {
         for (AptiAPIListener listener : APIListeners) {
             listener.displayInfo(message);
         }
     }
 
-    private void displayError(String message) {
+    protected void displayError(String message) {
         for (AptiAPIListener listener : APIListeners) {
             listener.displayError(message);
         }
     }
 
-    private void shutdown() {
+    protected void shutdownListeners() {
         for (AptiAPIListener listener : APIListeners) {
             listener.shutdown();
         }
@@ -137,5 +148,9 @@ public class AptiAPI {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public Image getIconImage() {
+        return imageIcon;
     }
 }
