@@ -25,7 +25,6 @@ import com.AptiTekk.AptiAPI.AptiAPIListener;
 import net.liveforcode.EmojiTools.ConsoleManager;
 import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.GUI.Tabs.*;
-import net.liveforcode.EmojiTools.Versioning;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,7 +54,7 @@ public class EmojiToolsGUI extends JFrame implements MouseListener, AptiAPIListe
     public EmojiToolsGUI(AptiAPI aptiAPI, File fontFile) {
         this.aptiAPI = aptiAPI;
 
-        setTitle(Versioning.PROGRAM_NAME);
+        setTitle(aptiAPI.getVersioningDetails().getProgramName());
         setContentPane(contentPane);
         setResizable(false);
 
@@ -75,7 +74,7 @@ public class EmojiToolsGUI extends JFrame implements MouseListener, AptiAPIListe
             }
         });
 
-        this.headerLabel.setText(Versioning.PROGRAM_NAME_WITH_VERSION);
+        this.headerLabel.setText(aptiAPI.getVersioningDetails().getProgramNameWithVersion());
 
         this.extractionTab = new ExtractionTab(this, fontFile);
         this.renamingTab = new RenamingTab(this);

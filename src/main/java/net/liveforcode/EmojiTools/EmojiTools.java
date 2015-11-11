@@ -32,7 +32,7 @@ import java.net.URISyntaxException;
 public class EmojiTools {
 
     private static final Image logoImage = new ImageIcon(EmojiTools.class.getResource("/Images/EmojiToolsLogo.png")).getImage();
-    private static final AptiAPI aptiAPI = new AptiAPI(Versioning.APTIAPI_PROJECT_ID, logoImage);
+    private static final AptiAPI aptiAPI = new AptiAPI(new Versioning(), logoImage);
     private static final ErrorHandler errorHandler = aptiAPI.getErrorHandler();
 
     public static void main(String[] args) {

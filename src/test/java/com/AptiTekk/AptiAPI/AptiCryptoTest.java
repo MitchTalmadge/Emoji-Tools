@@ -20,22 +20,31 @@
 
 package com.AptiTekk.AptiAPI;
 
-public class ErrorHandler implements Thread.UncaughtExceptionHandler {
+import org.junit.Before;
+import org.junit.Test;
 
-    private final AptiAPI aptiAPI;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-    public ErrorHandler(AptiAPI aptiAPI) {
-        this.aptiAPI = aptiAPI;
+public class AptiCryptoTest {
+
+    private AptiCrypto aptiCrypto;
+
+    @Before
+    public void setUp() throws Exception {
+        aptiCrypto = new AptiCrypto("TestKey");
     }
 
-    @Override
-    public void uncaughtException(Thread t, Throwable e) {
-        ErrorReport errorReport = new ErrorReport(t, e);
+    @Test
+    public void testEncryptAndDecrypt() throws Exception {
+        String message = "TestMessage";
 
-        System.out.println("ERROR OCCURRED!");
-        System.out.println("Thread Name: " + t.getName());
-        System.out.println("Exception:\n" + errorReport.getStackTrace());
+        String encryptedMessage = aptiCrypto.encrypt(message);
+        assertNotNull("Encrypt message", encryptedMessage);
 
-        new ErrorReportDialog(aptiAPI, errorReport).setVisible(true);
+        String decryptedMessage = aptiCrypto.decrypt(encryptedMessage);
+        assertNotNull("Decrypt message", decryptedMessage);
+
+        assertEquals("Decrypted message equals original message", decryptedMessage, message);
     }
 }

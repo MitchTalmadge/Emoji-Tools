@@ -20,11 +20,38 @@
 
 package net.liveforcode.EmojiTools;
 
-public class Versioning {
+import com.AptiTekk.AptiAPI.AptiAPIVersioningDetails;
 
-    public static final String VERSION_STRING = "1.7";
-    public static final String PROGRAM_NAME = "Emoji Tools";
-    public static final String PROGRAM_NAME_WITH_VERSION = PROGRAM_NAME + " V" + VERSION_STRING;
-    public static final int APTIAPI_PROJECT_ID = 1;
+public class Versioning implements AptiAPIVersioningDetails {
 
+    private static final double VERSION = 1.7;
+    private static final String VERSION_STRING = VERSION + "";
+    private static final String PROGRAM_NAME = "Emoji Tools";
+    private static final String PROGRAM_NAME_WITH_VERSION = PROGRAM_NAME + " V" + VERSION_STRING;
+    private static final int APTIAPI_PROJECT_ID = 1;
+
+    @Override
+    public double getVersion() {
+        return VERSION;
+    }
+
+    @Override
+    public String getVersionString() {
+        return VERSION_STRING;
+    }
+
+    @Override
+    public String getProgramName() {
+        return PROGRAM_NAME;
+    }
+
+    @Override
+    public String getProgramNameWithVersion() {
+        return PROGRAM_NAME_WITH_VERSION;
+    }
+
+    @Override
+    public int getAptiAPIProjectID() {
+        return APTIAPI_PROJECT_ID;
+    }
 }
