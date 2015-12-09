@@ -18,8 +18,10 @@
 #
 
 
-import sys
+import re
 import struct
+import sys
+
 from png import PNG
 
 
@@ -443,8 +445,9 @@ By default they are dropped.
         img_files = {}
         glb = "%s*.png" % img_prefix
         print "Looking for images matching '%s'." % glb
+        pattern = re.compile("^[A-Fa-f0-9]+$")
         for img_file in glob.glob(glb):
-            if ("_" in img_file[len(img_prefix):-4]) or ("." in img_file[len(img_prefix):-4]):
+            if not pattern.match(img_file[len(img_prefix):-4]):
                 continue
             uchar = int(img_file[len(img_prefix):-4], 16)
             img_files[uchar] = img_file

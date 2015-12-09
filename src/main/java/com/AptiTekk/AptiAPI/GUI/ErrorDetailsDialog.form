@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.AptiTekk.AptiAPI.GUI.ErrorDetailsDialog">
+  <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="48" y="54" width="600" height="391"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="cfccc" class="javax.swing.JLabel">
+        <constraints border-constraint="North"/>
+        <properties>
+          <font size="16"/>
+          <horizontalAlignment value="0"/>
+          <text value="Error Report Details"/>
+        </properties>
+      </component>
+      <grid id="8d8ba" layout-manager="FormLayout">
+        <rowspec value="top:35px:noGrow"/>
+        <rowspec value="top:302px:noGrow"/>
+        <rowspec value="top:d:noGrow"/>
+        <colspec value="fill:600px:noGrow"/>
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <clientProperties>
+          <html.disable class="java.lang.Boolean" value="false"/>
+        </clientProperties>
+        <border type="none">
+          <size top="10" left="10" bottom="10" right="10"/>
+        </border>
+        <children>
+          <component id="1b70e" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="0"/>
+              <labelFor value="94e1"/>
+              <text value="&lt;html&gt;&lt;center&gt;&amp;An error report has been generated for you below. What you see below is exactly what we will receive. The developers are the only people who will see your report; it is not public.&lt;/center&gt;&lt;/html&gt;"/>
+            </properties>
+            <clientProperties>
+              <html.disable class="java.lang.Boolean" value="false"/>
+            </clientProperties>
+          </component>
+          <scrollpane id="94e1" binding="scrollPane">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <forms top="10" left="10" bottom="10" right="10" defaultalign-horz="false" defaultalign-vert="false"/>
+            </constraints>
+            <properties>
+              <horizontalScrollBarPolicy value="32"/>
+              <verticalScrollBarPolicy value="22"/>
+            </properties>
+            <border type="none">
+              <size top="10" left="10" bottom="10" right="10"/>
+            </border>
+            <children>
+              <component id="77896" class="javax.swing.JTextPane" binding="reportArea">
+                <constraints/>
+                <properties>
+                  <contentType value="text/html"/>
+                  <editable value="false"/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
+          <component id="665c1" class="javax.swing.JButton" binding="OKButton" default-binding="true">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <forms defaultalign-vert="false"/>
+            </constraints>
+            <properties>
+              <horizontalTextPosition value="11"/>
+              <text value="&amp;OK"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

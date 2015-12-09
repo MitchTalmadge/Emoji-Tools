@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 import glob
+import re
 import sys
+
 from fontTools import ttx
 from png import PNG
 
@@ -33,8 +35,9 @@ font.importXML(in_file)
 img_files = {}
 glb = "%s*.png" % img_prefix
 print "Looking for images matching '%s'." % glb
+pattern = re.compile("^[A-Fa-f0-9]+$")
 for img_file in glob.glob(glb):
-    if ("_" in img_file[len(img_prefix):-4]) or ("." in img_file[len(img_prefix):-4]):
+    if not pattern.match(img_file[len(img_prefix):-4]):
         continue
     u = int(img_file[len(img_prefix):-4], 16)
     img_files[u] = img_file

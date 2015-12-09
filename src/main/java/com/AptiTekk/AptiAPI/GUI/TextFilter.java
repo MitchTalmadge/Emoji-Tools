@@ -18,7 +18,7 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package com.AptiTekk.AptiAPI.GUI;
 
 import javax.swing.text.*;
 import java.util.ArrayList;
@@ -63,8 +63,6 @@ public class TextFilter {
 
         @Override
         public void replace(FilterBypass fb, int i, int i1, String string, AttributeSet as) throws BadLocationException {
-            if (string == null)
-                return;
             for (int n = string.length(); n > 0; n--) {
                 char c = string.charAt(n - 1);
                 switch (filterType) {
