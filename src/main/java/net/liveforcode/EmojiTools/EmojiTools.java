@@ -23,17 +23,27 @@ package net.liveforcode.EmojiTools;
 import com.AptiTekk.AptiAPI.AptiAPI;
 import com.AptiTekk.AptiAPI.ErrorHandler;
 import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
+import org.python.core.PyString;
+import org.python.core.PySystemState;
+import org.python.util.PythonInterpreter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.ExecutionException;
 
 public class EmojiTools {
 
     private static final Image logoImage = new ImageIcon(EmojiTools.class.getResource("/Images/EmojiToolsLogo.png")).getImage();
     private static final AptiAPI aptiAPI = new AptiAPI(new Versioning(), logoImage);
     private static final ErrorHandler errorHandler = aptiAPI.getErrorHandler();
+
+    private static final ArrayList<JythonListener> jythonListenerList = new ArrayList<>();
+    private static JythonHandler jythonHandler;
 
     public static void main(String[] args) {
         System.setProperty("python.cachedir.skip", "false");
@@ -46,6 +56,8 @@ public class EmojiTools {
             fontName = args[0];
 
         final File font = new File(getRootDirectory() + "/" + fontName);
+
+        new JythonLoader().execute();
 
         try {
             UIManager.setLookAndFeel(
@@ -63,6 +75,22 @@ public class EmojiTools {
         });
     }
 
+    public static void shutDown() {
+        if (jythonHandler != null) {
+            jythonHandler.getPythonInterpreter().close();
+
+            if (jythonHandler.getScriptDirectory().exists()) {
+                try {
+                    org.apache.commons.io.FileUtils.deleteDirectory(jythonHandler.getScriptDirectory());
+                } catch (IOException e) {
+                    EmojiTools.submitError(Thread.currentThread(), e);
+                }
+            }
+        }
+
+        System.exit(0);
+    }
+
     public static Image getLogoImage() {
         return logoImage;
     }
@@ -77,6 +105,78 @@ public class EmojiTools {
         } catch (URISyntaxException e) {
             submitError(Thread.currentThread(), e);
             return null;
+        }
+    }
+
+    public static void addJythonListener(JythonListener listener) {
+        if (!jythonListenerList.contains(listener))
+            jythonListenerList.add(listener);
+
+        if (jythonHandler != null)
+            listener.onJythonReady(jythonHandler);
+    }
+
+    private static void notifyListenersJythonReady(JythonHandler jythonHandler) {
+        EmojiTools.jythonHandler = jythonHandler;
+
+        Iterator<JythonListener> iterator = jythonListenerList.iterator();
+
+        while (iterator.hasNext()) {
+            JythonListener listener = iterator.next();
+            if (listener != null)
+                listener.onJythonReady(jythonHandler);
+            else
+                iterator.remove();
+        }
+    }
+
+    public interface JythonListener {
+        void onJythonReady(JythonHandler jythonHandler);
+    }
+
+    private static class JythonLoader extends SwingWorker<JythonHandler, Void> {
+        @Override
+        protected JythonHandler doInBackground() throws Exception {
+            File scriptsDirectory = extractScriptsToTempDir();
+
+            //Create Interpreter
+            PySystemState pySystemState = new PySystemState();
+            PythonInterpreter pythonInterpreter = new PythonInterpreter(null, pySystemState);
+
+            //Set encoding to UTF8
+            pythonInterpreter.exec("import sys\n" +
+                    "reload(sys)\n" +
+                    "sys.setdefaultencoding('UTF8')\n" +
+                    "print('Encoding: '+sys.getdefaultencoding())");
+
+            //Set Outputs
+            pythonInterpreter.setOut(System.out);
+            pythonInterpreter.setErr(System.err);
+
+            //Set sys.path
+            String pythonScriptsPath = scriptsDirectory.getAbsolutePath() + "/PythonScripts";
+            pySystemState.path.append(new PyString(pythonScriptsPath));
+
+            return new JythonHandler(pySystemState, pythonInterpreter, scriptsDirectory);
+        }
+
+        private File extractScriptsToTempDir() throws Exception {
+            File tempFolder = new File(getRootDirectory().getAbsolutePath() + "/tmp");
+            tempFolder.mkdir();
+
+            FileUtils.copyResourcesRecursively(getClass().getResource("/PythonScripts"), tempFolder);
+            FileUtils.copyResourcesRecursively(getClass().getResource("/FontTemplates"), tempFolder);
+
+            return tempFolder;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                notifyListenersJythonReady(get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 

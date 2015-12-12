@@ -70,7 +70,7 @@ public class EmojiToolsGUI extends JFrame implements MouseListener, AptiAPIListe
                     if (component instanceof OperationTab)
                         ((OperationTab) component).stopOperations();
                 }
-                System.exit(0);
+                EmojiTools.shutDown();
             }
         });
 

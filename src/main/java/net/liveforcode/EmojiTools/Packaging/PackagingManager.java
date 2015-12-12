@@ -30,14 +30,14 @@ public class PackagingManager extends OperationManager {
 
     private final EmojiToolsGUI gui;
 
-    private final PackagingThread packagingThread;
+    private final PackagingThread1_8 packagingThread;
     private final PackagingDialog packagingDialog;
 
     public PackagingManager(EmojiToolsGUI gui, File pngDirectory, PackagingDialog packagingDialog, int outputType) {
         this.gui = gui;
         this.packagingDialog = packagingDialog;
 
-        this.packagingThread = new PackagingThread(gui, pngDirectory, this, packagingDialog, outputType);
+        this.packagingThread = new PackagingThread1_8(gui, pngDirectory, this, packagingDialog, outputType);
     }
 
     @Override
