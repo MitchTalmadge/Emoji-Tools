@@ -20,28 +20,46 @@
 
 package net.liveforcode.EmojiTools.Packaging;
 
+import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
 import net.liveforcode.EmojiTools.GUI.PackagingDialog;
+import net.liveforcode.EmojiTools.GUI.Tabs.PackagingTab;
+import net.liveforcode.EmojiTools.JythonHandler;
 import net.liveforcode.EmojiTools.OperationManager;
+import net.liveforcode.EmojiTools.Packaging.PackagingThreads.AndroidPackagingThread;
+import net.liveforcode.EmojiTools.Packaging.PackagingThreads.PackagingThread;
 
 import java.io.File;
 
-public class PackagingManager extends OperationManager {
+public class PackagingManager extends OperationManager implements EmojiTools.JythonListener {
 
     private final EmojiToolsGUI gui;
-
-    private final PackagingThread1_8 packagingThread;
+    private final File pngDirectory;
     private final PackagingDialog packagingDialog;
+    private final int outputType;
+    private PackagingThread packagingThread;
 
     public PackagingManager(EmojiToolsGUI gui, File pngDirectory, PackagingDialog packagingDialog, int outputType) {
         this.gui = gui;
+        this.pngDirectory = pngDirectory;
         this.packagingDialog = packagingDialog;
-
-        this.packagingThread = new PackagingThread1_8(gui, pngDirectory, this, packagingDialog, outputType);
+        this.outputType = outputType;
     }
 
     @Override
     public void start() {
+        if (this.outputType == PackagingTab.ANDROID) { //TODO: Implement iOS and OSX Emoji Fonts
+            packagingDialog.setIndeterminate(true);
+            packagingDialog.appendToStatus("Compiling Scripts... (This can take a minute. Please Wait...)");
+
+            EmojiTools.addJythonListener(this);
+        }
+    }
+
+    @Override
+    public void onJythonReady(JythonHandler jythonHandler) {
+        this.packagingThread = new AndroidPackagingThread(gui, pngDirectory, this, packagingDialog, jythonHandler);
+        this.gui.getConsoleManager().addConsoleListener(packagingThread);
         this.packagingThread.start();
     }
 

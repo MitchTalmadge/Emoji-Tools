@@ -36,7 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-class PackagingThread extends Thread implements ConsoleManager.ConsoleListener {
+class PackagingThread1_7 extends Thread implements ConsoleManager.ConsoleListener {
 
     private final EmojiToolsGUI gui;
     private final File pngDirectory;
@@ -45,7 +45,7 @@ class PackagingThread extends Thread implements ConsoleManager.ConsoleListener {
     private final int outputType;
     private boolean running = true;
 
-    public PackagingThread(EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog, int outputType) {
+    public PackagingThread1_7(EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog, int outputType) {
         super("PackagingThread");
         this.gui = gui;
         this.pngDirectory = pngDirectory;

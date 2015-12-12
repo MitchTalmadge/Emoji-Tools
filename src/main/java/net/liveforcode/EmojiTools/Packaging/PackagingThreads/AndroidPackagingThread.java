@@ -18,61 +18,27 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.Packaging;
+package net.liveforcode.EmojiTools.Packaging.PackagingThreads;
 
-import net.liveforcode.EmojiTools.ConsoleManager;
 import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
 import net.liveforcode.EmojiTools.GUI.PackagingDialog;
-import net.liveforcode.EmojiTools.GUI.Tabs.PackagingTab;
 import net.liveforcode.EmojiTools.JythonHandler;
+import net.liveforcode.EmojiTools.Packaging.PackagingManager;
 import org.python.core.PyList;
 import org.python.core.PyType;
 
 import java.io.File;
 import java.util.ArrayList;
 
-class PackagingThread1_8 extends Thread implements ConsoleManager.ConsoleListener, EmojiTools.JythonListener {
+public class AndroidPackagingThread extends PackagingThread {
 
-    private final EmojiToolsGUI gui;
-    private final File pngDirectory;
-    private final PackagingManager packagingManager;
-    private final PackagingDialog packagingDialog;
-    private final int outputType;
-    private boolean running = true;
-
-    public PackagingThread1_8(EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog, int outputType) {
-        super("PackagingThread");
-        this.gui = gui;
-        this.pngDirectory = pngDirectory;
-        this.packagingManager = packagingManager;
-        this.packagingDialog = packagingDialog;
-        this.outputType = outputType;
+    public AndroidPackagingThread(EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog, JythonHandler jythonHandler) {
+        super("AndroidPackagingThread", gui, pngDirectory, packagingManager, packagingDialog, jythonHandler);
     }
 
     @Override
     public void run() {
-        if (outputType == PackagingTab.ANDROID) { //TODO: Implement iOS and OSX Emoji Fonts
-            gui.getConsoleManager().addConsoleListener(this);
-
-            packagingDialog.setIndeterminate(true);
-            packagingDialog.appendToStatus("Compiling Scripts... (This can take a minute. Please Wait...)");
-
-            EmojiTools.addJythonListener(this);
-        }
-    }
-
-    public void endPackaging() {
-        running = false;
-    }
-
-    @Override
-    public void write(String message) {
-        this.packagingDialog.writeToStatus(message);
-    }
-
-    @Override
-    public void onJythonReady(JythonHandler jythonHandler) {
         try {
             File outputDirectory = new File(EmojiTools.getRootDirectory(), "Output");
             if (!outputDirectory.exists())
