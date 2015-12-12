@@ -70,4 +70,7 @@ public class PackagingManager extends OperationManager implements EmojiTools.Jyt
         }
     }
 
+    public void showMessageDialog(String message) {
+        this.gui.showMessageDialog(message);
+    }
 }

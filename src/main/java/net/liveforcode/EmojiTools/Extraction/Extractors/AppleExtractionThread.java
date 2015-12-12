@@ -36,18 +36,15 @@ public class AppleExtractionThread extends ExtractionThread {
     private final List<Integer> tableLengths;
 
     private final ExtractionManager extractionManager;
-    private final ExtractionDialog extractionDialog;
 
     public AppleExtractionThread(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
-        super("AppleExtractionThread", font, extractionDirectory, jythonHandler);
+        super("AppleExtractionThread", font, extractionDirectory, extractionDialog, jythonHandler);
 
         this.tableNames = tableNames;
         this.tableOffsets = tableOffsets;
         this.tableLengths = tableLengths;
 
         this.extractionManager = extractionManager;
-        this.extractionDialog = extractionDialog;
-
     }
 
     @Override

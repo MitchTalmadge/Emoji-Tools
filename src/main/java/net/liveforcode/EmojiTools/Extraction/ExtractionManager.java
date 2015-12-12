@@ -101,6 +101,7 @@ public class ExtractionManager extends OperationManager implements EmojiTools.Jy
             extractionThread = new GoogleExtractionThread1_8(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog, jythonHandler);
         else
             extractionThread = new StandardExtractionThread(font, extractionDirectory, this, extractionDialog, jythonHandler);
+        this.gui.getConsoleManager().addConsoleListener(extractionThread);
         extractionThread.start();
     }
 

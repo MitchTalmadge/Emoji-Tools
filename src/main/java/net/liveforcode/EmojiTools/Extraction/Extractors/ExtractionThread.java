@@ -20,11 +20,13 @@
 
 package net.liveforcode.EmojiTools.Extraction.Extractors;
 
+import net.liveforcode.EmojiTools.ConsoleManager;
+import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
 
 import java.io.File;
 
-public class ExtractionThread extends Thread {
+public class ExtractionThread extends Thread implements ConsoleManager.ConsoleListener {
     final static String[] standardOrderNames = {
             ".notdef", //0
             ".null",
@@ -288,14 +290,14 @@ public class ExtractionThread extends Thread {
     final File font;
     final File extractionDirectory;
     final JythonHandler jythonHandler;
-    private final String threadName;
+    ExtractionDialog extractionDialog;
     boolean running = true;
 
-    ExtractionThread(String threadName, File font, File extractionDirectory, JythonHandler jythonHandler) {
+    ExtractionThread(String threadName, File font, File extractionDirectory, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
         super(threadName);
-        this.threadName = threadName;
         this.font = font;
         this.extractionDirectory = extractionDirectory;
+        this.extractionDialog = extractionDialog;
         this.jythonHandler = jythonHandler;
     }
 
@@ -303,4 +305,8 @@ public class ExtractionThread extends Thread {
         running = false;
     }
 
+    @Override
+    public void write(String message) {
+        extractionDialog.writeToStatus(message);
+    }
 }

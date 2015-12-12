@@ -32,14 +32,11 @@ public class StandardExtractionThread extends ExtractionThread {
     private static final int[] suffix = new int[]{0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82};
     private static boolean[] searchBooleans = new boolean[8];
     private final ExtractionManager extractionManager;
-    private final ExtractionDialog extractionDialog;
     private long currentBytePos = 0;
 
     public StandardExtractionThread(File font, File extractionDirectory, ExtractionManager extractionManager, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
-        super("StandardExtractionThread", font, extractionDirectory, jythonHandler);
+        super("StandardExtractionThread", font, extractionDirectory, extractionDialog, jythonHandler);
         this.extractionManager = extractionManager;
-        this.extractionDialog = extractionDialog;
-
     }
 
     @Override

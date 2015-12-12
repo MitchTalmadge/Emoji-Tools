@@ -25,8 +25,11 @@ import net.liveforcode.EmojiTools.Extraction.ExtractionManager;
 import net.liveforcode.EmojiTools.Extraction.ExtractionUtilites;
 import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
+import org.python.core.PyList;
+import org.python.core.PyType;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,28 +40,46 @@ public class GoogleExtractionThread1_8 extends ExtractionThread {
     private final List<Integer> tableLengths;
 
     private final ExtractionManager extractionManager;
-    private final ExtractionDialog extractionDialog;
 
     public GoogleExtractionThread1_8(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
-        super("GoogleExtractionThread", font, extractionDirectory, jythonHandler);
+        super("GoogleExtractionThread", font, extractionDirectory, extractionDialog, jythonHandler);
 
         this.tableNames = tableNames;
         this.tableOffsets = tableOffsets;
         this.tableLengths = tableLengths;
 
         this.extractionManager = extractionManager;
-        this.extractionDialog = extractionDialog;
-
     }
 
     @Override
     public void run() {
+        if (!extractionDirectory.exists()) {
+            extractionDirectory.mkdir();
+        }
+
+        //---- ttx.py ----//
+        extractionDialog.setIndeterminate(true);
+        extractionDialog.appendToStatus("Converting Emoji Font... Please wait...");
+
+        //Set sys.argv
+        ArrayList<String> argvList = new ArrayList<>();
+        argvList.add("package.py");                                      //Python Script Name
+        argvList.add("-o");                                              //Output flag
+        argvList.add(extractionDirectory.getAbsolutePath() + "/info.ttx"); //Output ttx path
+        argvList.add(font.getAbsolutePath());                            //Input ttf path
+
+        jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
+
+        if (!running)
+            return;
+
+        //Execute
+        jythonHandler.getPythonInterpreter().execfile(jythonHandler.getScriptDirectory().getAbsolutePath() + "/PythonScripts/package.py");
+
+        extractionDialog.setIndeterminate(false);
+
         try {
             RandomAccessFile inputStream = new RandomAccessFile(font, "r");
-
-            if (!extractionDirectory.exists()) {
-                extractionDirectory.mkdir();
-            }
 
             appendToStatus("Searching for Emojis - Please wait until complete!");
 

@@ -37,18 +37,15 @@ public class GoogleExtractionThread extends ExtractionThread {
     private final List<Integer> tableLengths;
 
     private final ExtractionManager extractionManager;
-    private final ExtractionDialog extractionDialog;
 
     public GoogleExtractionThread(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
-        super("GoogleExtractionThread", font, extractionDirectory, jythonHandler);
+        super("GoogleExtractionThread", font, extractionDirectory, extractionDialog, jythonHandler);
 
         this.tableNames = tableNames;
         this.tableOffsets = tableOffsets;
         this.tableLengths = tableLengths;
 
         this.extractionManager = extractionManager;
-        this.extractionDialog = extractionDialog;
-
     }
 
     @Override

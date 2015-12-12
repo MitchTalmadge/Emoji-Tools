@@ -25,11 +25,15 @@ import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
 import net.liveforcode.EmojiTools.GUI.PackagingDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
 import net.liveforcode.EmojiTools.Packaging.PackagingManager;
-import org.python.core.PyList;
-import org.python.core.PyType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AndroidPackagingThread extends PackagingThread {
 
@@ -46,75 +50,80 @@ public class AndroidPackagingThread extends PackagingThread {
 
             packagingDialog.setIndeterminate(false);
 
+            packagingDialog.appendToStatus("Rewriting Emojis...");
+            HashMap<String, String> glyphCodeNameMap = new HashMap<>();
+            HashMap<File, String> glyphFileNameMap = new HashMap<>();
+
+            Document infoFile = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(pngDirectory, "info.ttx"));
+            Element rootElement = infoFile.getDocumentElement();
+            if (!rootElement.getTagName().equals("ttFont")) {
+                packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 1)");
+                packagingDialog.dispose();
+                return;
+            }
+
+            Element cmapElement = (Element) rootElement.getElementsByTagName("cmap").item(0);
+            if (cmapElement == null) {
+                packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 2)");
+                packagingDialog.dispose();
+                return;
+            }
+
+            Element cmapFormat12Element = (Element) cmapElement.getElementsByTagName("cmap_format_12").item(0);
+            if (cmapFormat12Element == null) {
+                packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 3)");
+                packagingDialog.dispose();
+                return;
+            }
+
+            NodeList mappingList = cmapFormat12Element.getElementsByTagName("map");
+            for (int i = 0; i < mappingList.getLength(); i++) {
+                Element mappingElement = (Element) mappingList.item(i);
+                String code = mappingElement.getAttribute("code");
+                String name = mappingElement.getAttribute("name");
+
+                Pattern pattern = Pattern.compile("^0x([A-Fa-f0-9]+)L?$");
+                Matcher matcher = pattern.matcher(code);
+                if (matcher.find()) {
+                    code = matcher.group(1);
+                    if (code.length() < 4) {
+                        code = new String(new char[4 - code.length()]).replace("\0", "0") + code;
+                        glyphCodeNameMap.put(code, name);
+                    }
+                }
+            }
+
+            for (File file : pngDirectory.listFiles()) {
+                String fileName = file.getName();
+                Pattern pattern = Pattern.compile("^(uni[A-Fa-f0-9]+(_uni[A-Fa-f0-9]+)*?)\\.png$");
+                Matcher matcher = pattern.matcher(fileName);
+                if (matcher.matches()) {
+                    fileName = matcher.group(1);
+                    String[] splitFileName = fileName.split("_");
+                    //Remove "uni" prefixes
+                    for (int i = 0; i < splitFileName.length; i++) {
+                        if (splitFileName[i].startsWith("uni"))
+                            splitFileName[i] = splitFileName[i].substring(3);
+
+                        System.out.println(splitFileName[i]);
+                    }
+                    if (splitFileName.length > 1) {
+                        //TODO: GSUB table
+                    } else {
+                        System.out.println("Split: " + splitFileName[0]);
+                        if (glyphCodeNameMap.get(splitFileName[0]) != null) {
+                            glyphFileNameMap.put(file, glyphCodeNameMap.get(splitFileName[0]));
+                            System.out.println("File " + file.getName() + " has been assigned to " + glyphCodeNameMap.get(splitFileName[0]));
+                        }
+                    }
+                }
+            }
+
+            //TODO: For each image, check if it has underscores; if it does, place it in the gsub table.
+
             packagingDialog.appendToStatus("Extracting Scripts...");
 
-            //---- add_glyphs.py ----//
 
-            packagingDialog.setProgress(25);
-
-            packagingDialog.appendToStatus("Running add_glyphs.py...");
-
-            //Set sys.argv
-            String fontTemplatePath;
-            fontTemplatePath = jythonHandler.getScriptDirectory().getAbsolutePath() + "/FontTemplates/NotoColorEmoji.tmpl.ttx";
-
-            ArrayList<String> argvList = new ArrayList<>();
-            argvList.add("add_glyphs.py");                                      //Python Script Name
-            argvList.add(fontTemplatePath);                                     //Template Path
-            argvList.add(jythonHandler.getScriptDirectory().getAbsolutePath() + "/NotoColorEmoji.ttx"); //Output ttx path
-            argvList.add(pngDirectory.getAbsolutePath() + "/uni");              //Prefix Path
-
-            jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
-
-            if (!running)
-                return;
-
-            //Execute
-            jythonHandler.getPythonInterpreter().execfile(jythonHandler.getScriptDirectory().getAbsolutePath() + "/PythonScripts/add_glyphs.py");
-
-            //---- package.py ----//
-
-            packagingDialog.setProgress(50);
-
-            packagingDialog.appendToStatus("Running package.py...");
-
-            //Set sys.argv
-            argvList = new ArrayList<>();
-            argvList.add("package.py");                                                 //Python Script Name
-            argvList.add("-o");                                                         //Output flag
-            argvList.add(jythonHandler.getScriptDirectory().getAbsolutePath() + "/NotoColorEmoji.empty.ttf");   //Output empty ttf path
-            argvList.add(jythonHandler.getScriptDirectory().getAbsolutePath() + "/NotoColorEmoji.ttx");         //ttx path
-
-            jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
-
-            if (!running)
-                return;
-
-            //Execute
-            jythonHandler.getPythonInterpreter().execfile(jythonHandler.getScriptDirectory().getAbsolutePath() + "/PythonScripts/package.py");
-
-            //---- emoji_builder.py.py ----//
-
-            packagingDialog.setProgress(75);
-
-            packagingDialog.appendToStatus("Running emoji_builder.py...");
-
-            //Set sys.argv
-            argvList = new ArrayList<>();
-            argvList.add("emoji_builder.py");                                           //Python Script Name
-            argvList.add(jythonHandler.getScriptDirectory().getAbsolutePath() + "/NotoColorEmoji.empty.ttf");   //Empty ttf path
-            argvList.add(outputDirectory.getAbsolutePath() + "/NotoColorEmoji.ttf");    //Output ttf path
-            argvList.add(pngDirectory.getAbsolutePath() + "/uni");                      //Prefix Path
-
-            jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
-
-            if (!running)
-                return;
-
-            //Execute
-            jythonHandler.getPythonInterpreter().execfile(jythonHandler.getScriptDirectory().getAbsolutePath() + "/PythonScripts/emoji_builder.py");
-
-            packagingDialog.setProgress(100);
 
         } catch (Exception e) {
             EmojiTools.submitError(Thread.currentThread(), e);
