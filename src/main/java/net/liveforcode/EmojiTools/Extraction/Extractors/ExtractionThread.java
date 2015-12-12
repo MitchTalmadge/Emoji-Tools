@@ -20,6 +20,8 @@
 
 package net.liveforcode.EmojiTools.Extraction.Extractors;
 
+import net.liveforcode.EmojiTools.JythonHandler;
+
 import java.io.File;
 
 public class ExtractionThread extends Thread {
@@ -285,12 +287,16 @@ public class ExtractionThread extends Thread {
     };
     final File font;
     final File extractionDirectory;
+    final JythonHandler jythonHandler;
+    private final String threadName;
     boolean running = true;
 
-    ExtractionThread(File font, File extractionDirectory, String threadName) {
+    ExtractionThread(String threadName, File font, File extractionDirectory, JythonHandler jythonHandler) {
         super(threadName);
+        this.threadName = threadName;
         this.font = font;
         this.extractionDirectory = extractionDirectory;
+        this.jythonHandler = jythonHandler;
     }
 
     public void endExtraction() {

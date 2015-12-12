@@ -23,10 +23,11 @@ package net.liveforcode.EmojiTools.Extraction;
 import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.Extraction.Extractors.AppleExtractionThread;
 import net.liveforcode.EmojiTools.Extraction.Extractors.ExtractionThread;
-import net.liveforcode.EmojiTools.Extraction.Extractors.GoogleExtractionThread;
+import net.liveforcode.EmojiTools.Extraction.Extractors.GoogleExtractionThread1_8;
 import net.liveforcode.EmojiTools.Extraction.Extractors.StandardExtractionThread;
 import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
 import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
+import net.liveforcode.EmojiTools.JythonHandler;
 import net.liveforcode.EmojiTools.OperationManager;
 
 import java.io.File;
@@ -35,14 +36,24 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.List;
 
-public class ExtractionManager extends OperationManager {
+public class ExtractionManager extends OperationManager implements EmojiTools.JythonListener {
 
+    private final File font;
+    private final File extractionDirectory;
     private final EmojiToolsGUI gui;
+    private final ExtractionDialog extractionDialog;
+
+    private List<String> tableNames;
+    private List<Integer> tableOffsets;
+    private List<Integer> tableLengths;
 
     private ExtractionThread extractionThread;
 
     public ExtractionManager(File font, File extractionDirectory, EmojiToolsGUI gui, ExtractionDialog extractionDialog) {
+        this.font = font;
+        this.extractionDirectory = extractionDirectory;
         this.gui = gui;
+        this.extractionDialog = extractionDialog;
 
         //Determine which Extraction Method to use
         try {
@@ -55,9 +66,9 @@ public class ExtractionManager extends OperationManager {
             }
 
             short numTables = inputStream.readShort();
-            List<String> tableNames = Arrays.asList(new String[numTables]);
-            List<Integer> tableOffsets = Arrays.asList(new Integer[numTables]);
-            List<Integer> tableLengths = Arrays.asList(new Integer[numTables]);
+            tableNames = Arrays.asList(new String[numTables]);
+            tableOffsets = Arrays.asList(new Integer[numTables]);
+            tableLengths = Arrays.asList(new Integer[numTables]);
 
             inputStream.seek(12);
             for (int i = 0; i < numTables; i++) {
@@ -66,13 +77,6 @@ public class ExtractionManager extends OperationManager {
                 tableOffsets.set(i, inputStream.readInt());
                 tableLengths.set(i, inputStream.readInt());
             }
-
-            if (tableNames.contains("sbix"))
-                extractionThread = new AppleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog);
-            else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
-                extractionThread = new GoogleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog);
-            else
-                extractionThread = new StandardExtractionThread(font, extractionDirectory, this, extractionDialog);
 
             inputStream.close();
         } catch (IOException e) {
@@ -86,6 +90,17 @@ public class ExtractionManager extends OperationManager {
 
     @Override
     public void start() {
+        EmojiTools.addJythonListener(this);
+    }
+
+    @Override
+    public void onJythonReady(JythonHandler jythonHandler) {
+        if (tableNames.contains("sbix"))
+            extractionThread = new AppleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog, jythonHandler);
+        else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
+            extractionThread = new GoogleExtractionThread1_8(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog, jythonHandler);
+        else
+            extractionThread = new StandardExtractionThread(font, extractionDirectory, this, extractionDialog, jythonHandler);
         extractionThread.start();
     }
 

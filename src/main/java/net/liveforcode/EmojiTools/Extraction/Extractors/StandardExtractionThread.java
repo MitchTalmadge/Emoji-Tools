@@ -23,6 +23,7 @@ package net.liveforcode.EmojiTools.Extraction.Extractors;
 import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.Extraction.ExtractionManager;
 import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
+import net.liveforcode.EmojiTools.JythonHandler;
 
 import java.io.*;
 
@@ -34,8 +35,8 @@ public class StandardExtractionThread extends ExtractionThread {
     private final ExtractionDialog extractionDialog;
     private long currentBytePos = 0;
 
-    public StandardExtractionThread(File font, File extractionDirectory, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
-        super(font, extractionDirectory, "StandardExtractionThread");
+    public StandardExtractionThread(File font, File extractionDirectory, ExtractionManager extractionManager, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
+        super("StandardExtractionThread", font, extractionDirectory, jythonHandler);
         this.extractionManager = extractionManager;
         this.extractionDialog = extractionDialog;
 

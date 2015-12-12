@@ -24,6 +24,7 @@ import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.Extraction.ExtractionManager;
 import net.liveforcode.EmojiTools.Extraction.ExtractionUtilites;
 import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
+import net.liveforcode.EmojiTools.JythonHandler;
 
 import java.io.*;
 import java.util.List;
@@ -37,8 +38,8 @@ public class AppleExtractionThread extends ExtractionThread {
     private final ExtractionManager extractionManager;
     private final ExtractionDialog extractionDialog;
 
-    public AppleExtractionThread(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog) {
-        super(font, extractionDirectory, "AppleExtractionThread");
+    public AppleExtractionThread(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
+        super("AppleExtractionThread", font, extractionDirectory, jythonHandler);
 
         this.tableNames = tableNames;
         this.tableOffsets = tableOffsets;
