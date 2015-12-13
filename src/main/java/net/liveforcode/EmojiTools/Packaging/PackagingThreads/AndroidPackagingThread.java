@@ -24,6 +24,7 @@ import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
 import net.liveforcode.EmojiTools.GUI.PackagingDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
+import net.liveforcode.EmojiTools.Packaging.LigatureSet;
 import net.liveforcode.EmojiTools.Packaging.PackagingManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -88,9 +89,18 @@ public class AndroidPackagingThread extends PackagingThread {
                     code = matcher.group(1);
                     if (code.length() < 4) {
                         code = new String(new char[4 - code.length()]).replace("\0", "0") + code;
-                        glyphCodeNameMap.put(code, name);
                     }
+                    glyphCodeNameMap.put(code, name);
                 }
+            }
+
+            HashMap<String, LigatureSet> ligatureSetMap = new HashMap<>();
+
+            Element gsubTable = (Element) rootElement.getElementsByTagName("GSUB").item(0);
+            boolean gsubEnabled = gsubTable != null;
+            if(gsubEnabled)
+            {
+
             }
 
             for (File file : pngDirectory.listFiles()) {
@@ -108,7 +118,10 @@ public class AndroidPackagingThread extends PackagingThread {
                         System.out.println(splitFileName[i]);
                     }
                     if (splitFileName.length > 1) {
-                        //TODO: GSUB table
+                        if(gsubEnabled)
+                        {
+
+                        }
                     } else {
                         System.out.println("Split: " + splitFileName[0]);
                         if (glyphCodeNameMap.get(splitFileName[0]) != null) {
