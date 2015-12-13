@@ -25,8 +25,11 @@ import net.liveforcode.EmojiTools.Extraction.ExtractionManager;
 import net.liveforcode.EmojiTools.Extraction.ExtractionUtilites;
 import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
+import org.python.core.PyList;
+import org.python.core.PyType;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,12 +53,35 @@ public class GoogleExtractionThread extends ExtractionThread {
 
     @Override
     public void run() {
+        if (!extractionDirectory.exists()) {
+            extractionDirectory.mkdir();
+        }
+
+        //---- ttx.py ----//
+        extractionDialog.setIndeterminate(true);
+        extractionDialog.appendToStatus("Converting Emoji Font... Please wait...");
+
+        //Set sys.argv
+        ArrayList<String> argvList = new ArrayList<>();
+        argvList.add("package.py");                                         //Python Script Name
+        argvList.add("-o");                                                 //Output flag
+        argvList.add(extractionDirectory.getAbsolutePath()
+                + "/" + ExtractionManager.TTXType.ANDROID.getFileName());   //Output ttx path
+        argvList.add(font.getAbsolutePath());                               //Input ttf path
+
+        jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
+
+        if (!running)
+            return;
+
+        //Execute
+        jythonHandler.getPythonInterpreter().execfile(jythonHandler.getTempDirectory().getAbsolutePath()
+                + "/PythonScripts/package.py");
+
+        extractionDialog.setIndeterminate(false);
+
         try {
             RandomAccessFile inputStream = new RandomAccessFile(font, "r");
-
-            if (!extractionDirectory.exists()) {
-                extractionDirectory.mkdir();
-            }
 
             appendToStatus("Searching for Emojis - Please wait until complete!");
 
@@ -79,7 +105,8 @@ public class GoogleExtractionThread extends ExtractionThread {
                 short[] platformSpecificIDs = new short[numSubTables];
                 int[] subTableOffsets = new int[numSubTables];
 
-                HashMap<Integer, String> unicodeNameMap = new HashMap<>(); //Key: GlyphID, Value: Unicode Name String (i.e. uni00a9)
+                //Key: GlyphID, Value: Unicode Name String (i.e. uni00a9)
+                HashMap<Integer, String> unicodeNameMap = new HashMap<>();
 
                 for (short subTableId = 0; subTableId < numSubTables; subTableId++) {
                     platformIDs[subTableId] = inputStream.readShort();
@@ -198,7 +225,7 @@ public class GoogleExtractionThread extends ExtractionThread {
                                     ligSetOffsets[i] = ligatureTableOffset + inputStream.readShort();
                                 }
 
-                        /* Coverage Table */
+                                /* Coverage Table */
                                 inputStream.seek(coverageOffset);
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02)) {
                                     extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 5)");
@@ -217,13 +244,13 @@ public class GoogleExtractionThread extends ExtractionThread {
                                     }
                                 }
 
-                        /* LigSet Tables */
+                                /* LigSet Tables */
                                 for (int i = 0; i < ligSetCount; i++) {
                                     inputStream.seek(ligSetOffsets[i]);
 
                                     short ligatureCount = inputStream.readShort();
                                     int[] ligatureOffsets = new int[ligatureCount];
-                            /* Ligature Tables */
+                                    /* Ligature Tables */
                                     for (int j = 0; j < ligatureCount; j++) {
                                         ligatureOffsets[j] = ligSetOffsets[i] + inputStream.readShort();
                                     }

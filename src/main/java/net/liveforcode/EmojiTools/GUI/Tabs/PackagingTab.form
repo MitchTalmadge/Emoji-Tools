@@ -8,7 +8,7 @@
     <border type="none"/>
     <children>
       <grid id="7221f" layout-manager="FormLayout">
-        <rowspec value="center:18px:noGrow"/>
+        <rowspec value="center:35px:noGrow"/>
         <rowspec value="center:max(d;4px):noGrow"/>
         <rowspec value="center:d:grow"/>
         <colspec value="fill:200px:noGrow"/>
@@ -45,62 +45,9 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Select a folder of Emoji .png files to Package"/>
+              <text value="&lt;html&gt;Select a folder of Emoji .png files to package.&lt;br&gt;&#10;(Must have been extracted using Emoji Tools)&lt;/html&gt;"/>
             </properties>
           </component>
-        </children>
-      </grid>
-      <grid id="6a028" layout-manager="FormLayout">
-        <rowspec value="center:d:grow"/>
-        <colspec value="fill:d:grow"/>
-        <constraints border-constraint="Center"/>
-        <properties/>
-        <border type="etched" title="Options"/>
-        <children>
-          <grid id="60c56" layout-manager="FormLayout">
-            <rowspec value="center:25px:noGrow"/>
-            <rowspec value="center:25px:noGrow"/>
-            <rowspec value="center:25px:noGrow"/>
-            <colspec value="fill:d:noGrow"/>
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
-              <forms defaultalign-vert="false"/>
-            </constraints>
-            <properties/>
-            <border type="etched" title="Output Font Type"/>
-            <children>
-              <component id="9b3e1" class="javax.swing.JRadioButton" binding="outputRadioButton1">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <selected value="true"/>
-                  <text value="&amp;Android (NotoColorEmoji.ttf)"/>
-                </properties>
-              </component>
-              <component id="74549" class="javax.swing.JRadioButton" binding="outputRadioButton2">
-                <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <enabled value="false"/>
-                  <text value="&amp;iOS (AppleColorEmoji@2x.ttf) -- Coming Soon"/>
-                </properties>
-              </component>
-              <component id="9b2a1" class="javax.swing.JRadioButton" binding="outputRadioButton3">
-                <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <enabled value="false"/>
-                  <text value="OS&amp;X (AppleColorEmoji.ttf) -- Coming Soon"/>
-                </properties>
-              </component>
-            </children>
-          </grid>
         </children>
       </grid>
       <grid id="f9f00" layout-manager="BorderLayout" hgap="0" vgap="0">

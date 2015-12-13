@@ -22,6 +22,7 @@ package net.liveforcode.EmojiTools.GUI.Tabs;
 
 import net.liveforcode.EmojiTools.Conversion.ConversionManager;
 import net.liveforcode.EmojiTools.EmojiTools;
+import net.liveforcode.EmojiTools.Extraction.ExtractionManager;
 import net.liveforcode.EmojiTools.GUI.*;
 import net.liveforcode.EmojiTools.Packaging.PackagingManager;
 import net.liveforcode.EmojiTools.Renaming.RenamingManager;
@@ -43,11 +44,8 @@ public class PackagingTab extends OperationTab implements ActionListener {
     private JPanel contentPane;
     private JTextField fileNameField;
     private JButton browseButton;
-    private JRadioButton outputRadioButton1;
-    private JRadioButton outputRadioButton2;
     private JButton startPackagingButton;
     private JButton openRootDirectoryButton;
-    private JRadioButton outputRadioButton3;
     private File packagingFile;
 
     public PackagingTab(EmojiToolsGUI gui) {
@@ -57,9 +55,6 @@ public class PackagingTab extends OperationTab implements ActionListener {
         this.add(this.contentPane, BorderLayout.CENTER);
 
         this.browseButton.addActionListener(this);
-
-        this.outputRadioButton1.addActionListener(this);
-        this.outputRadioButton1.addActionListener(this);
 
         this.openRootDirectoryButton.addActionListener(this);
         this.startPackagingButton.addActionListener(this);
@@ -75,6 +70,25 @@ public class PackagingTab extends OperationTab implements ActionListener {
             return;
         }
 
+        File ttxFile = null;
+        for (File file : packagingFile.listFiles()) {
+            if (file.getName().endsWith(".ttx"))
+                ttxFile = file;
+        }
+
+        if (ttxFile == null) {
+            gui.showMessageDialog("The selected directory is not a valid Emoji Tools extraction directory!");
+            return;
+        }
+
+        ExtractionManager.TTXType ttxType = null;
+        for (ExtractionManager.TTXType type : ExtractionManager.TTXType.values()) {
+            if (type.getFileName().equals(ttxFile.getName())) {
+                ttxType = type;
+                break;
+            }
+        }
+
         boolean containsPngs = false;
 
         for (String fileName : this.packagingFile.list()) {
@@ -86,14 +100,6 @@ public class PackagingTab extends OperationTab implements ActionListener {
             gui.showMessageDialog("The selected directory does not contain any Emojis!");
             return;
         }
-
-        int outputType;
-        if (this.outputRadioButton1.isSelected())
-            outputType = ANDROID;
-        else if (this.outputRadioButton2.isSelected())
-            outputType = IOS;
-        else
-            outputType = OSX;
 
         RenamingDialog renamingDialog = new RenamingDialog(this);
         this.currentOperationManager = new RenamingManager(this.packagingFile, this.gui, renamingDialog, new boolean[]{false, false, true, false}, new boolean[]{false, false, true, true});
@@ -109,7 +115,7 @@ public class PackagingTab extends OperationTab implements ActionListener {
 
         if (!cancelled) {
             PackagingDialog packagingDialog = new PackagingDialog(this);
-            this.currentOperationManager = new PackagingManager(this.gui, this.packagingFile, packagingDialog, outputType);
+            this.currentOperationManager = new PackagingManager(this.gui, this.packagingFile, packagingDialog, ttxType);
             currentOperationManager.start();
             packagingDialog.setVisible(true);
         }

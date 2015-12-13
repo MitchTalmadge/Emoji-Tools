@@ -21,9 +21,9 @@
 package net.liveforcode.EmojiTools.Packaging;
 
 import net.liveforcode.EmojiTools.EmojiTools;
+import net.liveforcode.EmojiTools.Extraction.ExtractionManager;
 import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
 import net.liveforcode.EmojiTools.GUI.PackagingDialog;
-import net.liveforcode.EmojiTools.GUI.Tabs.PackagingTab;
 import net.liveforcode.EmojiTools.JythonHandler;
 import net.liveforcode.EmojiTools.OperationManager;
 import net.liveforcode.EmojiTools.Packaging.PackagingThreads.AndroidPackagingThread;
@@ -36,31 +36,50 @@ public class PackagingManager extends OperationManager implements EmojiTools.Jyt
     private final EmojiToolsGUI gui;
     private final File pngDirectory;
     private final PackagingDialog packagingDialog;
-    private final int outputType;
     private PackagingThread packagingThread;
 
-    public PackagingManager(EmojiToolsGUI gui, File pngDirectory, PackagingDialog packagingDialog, int outputType) {
+    private ExtractionManager.TTXType ttxType;
+
+    public PackagingManager(EmojiToolsGUI gui, File pngDirectory, PackagingDialog packagingDialog, ExtractionManager.TTXType ttxType) {
         this.gui = gui;
         this.pngDirectory = pngDirectory;
         this.packagingDialog = packagingDialog;
-        this.outputType = outputType;
+        this.ttxType = ttxType;
     }
 
     @Override
     public void start() {
-        if (this.outputType == PackagingTab.ANDROID) { //TODO: Implement iOS and OSX Emoji Fonts
-            packagingDialog.setIndeterminate(true);
-            packagingDialog.appendToStatus("Compiling Scripts... (This can take a minute. Please Wait...)");
+        packagingDialog.setIndeterminate(true);
+        packagingDialog.appendToStatus("Compiling Scripts... (This can take a minute. Please Wait...)");
 
-            EmojiTools.addJythonListener(this);
+        switch (ttxType) {
+            case ANDROID:
+                EmojiTools.addJythonListener(this);
+                break;
+            case IOS:
+            case OSX:
+                showMessageDialog("iOS and OSX Emoji Fonts cannot be created yet. This feature is in development.");
+                break;
+            default:
+                showMessageDialog("The selected Emoji directory is invalid or cannot be packaged.");
+                break;
         }
     }
 
     @Override
     public void onJythonReady(JythonHandler jythonHandler) {
-        this.packagingThread = new AndroidPackagingThread(gui, pngDirectory, this, packagingDialog, jythonHandler);
-        this.gui.getConsoleManager().addConsoleListener(packagingThread);
-        this.packagingThread.start();
+        switch (ttxType) {
+            case ANDROID:
+                this.packagingThread = new AndroidPackagingThread(gui, pngDirectory, this, packagingDialog, jythonHandler);
+                this.gui.getConsoleManager().addConsoleListener(packagingThread);
+                packagingThread.start();
+                break;
+            case IOS:
+            case OSX:
+            default:
+                break;
+        }
+
     }
 
     @Override
