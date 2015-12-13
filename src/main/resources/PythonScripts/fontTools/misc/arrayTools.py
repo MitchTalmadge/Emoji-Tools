@@ -5,8 +5,9 @@
 
 
 from __future__ import print_function, division, absolute_import
-from fontTools.misc.py23 import *
+
 import math
+from fontTools.misc.py23 import *
 
 
 def calcBounds(array):
@@ -18,7 +19,6 @@ def calcBounds(array):
     xs = [x for x, y in array]
     ys = [y for x, y in array]
     return min(xs), min(ys), max(xs), max(ys)
-
 
 def calcIntBounds(array):
     """Return the integer bounding rectangle of a 2D points array as a
@@ -38,16 +38,14 @@ def updateBounds(bounds, p, min=min, max=max):
     xMin, yMin, xMax, yMax = bounds
     return min(xMin, x), min(yMin, y), max(xMax, x), max(yMax, y)
 
-
 def pointInRect(p, rect):
     """Return True when point (x, y) is inside rect."""
     (x, y) = p
     xMin, yMin, xMax, yMax = rect
     return (xMin <= x <= xMax) and (yMin <= y <= yMax)
 
-
 def pointsInRect(array, rect):
-    """Find out which points or array are inside rect. 
+    """Find out which points or array are inside rect.
     Returns an array with a boolean for each point.
     """
     if len(array) < 1:
@@ -55,16 +53,14 @@ def pointsInRect(array, rect):
     xMin, yMin, xMax, yMax = rect
     return [(xMin <= x <= xMax) and (yMin <= y <= yMax) for x, y in array]
 
-
 def vectorLength(vector):
     """Return the length of the given vector."""
     x, y = vector
-    return math.sqrt(x ** 2 + y ** 2)
-
+    return math.sqrt(x**2 + y**2)
 
 def asInt16(array):
     """Round and cast to 16 bit integer."""
-    return [int(math.floor(i + 0.5)) for i in array]
+    return [int(math.floor(i+0.5)) for i in array]
 
 
 def normRect(rect):
@@ -74,24 +70,20 @@ def normRect(rect):
     (xMin, yMin, xMax, yMax) = rect
     return min(xMin, xMax), min(yMin, yMax), max(xMin, xMax), max(yMin, yMax)
 
-
 def scaleRect(rect, x, y):
     """Scale the rectangle by x, y."""
     (xMin, yMin, xMax, yMax) = rect
     return xMin * x, yMin * y, xMax * x, yMax * y
 
-
 def offsetRect(rect, dx, dy):
     """Offset the rectangle by dx, dy."""
     (xMin, yMin, xMax, yMax) = rect
-    return xMin + dx, yMin + dy, xMax + dx, yMax + dy
-
+    return xMin+dx, yMin+dy, xMax+dx, yMax+dy
 
 def insetRect(rect, dx, dy):
     """Inset the rectangle by dx, dy on all sides."""
     (xMin, yMin, xMax, yMax) = rect
-    return xMin + dx, yMin + dy, xMax - dx, yMax - dy
-
+    return xMin+dx, yMin+dy, xMax-dx, yMax-dy
 
 def sectRect(rect1, rect2):
     """Return a boolean and a rectangle. If the input rectangles intersect, return
@@ -106,7 +98,6 @@ def sectRect(rect1, rect2):
         return False, (0, 0, 0, 0)
     return True, (xMin, yMin, xMax, yMax)
 
-
 def unionRect(rect1, rect2):
     """Return the smallest rectangle in which both input rectangles are fully
     enclosed. In other words, return the total bounding rectangle of both input
@@ -118,12 +109,10 @@ def unionRect(rect1, rect2):
                               max(xMax1, xMax2), max(yMax1, yMax2))
     return (xMin, yMin, xMax, yMax)
 
-
 def rectCenter(rect0):
     """Return the center of the rectangle as an (x, y) coordinate."""
     (xMin, yMin, xMax, yMax) = rect0
-    return (xMin + xMax) / 2, (yMin + yMax) / 2
-
+    return (xMin+xMax)/2, (yMin+yMax)/2
 
 def intRect(rect1):
     """Return the rectangle, rounded off to integer values, but guaranteeing that
@@ -192,8 +181,7 @@ def _test():
     (0, 2, 4, 5)
     """
 
-
 if __name__ == "__main__":
+    import sys
     import doctest
-
-    doctest.testmod()
+    sys.exit(doctest.testmod().failed)

@@ -74,7 +74,7 @@ public class AndroidPackagingThread extends PackagingThread {
             if (!running)
                 return;
 
-            //Open up info.ttx for reading and writing
+            //Open up ttx for reading and writing
             Document infoDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(pngDirectory, ExtractionManager.TTXType.ANDROID.getFileName()));
 
             //Check for ttFont element
@@ -275,7 +275,7 @@ public class AndroidPackagingThread extends PackagingThread {
 
             transformer.transform(input, output);
 
-            ////////////////////////////// STEP 4: Convert info.ttx to NotoColorEmoji.ttf //////////////////////////////
+            ////////////////////////////// STEP 4: Convert ttx to NotoColorEmoji.ttf //////////////////////////////
 
             if (!running)
                 return;
@@ -289,7 +289,7 @@ public class AndroidPackagingThread extends PackagingThread {
             argvList.add("package.py");                                                     //Python Script Name
             argvList.add("-o");                                                             //Output flag
             argvList.add(outputDirectory.getAbsolutePath() + "/NotoColorEmoji.ttf");        //Output ttf path
-            argvList.add(jythonHandler.getTempDirectory().getAbsolutePath() + "/info.ttx"); //Input ttx path
+            argvList.add(jythonHandler.getTempDirectory().getAbsolutePath() + "/"+ ExtractionManager.TTXType.ANDROID.getFileName()); //Input ttx path
 
             jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
 

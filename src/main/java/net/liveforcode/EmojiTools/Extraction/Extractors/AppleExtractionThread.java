@@ -75,9 +75,9 @@ public class AppleExtractionThread extends ExtractionThread {
 
             //Execute
             jythonHandler.getPythonInterpreter().execfile(jythonHandler.getTempDirectory().getAbsolutePath()
-                    + "/PythonScripts/package.py");
+                    + "/PythonScripts/package.py");*/
 
-            extractionDialog.setIndeterminate(false);*/
+            extractionDialog.setIndeterminate(false);
 
             appendToStatus("Searching for Emojis - Please wait until complete!");
 

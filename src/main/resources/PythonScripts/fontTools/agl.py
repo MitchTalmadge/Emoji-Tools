@@ -2,6 +2,7 @@
 # http://www.adobe.com/devnet/opentype/archives/aglfn.txt
 
 from __future__ import print_function, division, absolute_import
+
 from fontTools.misc.py23 import *
 
 _aglText = """\
@@ -704,35 +705,35 @@ _aglText = """\
 #END
 """
 
-AGLError = "AGLError"
+
+class AGLError(Exception):
+	pass
 
 AGL2UV = {}
 UV2AGL = {}
 
-
 def _builddicts():
-    import re
+	import re
 
-    lines = _aglText.splitlines()
+	lines = _aglText.splitlines()
 
-    parseAGL_RE = re.compile("([0-9A-F]{4});([A-Za-z_0-9.]+);.*?$")
+	parseAGL_RE = re.compile("([0-9A-F]{4});([A-Za-z_0-9.]+);.*?$")
 
-    for line in lines:
-        if not line or line[:1] == '#':
-            continue
-        m = parseAGL_RE.match(line)
-        if not m:
-            raise AGLError("syntax error in glyphlist.txt: %s" % repr(line[:20]))
-        unicode = m.group(1)
-        assert len(unicode) == 4
-        unicode = int(unicode, 16)
-        glyphName = m.group(2)
-        if glyphName in AGL2UV:
-            # the above table contains identical duplicates
-            assert AGL2UV[glyphName] == unicode
-        else:
-            AGL2UV[glyphName] = unicode
-        UV2AGL[unicode] = glyphName
-
+	for line in lines:
+		if not line or line[:1] == '#':
+			continue
+		m = parseAGL_RE.match(line)
+		if not m:
+			raise AGLError("syntax error in glyphlist.txt: %s" % repr(line[:20]))
+		unicode = m.group(1)
+		assert len(unicode) == 4
+		unicode = int(unicode, 16)
+		glyphName = m.group(2)
+		if glyphName in AGL2UV:
+			# the above table contains identical duplicates
+			assert AGL2UV[glyphName] == unicode
+		else:
+			AGL2UV[glyphName] = unicode
+		UV2AGL[unicode] = glyphName
 
 _builddicts()

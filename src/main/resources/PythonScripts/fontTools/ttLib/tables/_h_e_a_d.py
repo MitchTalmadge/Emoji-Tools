@@ -1,7 +1,10 @@
 from __future__ import print_function, division, absolute_import
-from fontTools.misc.py23 import *
+
+import warnings
 from fontTools.misc import sstruct
+from fontTools.misc.py23 import *
 from fontTools.misc.textTools import safeEval, num2binary, binary2num
+
 from . import DefaultTable
 
 headFormat = """
@@ -25,43 +28,50 @@ headFormat = """
 		glyphDataFormat:    h
 """
 
-
 class table__h_e_a_d(DefaultTable.DefaultTable):
-    dependencies = ['maxp', 'loca']
 
-    def decompile(self, data, ttFont):
-        dummy, rest = sstruct.unpack2(headFormat, data, self)
-        if rest:
-            # this is quite illegal, but there seem to be fonts out there that do this
-            assert rest == "\0\0"
+	dependencies = ['maxp', 'loca']
 
-    def compile(self, ttFont):
-        data = sstruct.pack(headFormat, self)
-        return data
+	def decompile(self, data, ttFont):
+		dummy, rest = sstruct.unpack2(headFormat, data, self)
+		if rest:
+			# this is quite illegal, but there seem to be fonts out there that do this
+			warnings.warn("extra bytes at the end of 'head' table")
+			assert rest == "\0\0"
 
-    def toXML(self, writer, ttFont):
-        writer.comment("Most of this table will be recalculated by the compiler")
-        writer.newline()
-        formatstring, names, fixes = sstruct.getformat(headFormat)
-        for name in names:
-            value = getattr(self, name)
-            if name in ("magicNumber", "checkSumAdjustment"):
-                if value < 0:
-                    value = value + 0x100000000
-                value = hex(value)
-                if value[-1:] == "L":
-                    value = value[:-1]
-            elif name in ("macStyle", "flags"):
-                value = num2binary(value, 16)
-            writer.simpletag(name, value=value)
-            writer.newline()
+		# For timestamp fields, ignore the top four bytes.  Some fonts have
+		# bogus values there.  Since till 2038 those bytes only can be zero,
+		# ignore them.
+		#
+		# https://github.com/behdad/fonttools/issues/99#issuecomment-66776810
+		for stamp in 'created', 'modified':
+			setattr(self, stamp, getattr(self, stamp))
 
-    def fromXML(self, name, attrs, content, ttFont):
-        value = attrs["value"]
-        if name in ("created", "modified"):
-            value = 0
-        elif name in ("macStyle", "flags"):
-            value = binary2num(value)
-        else:
-            value = safeEval(value)
-        setattr(self, name, value)
+	def compile(self, ttFont):
+		data = sstruct.pack(headFormat, self)
+		return data
+
+	def toXML(self, writer, ttFont):
+		writer.comment("Most of this table will be recalculated by the compiler")
+		writer.newline()
+		formatstring, names, fixes = sstruct.getformat(headFormat)
+		for name in names:
+			value = getattr(self, name)
+			if name in ("magicNumber", "checkSumAdjustment"):
+				if value < 0:
+					value = value + 0x100000000
+				value = hex(value)
+				if value[-1:] == "L":
+					value = value[:-1]
+			elif name in ("macStyle", "flags"):
+				value = num2binary(value, 16)
+			writer.simpletag(name, value=value)
+			writer.newline()
+
+	def fromXML(self, name, attrs, content, ttFont):
+		value = attrs["value"]
+		if name in ("macStyle", "flags"):
+			value = binary2num(value)
+		else:
+			value = safeEval(value)
+		setattr(self, name, value)
