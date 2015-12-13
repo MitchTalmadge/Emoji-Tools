@@ -37,7 +37,6 @@ sequence of length 2 will do.
 """
 
 from __future__ import print_function, division, absolute_import
-
 from fontTools.misc.py23 import *
 
 __all__ =  ["AbstractPen", "NullPen", "BasePen",

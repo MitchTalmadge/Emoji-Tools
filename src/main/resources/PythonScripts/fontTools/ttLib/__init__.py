@@ -42,9 +42,9 @@ Dumping 'prep' table...
 """
 
 from __future__ import print_function, division, absolute_import
-
-import os
 from fontTools.misc.py23 import *
+import os
+import sys
 
 
 class TTLibError(Exception): pass

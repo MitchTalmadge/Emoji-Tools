@@ -3,9 +3,9 @@ CFF dictionary data and Type1/Type2 CharStrings.
 """
 
 from __future__ import print_function, division, absolute_import
-
-import struct
 from fontTools.misc.py23 import *
+import struct
+
 
 DEBUG = 0
 

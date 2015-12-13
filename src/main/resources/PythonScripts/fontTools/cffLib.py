@@ -1,12 +1,11 @@
 """cffLib.py -- read/write tools for Adobe CFF fonts."""
 
 from __future__ import print_function, division, absolute_import
-
-import struct
-from fontTools.misc import psCharStrings
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
+from fontTools.misc import sstruct
+from fontTools.misc import psCharStrings
 from fontTools.misc.textTools import safeEval
+import struct
 
 DEBUG = 0
 
@@ -19,13 +18,14 @@ cffHeaderFormat = """
 """
 
 class CFFFontSet(object):
+
 	def __init__(self):
 		pass
 
 	def decompile(self, file, otFont):
 		sstruct.unpack(cffHeaderFormat, file.read(4), self)
 		assert self.major == 1 and self.minor == 0, \
-			"unknown CFF format: %d.%d" % (self.major, self.minor)
+				"unknown CFF format: %d.%d" % (self.major, self.minor)
 
 		file.seek(self.hdrSize)
 		self.fontNames = list(Index(file))
@@ -121,6 +121,7 @@ class CFFFontSet(object):
 
 
 class CFFWriter(object):
+
 	def __init__(self):
 		self.data = []
 
@@ -174,6 +175,7 @@ def calcOffSize(largestOffset):
 
 
 class IndexCompiler(object):
+
 	def __init__(self, items, strings, parent):
 		self.items = self.getItems(items, strings)
 		self.parent = parent
@@ -196,10 +198,10 @@ class IndexCompiler(object):
 		lastOffset = self.getOffsets()[-1]
 		offSize = calcOffSize(lastOffset)
 		dataLength = (
-			2 +  # count
-			1 +  # offSize
+			2 +                                # count
+			1 +                                # offSize
 			(len(self.items) + 1) * offSize +  # the offsets
-			lastOffset - 1  # size of object data
+			lastOffset - 1                     # size of object data
 		)
 		return dataLength
 
@@ -222,11 +224,13 @@ class IndexCompiler(object):
 
 
 class IndexedStringsCompiler(IndexCompiler):
+
 	def getItems(self, items, strings):
 		return items.strings
 
 
 class TopDictIndexCompiler(IndexCompiler):
+
 	def getItems(self, items, strings):
 		out = []
 		for item in items:
@@ -241,6 +245,7 @@ class TopDictIndexCompiler(IndexCompiler):
 
 
 class FDArrayIndexCompiler(IndexCompiler):
+
 	def getItems(self, items, strings):
 		out = []
 		for item in items:
@@ -293,6 +298,7 @@ class CharStringsCompiler(GlobalSubrsCompiler):
 
 
 class Index(object):
+
 	"""This class represents what the CFF spec calls an INDEX."""
 
 	compilerClass = IndexCompiler
@@ -315,7 +321,7 @@ class Index(object):
 		assert offSize <= 4, "offSize too large: %s" % offSize
 		self.offsets = offsets = []
 		pad = b'\0' * (4 - offSize)
-		for index in range(count + 1):
+		for index in range(count+1):
 			chunk = file.read(offSize)
 			chunk = pad + chunk
 			offset, = struct.unpack(">L", chunk)
@@ -333,7 +339,7 @@ class Index(object):
 		if item is not None:
 			return item
 		offset = self.offsets[index] + self.offsetBase
-		size = self.offsets[index + 1] - self.offsets[index]
+		size = self.offsets[index+1] - self.offsets[index]
 		file = self.file
 		file.seek(offset)
 		data = file.read(size)
@@ -353,6 +359,7 @@ class Index(object):
 
 
 class GlobalSubrsIndex(Index):
+
 	compilerClass = GlobalSubrsCompiler
 
 	def __init__(self, file=None, globalSubrs=None, private=None, fdSelect=None, fdArray=None):
@@ -406,6 +413,7 @@ class SubrsIndex(GlobalSubrsIndex):
 
 
 class TopDictIndex(Index):
+
 	compilerClass = TopDictIndexCompiler
 
 	def produceItem(self, index, data, file, offset, size):
@@ -423,6 +431,7 @@ class TopDictIndex(Index):
 
 
 class FDArrayIndex(TopDictIndex):
+
 	compilerClass = FDArrayIndexCompiler
 
 	def fromXML(self, name, attrs, content):
@@ -437,7 +446,7 @@ class FDArrayIndex(TopDictIndex):
 		self.append(fontDict)
 
 
-class FDSelect:
+class	FDSelect:
 	def __init__(self, file=None, numGlyphs=None, format=None):
 		if file:
 			# read data in from file
@@ -484,6 +493,7 @@ class FDSelect:
 
 
 class CharStrings(object):
+
 	def __init__(self, file, charset, globalSubrs, private, fdSelect, fdArray):
 		if file is not None:
 			self.charStringsIndex = SubrsIndex(file, globalSubrs, private, fdSelect, fdArray)
@@ -557,7 +567,7 @@ class CharStrings(object):
 				xmlWriter.begintag("CharString", [('name', name)] + raw)
 			else:
 				xmlWriter.begintag("CharString",
-								   [('name', name), ('fdSelectIndex', fdSelectIndex)] + raw)
+						[('name', name), ('fdSelectIndex', fdSelectIndex)] + raw)
 			xmlWriter.newline()
 			charStr.toXML(xmlWriter)
 			xmlWriter.endtag("CharString")
@@ -583,8 +593,8 @@ class CharStrings(object):
 
 			glyphName = attrs["name"]
 			charString = psCharStrings.T2CharString(
-				private=private,
-				globalSubrs=self.globalSubrs)
+					private=private,
+					globalSubrs=self.globalSubrs)
 			charString.fromXML(name, attrs, content)
 			if fdID >= 0:
 				charString.fdSelectIndex = fdID
@@ -649,42 +659,33 @@ def buildConverters(table):
 class SimpleConverter(object):
 	def read(self, parent, value):
 		return value
-
 	def write(self, parent, value):
 		return value
-
 	def xmlWrite(self, xmlWriter, name, value, progress):
 		xmlWriter.simpletag(name, value=value)
 		xmlWriter.newline()
-
 	def xmlRead(self, name, attrs, content, parent):
 		return attrs["value"]
 
 class ASCIIConverter(SimpleConverter):
 	def read(self, parent, value):
 		return tostr(value, encoding='ascii')
-
 	def write(self, parent, value):
 		return tobytes(value, encoding='ascii')
-
 	def xmlWrite(self, xmlWriter, name, value, progress):
 		xmlWriter.simpletag(name, value=tounicode(value, encoding="ascii"))
 		xmlWriter.newline()
-
 	def xmlRead(self, name, attrs, content, parent):
 		return tobytes(attrs["value"], encoding=("ascii"))
 
 class Latin1Converter(SimpleConverter):
 	def read(self, parent, value):
 		return tostr(value, encoding='latin1')
-
 	def write(self, parent, value):
 		return tobytes(value, encoding='latin1')
-
 	def xmlWrite(self, xmlWriter, name, value, progress):
 		xmlWriter.simpletag(name, value=tounicode(value, encoding="latin1"))
 		xmlWriter.newline()
-
 	def xmlRead(self, name, attrs, content, parent):
 		return tobytes(attrs["value"], encoding=("latin1"))
 
@@ -705,7 +706,6 @@ class ArrayConverter(SimpleConverter):
 		value = " ".join(map(str, value))
 		xmlWriter.simpletag(name, value=value)
 		xmlWriter.newline()
-
 	def xmlRead(self, name, attrs, content, parent):
 		values = attrs["value"].split()
 		return [parseNum(value) for value in values]
@@ -717,7 +717,6 @@ class TableConverter(SimpleConverter):
 		value.toXML(xmlWriter, progress)
 		xmlWriter.endtag(name)
 		xmlWriter.newline()
-
 	def xmlRead(self, name, attrs, content, parent):
 		ob = self.getClass()()
 		for element in content:
@@ -730,7 +729,6 @@ class TableConverter(SimpleConverter):
 class PrivateDictConverter(TableConverter):
 	def getClass(self):
 		return PrivateDict
-
 	def read(self, parent, value):
 		size, offset = value
 		file = parent.file
@@ -740,19 +738,16 @@ class PrivateDictConverter(TableConverter):
 		assert len(data) == size
 		priv.decompile(data)
 		return priv
-
 	def write(self, parent, value):
 		return (0, 0)  # dummy value
 
 class SubrsConverter(TableConverter):
 	def getClass(self):
 		return SubrsIndex
-
 	def read(self, parent, value):
 		file = parent.file
 		file.seek(parent.offset + value)  # Offset(self)
 		return SubrsIndex(file)
-
 	def write(self, parent, value):
 		return 0  # dummy value
 
@@ -769,10 +764,8 @@ class CharStringsConverter(TableConverter):
 			private = parent.Private
 		file.seek(value)  # Offset(0)
 		return CharStrings(file, charset, globalSubrs, private, fdSelect, fdArray)
-
 	def write(self, parent, value):
 		return 0  # dummy value
-
 	def xmlRead(self, name, attrs, content, parent):
 		if hasattr(parent, "ROS"):
 			# if it is a CID-keyed font, then the private Dict is extracted from the parent.FDArray
@@ -803,9 +796,9 @@ class CharsetConverter(object):
 			assert len(charset) == numGlyphs
 			if DEBUG:
 				print("    charset end at %s" % file.tell())
-		else:  # offset == 0 -> no charset data.
+		else: # offset == 0 -> no charset data.
 			if isCID or "CharStrings" not in parent.rawDict:
-				assert value == 0  # We get here only when processing fontDicts from the FDArray of CFF-CID fonts. Only the real topDict references the chrset.
+				assert value == 0 # We get here only when processing fontDicts from the FDArray of CFF-CID fonts. Only the real topDict references the chrset.
 				charset = None
 			elif value == 0:
 				charset = cffISOAdobeStrings
@@ -817,20 +810,19 @@ class CharsetConverter(object):
 
 	def write(self, parent, value):
 		return 0  # dummy value
-
 	def xmlWrite(self, xmlWriter, name, value, progress):
 		# XXX only write charset when not in OT/TTX context, where we
 		# dump charset as a separate "GlyphOrder" table.
 		##xmlWriter.simpletag("charset")
 		xmlWriter.comment("charset is dumped separately as the 'GlyphOrder' element")
 		xmlWriter.newline()
-
 	def xmlRead(self, name, attrs, content, parent):
 		if 0:
 			return safeEval(attrs["value"])
 
 
 class CharsetCompiler(object):
+
 	def __init__(self, strings, charset, parent):
 		assert charset[0] == '.notdef'
 		isCID = hasattr(parent.dictObj, "ROS")
@@ -867,7 +859,7 @@ def packCharset0(charset, isCID, strings):
 		getNameID = getSIDfromName
 
 	for name in charset[1:]:
-		data.append(packCard16(getNameID(name, strings)))
+		data.append(packCard16(getNameID(name,strings)))
 	return bytesjoin(data)
 
 
@@ -930,16 +922,17 @@ def parseCharset(numGlyphs, file, strings, isCID, fmt):
 		first = readCard16(file)
 		nLeft = nLeftFunc(file)
 		if isCID:
-			for CID in range(first, first + nLeft + 1):
+			for CID in range(first, first+nLeft+1):
 				charset.append("cid" + str(CID).zfill(5))
 		else:
-			for SID in range(first, first + nLeft + 1):
+			for SID in range(first, first+nLeft+1):
 				charset.append(strings[SID])
 		count = count + nLeft + 1
 	return charset
 
 
 class EncodingCompiler(object):
+
 	def __init__(self, strings, encoding, parent):
 		assert not isinstance(encoding, basestring)
 		data0 = packEncoding0(parent.dictObj.charset, encoding, parent.strings)
@@ -961,6 +954,7 @@ class EncodingCompiler(object):
 
 
 class EncodingConverter(SimpleConverter):
+
 	def read(self, parent, value):
 		if value == 0:
 			return "StandardEncoding"
@@ -979,10 +973,10 @@ class EncodingConverter(SimpleConverter):
 			fmt = fmt & 0x7f
 			if fmt == 0:
 				encoding = parseEncoding0(parent.charset, file, haveSupplement,
-										  parent.strings)
+						parent.strings)
 			elif fmt == 1:
 				encoding = parseEncoding1(parent.charset, file, haveSupplement,
-										  parent.strings)
+						parent.strings)
 			return encoding
 
 	def write(self, parent, value):
@@ -1100,6 +1094,7 @@ def packEncoding1(charset, encoding, strings):
 
 
 class FDArrayConverter(TableConverter):
+
 	def read(self, parent, value):
 		file = parent.file
 		file.seek(value)
@@ -1122,11 +1117,12 @@ class FDArrayConverter(TableConverter):
 
 
 class FDSelectConverter(object):
+
 	def read(self, parent, value):
 		file = parent.file
 		file.seek(value)
 		fdSelect = FDSelect(file, parent.numGlyphs)
-		return fdSelect
+		return 	fdSelect
 
 	def write(self, parent, value):
 		return 0  # dummy value
@@ -1168,7 +1164,7 @@ def packFDSelect3(fdSelectArray):
 	sentinelGID = i + 1
 
 	data = [packCard8(fmt)]
-	data.append(packCard16(len(fdRanges)))
+	data.append(packCard16( len(fdRanges) ))
 	for fdRange in fdRanges:
 		data.append(packCard16(fdRange[0]))
 		data.append(packCard8(fdRange[1]))
@@ -1177,6 +1173,7 @@ def packFDSelect3(fdSelectArray):
 
 
 class FDSelectCompiler(object):
+
 	def __init__(self, fdSelect, parent):
 		fmt = fdSelect.format
 		fdSelectArray = fdSelect.gidArray
@@ -1208,10 +1205,11 @@ class FDSelectCompiler(object):
 
 
 class ROSConverter(SimpleConverter):
+
 	def xmlWrite(self, xmlWriter, name, value, progress):
 		registry, order, supplement = value
 		xmlWriter.simpletag(name, [('Registry', tostr(registry)), ('Order', tostr(order)),
-								   ('Supplement', supplement)])
+			('Supplement', supplement)])
 		xmlWriter.newline()
 
 	def xmlRead(self, name, attrs, content, parent):
@@ -1219,41 +1217,41 @@ class ROSConverter(SimpleConverter):
 
 
 topDictOperators = [
-	#	opcode		name			argument type	default	converter
-	((12, 30), 'ROS', ('SID', 'SID', 'number'), None, ROSConverter()),
-	((12, 20), 'SyntheticBase', 'number', None, None),
-	(0, 'version', 'SID', None, None),
-	(1, 'Notice', 'SID', None, Latin1Converter()),
-	((12, 0), 'Copyright', 'SID', None, Latin1Converter()),
-	(2, 'FullName', 'SID', None, None),
-	((12, 38), 'FontName', 'SID', None, None),
-	(3, 'FamilyName', 'SID', None, None),
-	(4, 'Weight', 'SID', None, None),
-	((12, 1), 'isFixedPitch', 'number', 0, None),
-	((12, 2), 'ItalicAngle', 'number', 0, None),
-	((12, 3), 'UnderlinePosition', 'number', None, None),
-	((12, 4), 'UnderlineThickness', 'number', 50, None),
-	((12, 5), 'PaintType', 'number', 0, None),
-	((12, 6), 'CharstringType', 'number', 2, None),
-	((12, 7), 'FontMatrix', 'array', [0.001, 0, 0, 0.001, 0, 0], None),
-	(13, 'UniqueID', 'number', None, None),
-	(5, 'FontBBox', 'array', [0, 0, 0, 0], None),
-	((12, 8), 'StrokeWidth', 'number', 0, None),
-	(14, 'XUID', 'array', None, None),
-	((12, 21), 'PostScript', 'SID', None, None),
-	((12, 22), 'BaseFontName', 'SID', None, None),
-	((12, 23), 'BaseFontBlend', 'delta', None, None),
-	((12, 31), 'CIDFontVersion', 'number', 0, None),
-	((12, 32), 'CIDFontRevision', 'number', 0, None),
-	((12, 33), 'CIDFontType', 'number', 0, None),
-	((12, 34), 'CIDCount', 'number', 8720, None),
-	(15, 'charset', 'number', 0, CharsetConverter()),
-	((12, 35), 'UIDBase', 'number', None, None),
-	(16, 'Encoding', 'number', 0, EncodingConverter()),
-	(18, 'Private', ('number', 'number'), None, PrivateDictConverter()),
-	((12, 37), 'FDSelect', 'number', None, FDSelectConverter()),
-	((12, 36), 'FDArray', 'number', None, FDArrayConverter()),
-	(17, 'CharStrings', 'number', None, CharStringsConverter()),
+#	opcode		name			argument type	default	converter
+	((12, 30),	'ROS',	('SID', 'SID', 'number'),	None,	ROSConverter()),
+	((12, 20),	'SyntheticBase',	'number',	None,	None),
+	(0,		'version',		'SID',		None,	None),
+	(1,		'Notice',		'SID',		None,	Latin1Converter()),
+	((12, 0),	'Copyright',		'SID',		None,	Latin1Converter()),
+	(2,		'FullName',		'SID',		None,	None),
+	((12, 38),	'FontName',		'SID',		None,	None),
+	(3,		'FamilyName',		'SID',		None,	None),
+	(4,		'Weight',		'SID',		None,	None),
+	((12, 1),	'isFixedPitch',		'number',	0,	None),
+	((12, 2),	'ItalicAngle',		'number',	0,	None),
+	((12, 3),	'UnderlinePosition',	'number',	None,	None),
+	((12, 4),	'UnderlineThickness',	'number',	50,	None),
+	((12, 5),	'PaintType',		'number',	0,	None),
+	((12, 6),	'CharstringType',	'number',	2,	None),
+	((12, 7),	'FontMatrix',		'array',	[0.001, 0, 0, 0.001, 0, 0],	None),
+	(13,		'UniqueID',		'number',	None,	None),
+	(5,		'FontBBox',		'array',	[0, 0, 0, 0],	None),
+	((12, 8),	'StrokeWidth',		'number',	0,	None),
+	(14,		'XUID',			'array',	None,	None),
+	((12, 21),	'PostScript',		'SID',		None,	None),
+	((12, 22),	'BaseFontName',		'SID',		None,	None),
+	((12, 23),	'BaseFontBlend',	'delta',	None,	None),
+	((12, 31),	'CIDFontVersion',	'number',	0,	None),
+	((12, 32),	'CIDFontRevision',	'number',	0,	None),
+	((12, 33),	'CIDFontType',		'number',	0,	None),
+	((12, 34),	'CIDCount',		'number',	8720,	None),
+	(15,		'charset',		'number',	0,	CharsetConverter()),
+	((12, 35),	'UIDBase',		'number',	None,	None),
+	(16,		'Encoding',		'number',	0,	EncodingConverter()),
+	(18,		'Private',	('number', 'number'),	None,	PrivateDictConverter()),
+	((12, 37),	'FDSelect',		'number',	None,	FDSelectConverter()),
+	((12, 36),	'FDArray',		'number',	None,	FDArrayConverter()),
+	(17,		'CharStrings',		'number',	None,	CharStringsConverter()),
 ]
 
 # Note! FDSelect and FDArray must both preceed CharStrings in the output XML build order,
@@ -1261,27 +1259,27 @@ topDictOperators = [
 
 
 privateDictOperators = [
-	#	opcode		name			argument type	default	converter
-	(6, 'BlueValues', 'delta', None, None),
-	(7, 'OtherBlues', 'delta', None, None),
-	(8, 'FamilyBlues', 'delta', None, None),
-	(9, 'FamilyOtherBlues', 'delta', None, None),
-	((12, 9), 'BlueScale', 'number', 0.039625, None),
-	((12, 10), 'BlueShift', 'number', 7, None),
-	((12, 11), 'BlueFuzz', 'number', 1, None),
-	(10, 'StdHW', 'number', None, None),
-	(11, 'StdVW', 'number', None, None),
-	((12, 12), 'StemSnapH', 'delta', None, None),
-	((12, 13), 'StemSnapV', 'delta', None, None),
-	((12, 14), 'ForceBold', 'number', 0, None),
-	((12, 15), 'ForceBoldThreshold', 'number', None, None),  # deprecated
-	((12, 16), 'lenIV', 'number', None, None),  # deprecated
-	((12, 17), 'LanguageGroup', 'number', 0, None),
-	((12, 18), 'ExpansionFactor', 'number', 0.06, None),
-	((12, 19), 'initialRandomSeed', 'number', 0, None),
-	(20, 'defaultWidthX', 'number', 0, None),
-	(21, 'nominalWidthX', 'number', 0, None),
-	(19, 'Subrs', 'number', None, SubrsConverter()),
+#	opcode		name			argument type	default	converter
+	(6,		'BlueValues',		'delta',	None,	None),
+	(7,		'OtherBlues',		'delta',	None,	None),
+	(8,		'FamilyBlues',		'delta',	None,	None),
+	(9,		'FamilyOtherBlues',	'delta',	None,	None),
+	((12, 9),	'BlueScale',		'number',	0.039625, None),
+	((12, 10),	'BlueShift',		'number',	7,	None),
+	((12, 11),	'BlueFuzz',		'number',	1,	None),
+	(10,		'StdHW',		'number',	None,	None),
+	(11,		'StdVW',		'number',	None,	None),
+	((12, 12),	'StemSnapH',		'delta',	None,	None),
+	((12, 13),	'StemSnapV',		'delta',	None,	None),
+	((12, 14),	'ForceBold',		'number',	0,	None),
+	((12, 15),	'ForceBoldThreshold',	'number',	None,	None), # deprecated
+	((12, 16),	'lenIV',		'number',	None,	None), # deprecated
+	((12, 17),	'LanguageGroup',	'number',	0,	None),
+	((12, 18),	'ExpansionFactor',	'number',	0.06,	None),
+	((12, 19),	'initialRandomSeed',	'number',	0,	None),
+	(20,		'defaultWidthX',	'number',	0,	None),
+	(21,		'nominalWidthX',	'number',	0,	None),
+	(19,		'Subrs',		'number',	None,	SubrsConverter()),
 ]
 
 def addConverters(table):
@@ -1312,6 +1310,7 @@ class PrivateDictDecompiler(psCharStrings.DictDecompiler):
 
 
 class DictCompiler(object):
+
 	def __init__(self, dictObj, strings, parent):
 		assert isinstance(strings, IndexedStrings)
 		self.dictObj = dictObj
@@ -1365,16 +1364,13 @@ class DictCompiler(object):
 
 	def arg_number(self, num):
 		return encodeNumber(num)
-
 	def arg_SID(self, s):
 		return psCharStrings.encodeIntCFF(self.strings.getSID(s))
-
 	def arg_array(self, value):
 		data = []
 		for num in value:
 			data.append(encodeNumber(num))
 		return bytesjoin(data)
-
 	def arg_delta(self, value):
 		out = []
 		last = 0
@@ -1395,6 +1391,7 @@ def encodeNumber(num):
 
 
 class TopDictCompiler(DictCompiler):
+
 	opcodes = buildOpcodeDict(topDictOperators)
 
 	def getChildren(self, strings):
@@ -1411,7 +1408,7 @@ class TopDictCompiler(DictCompiler):
 			# either the font was read from XML, and teh FDSelect indices are all
 			# in the charstring data, or the FDSelect array is already fully defined.
 			fdSelect = self.dictObj.FDSelect
-			if len(fdSelect) == 0:  # probably read in from XML; assume fdIndex in CharString data
+			if len(fdSelect) == 0: # probably read in from XML; assume fdIndex in CharString data
 				charStrings = self.dictObj.CharStrings
 				for name in self.dictObj.charset:
 					fdSelect.append(charStrings[name].fdSelectIndex)
@@ -1439,6 +1436,7 @@ class TopDictCompiler(DictCompiler):
 
 
 class FontDictCompiler(DictCompiler):
+
 	opcodes = buildOpcodeDict(topDictOperators)
 
 	def getChildren(self, strings):
@@ -1451,6 +1449,7 @@ class FontDictCompiler(DictCompiler):
 
 
 class PrivateDictCompiler(DictCompiler):
+
 	opcodes = buildOpcodeDict(privateDictOperators)
 
 	def setPos(self, pos, endPos):
@@ -1466,6 +1465,7 @@ class PrivateDictCompiler(DictCompiler):
 
 
 class BaseDict(object):
+
 	def __init__(self, strings=None, file=None, offset=None):
 		self.rawDict = {}
 		if DEBUG:
@@ -1517,6 +1517,7 @@ class BaseDict(object):
 
 
 class TopDict(BaseDict):
+
 	defaults = buildDefaults(topDictOperators)
 	converters = buildConverters(topDictOperators)
 	order = buildOrder(topDictOperators)
@@ -1547,7 +1548,7 @@ class TopDict(BaseDict):
 			# these values have default values, but I only want them to show up
 			# in CID fonts.
 			self.skipNames = ['CIDFontVersion', 'CIDFontRevision', 'CIDFontType',
-							  'CIDCount']
+					'CIDCount']
 		BaseDict.toXML(self, xmlWriter, progress)
 
 	def decompileAllCharStrings(self, progress):
@@ -1567,6 +1568,7 @@ class TopDict(BaseDict):
 
 
 class FontDict(BaseDict):
+
 	defaults = buildDefaults(topDictOperators)
 	converters = buildConverters(topDictOperators)
 	order = buildOrder(topDictOperators)
@@ -1594,6 +1596,7 @@ class PrivateDict(BaseDict):
 
 
 class IndexedStrings(object):
+
 	"""SID -> string mapping."""
 
 	def __init__(self, file=None):
@@ -1641,69 +1644,69 @@ class IndexedStrings(object):
 # from Adobe Technical None #5176, version 1.0, 18 March 1998
 
 cffStandardStrings = ['.notdef', 'space', 'exclam', 'quotedbl', 'numbersign',
-					  'dollar', 'percent', 'ampersand', 'quoteright', 'parenleft', 'parenright',
-					  'asterisk', 'plus', 'comma', 'hyphen', 'period', 'slash', 'zero', 'one',
-					  'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'colon',
-					  'semicolon', 'less', 'equal', 'greater', 'question', 'at', 'A', 'B', 'C',
-					  'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-					  'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'bracketleft', 'backslash',
-					  'bracketright', 'asciicircum', 'underscore', 'quoteleft', 'a', 'b', 'c',
-					  'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-					  's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'braceleft', 'bar', 'braceright',
-					  'asciitilde', 'exclamdown', 'cent', 'sterling', 'fraction', 'yen', 'florin',
-					  'section', 'currency', 'quotesingle', 'quotedblleft', 'guillemotleft',
-					  'guilsinglleft', 'guilsinglright', 'fi', 'fl', 'endash', 'dagger',
-					  'daggerdbl', 'periodcentered', 'paragraph', 'bullet', 'quotesinglbase',
-					  'quotedblbase', 'quotedblright', 'guillemotright', 'ellipsis', 'perthousand',
-					  'questiondown', 'grave', 'acute', 'circumflex', 'tilde', 'macron', 'breve',
-					  'dotaccent', 'dieresis', 'ring', 'cedilla', 'hungarumlaut', 'ogonek', 'caron',
-					  'emdash', 'AE', 'ordfeminine', 'Lslash', 'Oslash', 'OE', 'ordmasculine', 'ae',
-					  'dotlessi', 'lslash', 'oslash', 'oe', 'germandbls', 'onesuperior',
-					  'logicalnot', 'mu', 'trademark', 'Eth', 'onehalf', 'plusminus', 'Thorn',
-					  'onequarter', 'divide', 'brokenbar', 'degree', 'thorn', 'threequarters',
-					  'twosuperior', 'registered', 'minus', 'eth', 'multiply', 'threesuperior',
-					  'copyright', 'Aacute', 'Acircumflex', 'Adieresis', 'Agrave', 'Aring',
-					  'Atilde', 'Ccedilla', 'Eacute', 'Ecircumflex', 'Edieresis', 'Egrave',
-					  'Iacute', 'Icircumflex', 'Idieresis', 'Igrave', 'Ntilde', 'Oacute',
-					  'Ocircumflex', 'Odieresis', 'Ograve', 'Otilde', 'Scaron', 'Uacute',
-					  'Ucircumflex', 'Udieresis', 'Ugrave', 'Yacute', 'Ydieresis', 'Zcaron',
-					  'aacute', 'acircumflex', 'adieresis', 'agrave', 'aring', 'atilde', 'ccedilla',
-					  'eacute', 'ecircumflex', 'edieresis', 'egrave', 'iacute', 'icircumflex',
-					  'idieresis', 'igrave', 'ntilde', 'oacute', 'ocircumflex', 'odieresis',
-					  'ograve', 'otilde', 'scaron', 'uacute', 'ucircumflex', 'udieresis', 'ugrave',
-					  'yacute', 'ydieresis', 'zcaron', 'exclamsmall', 'Hungarumlautsmall',
-					  'dollaroldstyle', 'dollarsuperior', 'ampersandsmall', 'Acutesmall',
-					  'parenleftsuperior', 'parenrightsuperior', 'twodotenleader', 'onedotenleader',
-					  'zerooldstyle', 'oneoldstyle', 'twooldstyle', 'threeoldstyle', 'fouroldstyle',
-					  'fiveoldstyle', 'sixoldstyle', 'sevenoldstyle', 'eightoldstyle',
-					  'nineoldstyle', 'commasuperior', 'threequartersemdash', 'periodsuperior',
-					  'questionsmall', 'asuperior', 'bsuperior', 'centsuperior', 'dsuperior',
-					  'esuperior', 'isuperior', 'lsuperior', 'msuperior', 'nsuperior', 'osuperior',
-					  'rsuperior', 'ssuperior', 'tsuperior', 'ff', 'ffi', 'ffl', 'parenleftinferior',
-					  'parenrightinferior', 'Circumflexsmall', 'hyphensuperior', 'Gravesmall',
-					  'Asmall', 'Bsmall', 'Csmall', 'Dsmall', 'Esmall', 'Fsmall', 'Gsmall', 'Hsmall',
-					  'Ismall', 'Jsmall', 'Ksmall', 'Lsmall', 'Msmall', 'Nsmall', 'Osmall', 'Psmall',
-					  'Qsmall', 'Rsmall', 'Ssmall', 'Tsmall', 'Usmall', 'Vsmall', 'Wsmall', 'Xsmall',
-					  'Ysmall', 'Zsmall', 'colonmonetary', 'onefitted', 'rupiah', 'Tildesmall',
-					  'exclamdownsmall', 'centoldstyle', 'Lslashsmall', 'Scaronsmall', 'Zcaronsmall',
-					  'Dieresissmall', 'Brevesmall', 'Caronsmall', 'Dotaccentsmall', 'Macronsmall',
-					  'figuredash', 'hypheninferior', 'Ogoneksmall', 'Ringsmall', 'Cedillasmall',
-					  'questiondownsmall', 'oneeighth', 'threeeighths', 'fiveeighths', 'seveneighths',
-					  'onethird', 'twothirds', 'zerosuperior', 'foursuperior', 'fivesuperior',
-					  'sixsuperior', 'sevensuperior', 'eightsuperior', 'ninesuperior', 'zeroinferior',
-					  'oneinferior', 'twoinferior', 'threeinferior', 'fourinferior', 'fiveinferior',
-					  'sixinferior', 'seveninferior', 'eightinferior', 'nineinferior', 'centinferior',
-					  'dollarinferior', 'periodinferior', 'commainferior', 'Agravesmall',
-					  'Aacutesmall', 'Acircumflexsmall', 'Atildesmall', 'Adieresissmall', 'Aringsmall',
-					  'AEsmall', 'Ccedillasmall', 'Egravesmall', 'Eacutesmall', 'Ecircumflexsmall',
-					  'Edieresissmall', 'Igravesmall', 'Iacutesmall', 'Icircumflexsmall',
-					  'Idieresissmall', 'Ethsmall', 'Ntildesmall', 'Ogravesmall', 'Oacutesmall',
-					  'Ocircumflexsmall', 'Otildesmall', 'Odieresissmall', 'OEsmall', 'Oslashsmall',
-					  'Ugravesmall', 'Uacutesmall', 'Ucircumflexsmall', 'Udieresissmall',
-					  'Yacutesmall', 'Thornsmall', 'Ydieresissmall', '001.000', '001.001', '001.002',
-					  '001.003', 'Black', 'Bold', 'Book', 'Light', 'Medium', 'Regular', 'Roman',
-					  'Semibold'
-					  ]
+		'dollar', 'percent', 'ampersand', 'quoteright', 'parenleft', 'parenright',
+		'asterisk', 'plus', 'comma', 'hyphen', 'period', 'slash', 'zero', 'one',
+		'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'colon',
+		'semicolon', 'less', 'equal', 'greater', 'question', 'at', 'A', 'B', 'C',
+		'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+		'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'bracketleft', 'backslash',
+		'bracketright', 'asciicircum', 'underscore', 'quoteleft', 'a', 'b', 'c',
+		'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+		's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'braceleft', 'bar', 'braceright',
+		'asciitilde', 'exclamdown', 'cent', 'sterling', 'fraction', 'yen', 'florin',
+		'section', 'currency', 'quotesingle', 'quotedblleft', 'guillemotleft',
+		'guilsinglleft', 'guilsinglright', 'fi', 'fl', 'endash', 'dagger',
+		'daggerdbl', 'periodcentered', 'paragraph', 'bullet', 'quotesinglbase',
+		'quotedblbase', 'quotedblright', 'guillemotright', 'ellipsis', 'perthousand',
+		'questiondown', 'grave', 'acute', 'circumflex', 'tilde', 'macron', 'breve',
+		'dotaccent', 'dieresis', 'ring', 'cedilla', 'hungarumlaut', 'ogonek', 'caron',
+		'emdash', 'AE', 'ordfeminine', 'Lslash', 'Oslash', 'OE', 'ordmasculine', 'ae',
+		'dotlessi', 'lslash', 'oslash', 'oe', 'germandbls', 'onesuperior',
+		'logicalnot', 'mu', 'trademark', 'Eth', 'onehalf', 'plusminus', 'Thorn',
+		'onequarter', 'divide', 'brokenbar', 'degree', 'thorn', 'threequarters',
+		'twosuperior', 'registered', 'minus', 'eth', 'multiply', 'threesuperior',
+		'copyright', 'Aacute', 'Acircumflex', 'Adieresis', 'Agrave', 'Aring',
+		'Atilde', 'Ccedilla', 'Eacute', 'Ecircumflex', 'Edieresis', 'Egrave',
+		'Iacute', 'Icircumflex', 'Idieresis', 'Igrave', 'Ntilde', 'Oacute',
+		'Ocircumflex', 'Odieresis', 'Ograve', 'Otilde', 'Scaron', 'Uacute',
+		'Ucircumflex', 'Udieresis', 'Ugrave', 'Yacute', 'Ydieresis', 'Zcaron',
+		'aacute', 'acircumflex', 'adieresis', 'agrave', 'aring', 'atilde', 'ccedilla',
+		'eacute', 'ecircumflex', 'edieresis', 'egrave', 'iacute', 'icircumflex',
+		'idieresis', 'igrave', 'ntilde', 'oacute', 'ocircumflex', 'odieresis',
+		'ograve', 'otilde', 'scaron', 'uacute', 'ucircumflex', 'udieresis', 'ugrave',
+		'yacute', 'ydieresis', 'zcaron', 'exclamsmall', 'Hungarumlautsmall',
+		'dollaroldstyle', 'dollarsuperior', 'ampersandsmall', 'Acutesmall',
+		'parenleftsuperior', 'parenrightsuperior', 'twodotenleader', 'onedotenleader',
+		'zerooldstyle', 'oneoldstyle', 'twooldstyle', 'threeoldstyle', 'fouroldstyle',
+		'fiveoldstyle', 'sixoldstyle', 'sevenoldstyle', 'eightoldstyle',
+		'nineoldstyle', 'commasuperior', 'threequartersemdash', 'periodsuperior',
+		'questionsmall', 'asuperior', 'bsuperior', 'centsuperior', 'dsuperior',
+		'esuperior', 'isuperior', 'lsuperior', 'msuperior', 'nsuperior', 'osuperior',
+		'rsuperior', 'ssuperior', 'tsuperior', 'ff', 'ffi', 'ffl', 'parenleftinferior',
+		'parenrightinferior', 'Circumflexsmall', 'hyphensuperior', 'Gravesmall',
+		'Asmall', 'Bsmall', 'Csmall', 'Dsmall', 'Esmall', 'Fsmall', 'Gsmall', 'Hsmall',
+		'Ismall', 'Jsmall', 'Ksmall', 'Lsmall', 'Msmall', 'Nsmall', 'Osmall', 'Psmall',
+		'Qsmall', 'Rsmall', 'Ssmall', 'Tsmall', 'Usmall', 'Vsmall', 'Wsmall', 'Xsmall',
+		'Ysmall', 'Zsmall', 'colonmonetary', 'onefitted', 'rupiah', 'Tildesmall',
+		'exclamdownsmall', 'centoldstyle', 'Lslashsmall', 'Scaronsmall', 'Zcaronsmall',
+		'Dieresissmall', 'Brevesmall', 'Caronsmall', 'Dotaccentsmall', 'Macronsmall',
+		'figuredash', 'hypheninferior', 'Ogoneksmall', 'Ringsmall', 'Cedillasmall',
+		'questiondownsmall', 'oneeighth', 'threeeighths', 'fiveeighths', 'seveneighths',
+		'onethird', 'twothirds', 'zerosuperior', 'foursuperior', 'fivesuperior',
+		'sixsuperior', 'sevensuperior', 'eightsuperior', 'ninesuperior', 'zeroinferior',
+		'oneinferior', 'twoinferior', 'threeinferior', 'fourinferior', 'fiveinferior',
+		'sixinferior', 'seveninferior', 'eightinferior', 'nineinferior', 'centinferior',
+		'dollarinferior', 'periodinferior', 'commainferior', 'Agravesmall',
+		'Aacutesmall', 'Acircumflexsmall', 'Atildesmall', 'Adieresissmall', 'Aringsmall',
+		'AEsmall', 'Ccedillasmall', 'Egravesmall', 'Eacutesmall', 'Ecircumflexsmall',
+		'Edieresissmall', 'Igravesmall', 'Iacutesmall', 'Icircumflexsmall',
+		'Idieresissmall', 'Ethsmall', 'Ntildesmall', 'Ogravesmall', 'Oacutesmall',
+		'Ocircumflexsmall', 'Otildesmall', 'Odieresissmall', 'OEsmall', 'Oslashsmall',
+		'Ugravesmall', 'Uacutesmall', 'Ucircumflexsmall', 'Udieresissmall',
+		'Yacutesmall', 'Thornsmall', 'Ydieresissmall', '001.000', '001.001', '001.002',
+		'001.003', 'Black', 'Bold', 'Book', 'Light', 'Medium', 'Regular', 'Roman',
+		'Semibold'
+]
 
 cffStandardStringCount = 391
 assert len(cffStandardStrings) == cffStandardStringCount
@@ -1713,95 +1716,95 @@ for _i in range(cffStandardStringCount):
 	cffStandardStringMapping[cffStandardStrings[_i]] = _i
 
 cffISOAdobeStrings = [".notdef", "space", "exclam", "quotedbl", "numbersign",
-					  "dollar", "percent", "ampersand", "quoteright", "parenleft", "parenright",
-					  "asterisk", "plus", "comma", "hyphen", "period", "slash", "zero", "one", "two",
-					  "three", "four", "five", "six", "seven", "eight", "nine", "colon", "semicolon",
-					  "less", "equal", "greater", "question", "at", "A", "B", "C", "D", "E", "F", "G",
-					  "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W",
-					  "X", "Y", "Z", "bracketleft", "backslash", "bracketright", "asciicircum",
-					  "underscore", "quoteleft", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-					  "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-					  "braceleft", "bar", "braceright", "asciitilde", "exclamdown", "cent",
-					  "sterling", "fraction", "yen", "florin", "section", "currency", "quotesingle",
-					  "quotedblleft", "guillemotleft", "guilsinglleft", "guilsinglright", "fi", "fl",
-					  "endash", "dagger", "daggerdbl", "periodcentered", "paragraph", "bullet",
-					  "quotesinglbase", "quotedblbase", "quotedblright", "guillemotright", "ellipsis",
-					  "perthousand", "questiondown", "grave", "acute", "circumflex", "tilde",
-					  "macron", "breve", "dotaccent", "dieresis", "ring", "cedilla", "hungarumlaut",
-					  "ogonek", "caron", "emdash", "AE", "ordfeminine", "Lslash", "Oslash", "OE",
-					  "ordmasculine", "ae", "dotlessi", "lslash", "oslash", "oe", "germandbls",
-					  "onesuperior", "logicalnot", "mu", "trademark", "Eth", "onehalf", "plusminus",
-					  "Thorn", "onequarter", "divide", "brokenbar", "degree", "thorn",
-					  "threequarters", "twosuperior", "registered", "minus", "eth", "multiply",
-					  "threesuperior", "copyright", "Aacute", "Acircumflex", "Adieresis", "Agrave",
-					  "Aring", "Atilde", "Ccedilla", "Eacute", "Ecircumflex", "Edieresis", "Egrave",
-					  "Iacute", "Icircumflex", "Idieresis", "Igrave", "Ntilde", "Oacute",
-					  "Ocircumflex", "Odieresis", "Ograve", "Otilde", "Scaron", "Uacute",
-					  "Ucircumflex", "Udieresis", "Ugrave", "Yacute", "Ydieresis", "Zcaron", "aacute",
-					  "acircumflex", "adieresis", "agrave", "aring", "atilde", "ccedilla", "eacute",
-					  "ecircumflex", "edieresis", "egrave", "iacute", "icircumflex", "idieresis",
-					  "igrave", "ntilde", "oacute", "ocircumflex", "odieresis", "ograve", "otilde",
-					  "scaron", "uacute", "ucircumflex", "udieresis", "ugrave", "yacute", "ydieresis",
-					  "zcaron"]
+"dollar", "percent", "ampersand", "quoteright", "parenleft", "parenright",
+"asterisk", "plus", "comma", "hyphen", "period", "slash", "zero", "one", "two",
+"three", "four", "five", "six", "seven", "eight", "nine", "colon", "semicolon",
+"less", "equal", "greater", "question", "at", "A", "B", "C", "D", "E", "F", "G",
+"H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W",
+"X", "Y", "Z", "bracketleft", "backslash", "bracketright", "asciicircum",
+"underscore", "quoteleft", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+"k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+"braceleft", "bar", "braceright", "asciitilde", "exclamdown", "cent",
+"sterling", "fraction", "yen", "florin", "section", "currency", "quotesingle",
+"quotedblleft", "guillemotleft", "guilsinglleft", "guilsinglright", "fi", "fl",
+"endash", "dagger", "daggerdbl", "periodcentered", "paragraph", "bullet",
+"quotesinglbase", "quotedblbase", "quotedblright", "guillemotright", "ellipsis",
+"perthousand", "questiondown", "grave", "acute", "circumflex", "tilde",
+"macron", "breve", "dotaccent", "dieresis", "ring", "cedilla", "hungarumlaut",
+"ogonek", "caron", "emdash", "AE", "ordfeminine", "Lslash", "Oslash", "OE",
+"ordmasculine", "ae", "dotlessi", "lslash", "oslash", "oe", "germandbls",
+"onesuperior", "logicalnot", "mu", "trademark", "Eth", "onehalf", "plusminus",
+"Thorn", "onequarter", "divide", "brokenbar", "degree", "thorn",
+"threequarters", "twosuperior", "registered", "minus", "eth", "multiply",
+"threesuperior", "copyright", "Aacute", "Acircumflex", "Adieresis", "Agrave",
+"Aring", "Atilde", "Ccedilla", "Eacute", "Ecircumflex", "Edieresis", "Egrave",
+"Iacute", "Icircumflex", "Idieresis", "Igrave", "Ntilde", "Oacute",
+"Ocircumflex", "Odieresis", "Ograve", "Otilde", "Scaron", "Uacute",
+"Ucircumflex", "Udieresis", "Ugrave", "Yacute", "Ydieresis", "Zcaron", "aacute",
+"acircumflex", "adieresis", "agrave", "aring", "atilde", "ccedilla", "eacute",
+"ecircumflex", "edieresis", "egrave", "iacute", "icircumflex", "idieresis",
+"igrave", "ntilde", "oacute", "ocircumflex", "odieresis", "ograve", "otilde",
+"scaron", "uacute", "ucircumflex", "udieresis", "ugrave", "yacute", "ydieresis",
+"zcaron"]
 
 cffISOAdobeStringCount = 229
 assert len(cffISOAdobeStrings) == cffISOAdobeStringCount
 
 cffIExpertStrings = [".notdef", "space", "exclamsmall", "Hungarumlautsmall",
-					 "dollaroldstyle", "dollarsuperior", "ampersandsmall", "Acutesmall",
-					 "parenleftsuperior", "parenrightsuperior", "twodotenleader", "onedotenleader",
-					 "comma", "hyphen", "period", "fraction", "zerooldstyle", "oneoldstyle",
-					 "twooldstyle", "threeoldstyle", "fouroldstyle", "fiveoldstyle", "sixoldstyle",
-					 "sevenoldstyle", "eightoldstyle", "nineoldstyle", "colon", "semicolon",
-					 "commasuperior", "threequartersemdash", "periodsuperior", "questionsmall",
-					 "asuperior", "bsuperior", "centsuperior", "dsuperior", "esuperior", "isuperior",
-					 "lsuperior", "msuperior", "nsuperior", "osuperior", "rsuperior", "ssuperior",
-					 "tsuperior", "ff", "fi", "fl", "ffi", "ffl", "parenleftinferior",
-					 "parenrightinferior", "Circumflexsmall", "hyphensuperior", "Gravesmall",
-					 "Asmall", "Bsmall", "Csmall", "Dsmall", "Esmall", "Fsmall", "Gsmall", "Hsmall",
-					 "Ismall", "Jsmall", "Ksmall", "Lsmall", "Msmall", "Nsmall", "Osmall", "Psmall",
-					 "Qsmall", "Rsmall", "Ssmall", "Tsmall", "Usmall", "Vsmall", "Wsmall", "Xsmall",
-					 "Ysmall", "Zsmall", "colonmonetary", "onefitted", "rupiah", "Tildesmall",
-					 "exclamdownsmall", "centoldstyle", "Lslashsmall", "Scaronsmall", "Zcaronsmall",
-					 "Dieresissmall", "Brevesmall", "Caronsmall", "Dotaccentsmall", "Macronsmall",
-					 "figuredash", "hypheninferior", "Ogoneksmall", "Ringsmall", "Cedillasmall",
-					 "onequarter", "onehalf", "threequarters", "questiondownsmall", "oneeighth",
-					 "threeeighths", "fiveeighths", "seveneighths", "onethird", "twothirds",
-					 "zerosuperior", "onesuperior", "twosuperior", "threesuperior", "foursuperior",
-					 "fivesuperior", "sixsuperior", "sevensuperior", "eightsuperior", "ninesuperior",
-					 "zeroinferior", "oneinferior", "twoinferior", "threeinferior", "fourinferior",
-					 "fiveinferior", "sixinferior", "seveninferior", "eightinferior", "nineinferior",
-					 "centinferior", "dollarinferior", "periodinferior", "commainferior",
-					 "Agravesmall", "Aacutesmall", "Acircumflexsmall", "Atildesmall",
-					 "Adieresissmall", "Aringsmall", "AEsmall", "Ccedillasmall", "Egravesmall",
-					 "Eacutesmall", "Ecircumflexsmall", "Edieresissmall", "Igravesmall",
-					 "Iacutesmall", "Icircumflexsmall", "Idieresissmall", "Ethsmall", "Ntildesmall",
-					 "Ogravesmall", "Oacutesmall", "Ocircumflexsmall", "Otildesmall",
-					 "Odieresissmall", "OEsmall", "Oslashsmall", "Ugravesmall", "Uacutesmall",
-					 "Ucircumflexsmall", "Udieresissmall", "Yacutesmall", "Thornsmall",
-					 "Ydieresissmall"]
+"dollaroldstyle", "dollarsuperior", "ampersandsmall", "Acutesmall",
+"parenleftsuperior", "parenrightsuperior", "twodotenleader", "onedotenleader",
+"comma", "hyphen", "period", "fraction", "zerooldstyle", "oneoldstyle",
+"twooldstyle", "threeoldstyle", "fouroldstyle", "fiveoldstyle", "sixoldstyle",
+"sevenoldstyle", "eightoldstyle", "nineoldstyle", "colon", "semicolon",
+"commasuperior", "threequartersemdash", "periodsuperior", "questionsmall",
+"asuperior", "bsuperior", "centsuperior", "dsuperior", "esuperior", "isuperior",
+"lsuperior", "msuperior", "nsuperior", "osuperior", "rsuperior", "ssuperior",
+"tsuperior", "ff", "fi", "fl", "ffi", "ffl", "parenleftinferior",
+"parenrightinferior", "Circumflexsmall", "hyphensuperior", "Gravesmall",
+"Asmall", "Bsmall", "Csmall", "Dsmall", "Esmall", "Fsmall", "Gsmall", "Hsmall",
+"Ismall", "Jsmall", "Ksmall", "Lsmall", "Msmall", "Nsmall", "Osmall", "Psmall",
+"Qsmall", "Rsmall", "Ssmall", "Tsmall", "Usmall", "Vsmall", "Wsmall", "Xsmall",
+"Ysmall", "Zsmall", "colonmonetary", "onefitted", "rupiah", "Tildesmall",
+"exclamdownsmall", "centoldstyle", "Lslashsmall", "Scaronsmall", "Zcaronsmall",
+"Dieresissmall", "Brevesmall", "Caronsmall", "Dotaccentsmall", "Macronsmall",
+"figuredash", "hypheninferior", "Ogoneksmall", "Ringsmall", "Cedillasmall",
+"onequarter", "onehalf", "threequarters", "questiondownsmall", "oneeighth",
+"threeeighths", "fiveeighths", "seveneighths", "onethird", "twothirds",
+"zerosuperior", "onesuperior", "twosuperior", "threesuperior", "foursuperior",
+"fivesuperior", "sixsuperior", "sevensuperior", "eightsuperior", "ninesuperior",
+"zeroinferior", "oneinferior", "twoinferior", "threeinferior", "fourinferior",
+"fiveinferior", "sixinferior", "seveninferior", "eightinferior", "nineinferior",
+"centinferior", "dollarinferior", "periodinferior", "commainferior",
+"Agravesmall", "Aacutesmall", "Acircumflexsmall", "Atildesmall",
+"Adieresissmall", "Aringsmall", "AEsmall", "Ccedillasmall", "Egravesmall",
+"Eacutesmall", "Ecircumflexsmall", "Edieresissmall", "Igravesmall",
+"Iacutesmall", "Icircumflexsmall", "Idieresissmall", "Ethsmall", "Ntildesmall",
+"Ogravesmall", "Oacutesmall", "Ocircumflexsmall", "Otildesmall",
+"Odieresissmall", "OEsmall", "Oslashsmall", "Ugravesmall", "Uacutesmall",
+"Ucircumflexsmall", "Udieresissmall", "Yacutesmall", "Thornsmall",
+"Ydieresissmall"]
 
 cffExpertStringCount = 166
 assert len(cffIExpertStrings) == cffExpertStringCount
 
 cffExpertSubsetStrings = [".notdef", "space", "dollaroldstyle",
-						  "dollarsuperior", "parenleftsuperior", "parenrightsuperior", "twodotenleader",
-						  "onedotenleader", "comma", "hyphen", "period", "fraction", "zerooldstyle",
-						  "oneoldstyle", "twooldstyle", "threeoldstyle", "fouroldstyle", "fiveoldstyle",
-						  "sixoldstyle", "sevenoldstyle", "eightoldstyle", "nineoldstyle", "colon",
-						  "semicolon", "commasuperior", "threequartersemdash", "periodsuperior",
-						  "asuperior", "bsuperior", "centsuperior", "dsuperior", "esuperior", "isuperior",
-						  "lsuperior", "msuperior", "nsuperior", "osuperior", "rsuperior", "ssuperior",
-						  "tsuperior", "ff", "fi", "fl", "ffi", "ffl", "parenleftinferior",
-						  "parenrightinferior", "hyphensuperior", "colonmonetary", "onefitted", "rupiah",
-						  "centoldstyle", "figuredash", "hypheninferior", "onequarter", "onehalf",
-						  "threequarters", "oneeighth", "threeeighths", "fiveeighths", "seveneighths",
-						  "onethird", "twothirds", "zerosuperior", "onesuperior", "twosuperior",
-						  "threesuperior", "foursuperior", "fivesuperior", "sixsuperior", "sevensuperior",
-						  "eightsuperior", "ninesuperior", "zeroinferior", "oneinferior", "twoinferior",
-						  "threeinferior", "fourinferior", "fiveinferior", "sixinferior", "seveninferior",
-						  "eightinferior", "nineinferior", "centinferior", "dollarinferior",
-						  "periodinferior", "commainferior"]
+"dollarsuperior", "parenleftsuperior", "parenrightsuperior", "twodotenleader",
+"onedotenleader", "comma", "hyphen", "period", "fraction", "zerooldstyle",
+"oneoldstyle", "twooldstyle", "threeoldstyle", "fouroldstyle", "fiveoldstyle",
+"sixoldstyle", "sevenoldstyle", "eightoldstyle", "nineoldstyle", "colon",
+"semicolon", "commasuperior", "threequartersemdash", "periodsuperior",
+"asuperior", "bsuperior", "centsuperior", "dsuperior", "esuperior", "isuperior",
+"lsuperior", "msuperior", "nsuperior", "osuperior", "rsuperior", "ssuperior",
+"tsuperior", "ff", "fi", "fl", "ffi", "ffl", "parenleftinferior",
+"parenrightinferior", "hyphensuperior", "colonmonetary", "onefitted", "rupiah",
+"centoldstyle", "figuredash", "hypheninferior", "onequarter", "onehalf",
+"threequarters", "oneeighth", "threeeighths", "fiveeighths", "seveneighths",
+"onethird", "twothirds", "zerosuperior", "onesuperior", "twosuperior",
+"threesuperior", "foursuperior", "fivesuperior", "sixsuperior", "sevensuperior",
+"eightsuperior", "ninesuperior", "zeroinferior", "oneinferior", "twoinferior",
+"threeinferior", "fourinferior", "fiveinferior", "sixinferior", "seveninferior",
+"eightinferior", "nineinferior", "centinferior", "dollarinferior",
+"periodinferior", "commainferior"]
 
 cffExpertSubsetStringCount = 87
 assert len(cffExpertSubsetStrings) == cffExpertSubsetStringCount

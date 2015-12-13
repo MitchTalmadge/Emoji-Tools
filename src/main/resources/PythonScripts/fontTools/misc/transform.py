@@ -46,7 +46,6 @@ Examples:
 """
 
 from __future__ import print_function, division, absolute_import
-
 from fontTools.misc.py23 import *
 
 __all__ = ["Transform", "Identity", "Offset", "Scale"]
@@ -68,6 +67,7 @@ def _normSinCos(v):
 
 
 class Transform(object):
+
 	"""2x2 transformation matrix plus offset, a.k.a. Affine transform.
 	Transform instances are immutable: all transforming methods, eg.
 	rotate(), return a new Transform instance.
@@ -109,7 +109,7 @@ class Transform(object):
 		"""
 		(x, y) = p
 		xx, xy, yx, yy, dx, dy = self.__affine
-		return (xx * x + yx * y + dx, xy * x + yy * y + dy)
+		return (xx*x + yx*y + dx, xy*x + yy*y + dy)
 
 	def transformPoints(self, points):
 		"""Transform a list of points.
@@ -121,7 +121,7 @@ class Transform(object):
 			>>>
 		"""
 		xx, xy, yx, yy, dx, dy = self.__affine
-		return [(xx * x + yx * y + dx, xy * x + yy * y + dy) for x, y in points]
+		return [(xx*x + yx*y + dx, xy*x + yy*y + dy) for x, y in points]
 
 	def translate(self, x=0, y=0):
 		"""Return a new transformation, translated (offset) by x, y.
@@ -191,12 +191,12 @@ class Transform(object):
 		xx1, xy1, yx1, yy1, dx1, dy1 = other
 		xx2, xy2, yx2, yy2, dx2, dy2 = self.__affine
 		return self.__class__(
-			xx1 * xx2 + xy1 * yx2,
-			xx1 * xy2 + xy1 * yy2,
-			yx1 * xx2 + yy1 * yx2,
-			yx1 * xy2 + yy1 * yy2,
-			xx2 * dx1 + yx2 * dy1 + dx2,
-			xy2 * dx1 + yy2 * dy1 + dy2)
+				xx1*xx2 + xy1*yx2,
+				xx1*xy2 + xy1*yy2,
+				yx1*xx2 + yy1*yx2,
+				yx1*xy2 + yy1*yy2,
+				xx2*dx1 + yx2*dy1 + dx2,
+				xy2*dx1 + yy2*dy1 + dy2)
 
 	def reverseTransform(self, other):
 		"""Return a new transformation, which is the other transformation
@@ -214,12 +214,12 @@ class Transform(object):
 		xx1, xy1, yx1, yy1, dx1, dy1 = self.__affine
 		xx2, xy2, yx2, yy2, dx2, dy2 = other
 		return self.__class__(
-			xx1 * xx2 + xy1 * yx2,
-			xx1 * xy2 + xy1 * yy2,
-			yx1 * xx2 + yy1 * yx2,
-			yx1 * xy2 + yy1 * yy2,
-			xx2 * dx1 + yx2 * dy1 + dx2,
-			xy2 * dx1 + yy2 * dy1 + dy2)
+				xx1*xx2 + xy1*yx2,
+				xx1*xy2 + xy1*yy2,
+				yx1*xx2 + yy1*yx2,
+				yx1*xy2 + yy1*yy2,
+				xx2*dx1 + yx2*dy1 + dx2,
+				xy2*dx1 + yy2*dy1 + dy2)
 
 	def inverse(self):
 		"""Return the inverse transformation.
@@ -236,9 +236,9 @@ class Transform(object):
 		if self.__affine == (1, 0, 0, 1, 0, 0):
 			return self
 		xx, xy, yx, yy, dx, dy = self.__affine
-		det = xx * yy - yx * xy
-		xx, xy, yx, yy = yy / det, -xy / det, -yx / det, xx / det
-		dx, dy = -xx * dx - yx * dy, -xy * dx - yy * dy
+		det = xx*yy - yx*xy
+		xx, xy, yx, yy = yy/det, -xy/det, -yx/det, xx/det
+		dx, dy = -xx*dx - yx*dy, -xy*dx - yy*dy
 		return self.__class__(xx, xy, yx, yy, dx, dy)
 
 	def toPS(self):
@@ -270,7 +270,6 @@ class Transform(object):
 
 	def __ne__(self, other):
 		return not self.__eq__(other)
-
 	def __eq__(self, other):
 		"""Transform instances are comparable:
 			>>> t1 = Identity.scale(2, 3).translate(4, 6)
@@ -293,7 +292,7 @@ class Transform(object):
 		xx1, xy1, yx1, yy1, dx1, dy1 = self.__affine
 		xx2, xy2, yx2, yy2, dx2, dy2 = other
 		return (xx1, xy1, yx1, yy1, dx1, dy1) == \
-			   (xx2, xy2, yx2, yy2, dx2, dy2)
+				(xx2, xy2, yx2, yy2, dx2, dy2)
 
 	def __hash__(self):
 		"""Transform instances are hashable, meaning you can use them as
@@ -323,7 +322,7 @@ class Transform(object):
 
 	def __repr__(self):
 		return "<%s [%g %g %g %g %g %g]>" % ((self.__class__.__name__,) \
-											 + self.__affine)
+				+ self.__affine)
 
 
 Identity = Transform()
@@ -355,5 +354,4 @@ def Scale(x, y=None):
 if __name__ == "__main__":
 	import sys
 	import doctest
-
 	sys.exit(doctest.testmod().failed)

@@ -1,11 +1,10 @@
 from __future__ import print_function, division, absolute_import
-
-import warnings
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
+from fontTools.misc import sstruct
 from fontTools.misc.textTools import safeEval, num2binary, binary2num
-
 from . import DefaultTable
+import warnings
+
 
 headFormat = """
 		>	# big endian

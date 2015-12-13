@@ -1,14 +1,12 @@
 from __future__ import print_function, division, absolute_import
-
+from fontTools.misc.py23 import *
+from fontTools.misc import sstruct
+from fontTools.misc.textTools import safeEval, readHex, hexStr, deHexStr
+from .BitmapGlyphMetrics import BigGlyphMetrics, bigGlyphMetricsFormat, SmallGlyphMetrics, smallGlyphMetricsFormat
+from . import DefaultTable
 import itertools
 import os
 import struct
-from fontTools.misc import sstruct
-from fontTools.misc.py23 import *
-from fontTools.misc.textTools import safeEval, readHex, hexStr, deHexStr
-
-from . import DefaultTable
-from .BitmapGlyphMetrics import BigGlyphMetrics, bigGlyphMetricsFormat, SmallGlyphMetrics, smallGlyphMetricsFormat
 
 ebdtTableVersionFormat = """
 	> # big endian
@@ -23,6 +21,7 @@ ebdtComponentFormat = """
 """
 
 class table_E_B_D_T_(DefaultTable.DefaultTable):
+
 	# Keep a reference to the name of the data locator table.
 	locatorName = 'EBLC'
 
@@ -177,6 +176,7 @@ class table_E_B_D_T_(DefaultTable.DefaultTable):
 			self.strikeData[strikeIndex] = bitmapGlyphDict
 
 class EbdtComponent(object):
+
 	def toXML(self, writer, ttFont):
 		writer.begintag('ebdtComponent', [('name', self.name)])
 		writer.newline()
@@ -217,7 +217,7 @@ def _data2binary(data, numBits):
 def _binary2data(binary):
 	byteList = []
 	for bitLoc in range(0, len(binary), 8):
-		byteString = binary[bitLoc:bitLoc + 8]
+		byteString = binary[bitLoc:bitLoc+8]
 		curByte = 0
 		for curBit in reversed(byteString):
 			curByte = curByte << 1
@@ -233,7 +233,6 @@ def _memoize(f):
 			if len(key) == 1:
 				self[key] = ret
 			return ret
-
 	return memodict().__getitem__
 
 # 00100111 -> 11100100 per byte, not to be confused with little/big endian.
@@ -302,7 +301,7 @@ def _writeBitwiseImageData(strikeIndex, glyphName, bitmapObject, writer, ttFont)
 	del bitmapObject.exportBitDepth
 
 	# A dict for mapping binary to more readable/artistic ASCII characters.
-	binaryConv = {'0': '.', '1': '@'}
+	binaryConv = {'0':'.', '1':'@'}
 
 	writer.begintag('bitwiseimagedata', bitDepth=bitDepth, width=metrics.width, height=metrics.height)
 	writer.newline()
@@ -324,7 +323,7 @@ def _readBitwiseImageData(bitmapObject, name, attrs, content, ttFont):
 
 	# A dict for mapping from ASCII to binary. All characters are considered
 	# a '1' except space, period and '0' which maps to '0'.
-	binaryConv = {' ': '0', '.': '0', '0': '0'}
+	binaryConv = {' ':'0', '.':'0', '0':'0'}
 
 	dataRows = []
 	for element in content:
@@ -371,6 +370,7 @@ def _readExtFileImageData(bitmapObject, name, attrs, content, ttFont):
 _bitmapGlyphSubclassPrefix = 'ebdt_bitmap_format_'
 
 class BitmapGlyph(object):
+
 	# For the external file format. This can be changed in subclasses. This way
 	# when the extfile option is turned on files have the form: glyphName.ext
 	# The default is just a flat binary file with no meaning.
@@ -378,20 +378,19 @@ class BitmapGlyph(object):
 
 	# Keep track of reading and writing of various forms.
 	xmlDataFunctions = {
-		'raw': (_writeRawImageData, _readRawImageData),
-		'row': (_writeRowImageData, _readRowImageData),
-		'bitwise': (_writeBitwiseImageData, _readBitwiseImageData),
-		'extfile': (_writeExtFileImageData, _readExtFileImageData),
-	}
+		'raw':		(_writeRawImageData, _readRawImageData),
+		'row':		(_writeRowImageData, _readRowImageData),
+		'bitwise':	(_writeBitwiseImageData, _readBitwiseImageData),
+		'extfile':	(_writeExtFileImageData, _readExtFileImageData),
+		}
 
 	def __init__(self, data, ttFont):
 		self.data = data
 		self.ttFont = ttFont
-
-	# TODO Currently non-lazy decompilation is untested here...
-	# if not ttFont.lazy:
-	#	self.decompile()
-	#	del self.data
+		# TODO Currently non-lazy decompilation is untested here...
+		#if not ttFont.lazy:
+		#	self.decompile()
+		#	del self.data
 
 	def __getattr__(self, attr):
 		# Allow lazy decompile.
@@ -463,7 +462,7 @@ def _createBitmapPlusMetricsMixin(metricsClass):
 	curMetricsName = metricsClass.__name__
 	# Find which metrics this is for and determine the opposite name.
 	metricsId = metricStrings.index(curMetricsName)
-	oppositeMetricsName = metricStrings[1 - metricsId]
+	oppositeMetricsName = metricStrings[1-metricsId]
 
 	class BitmapPlusMetricsMixin(object):
 
@@ -491,10 +490,11 @@ BitmapPlusSmallMetricsMixin = _createBitmapPlusMetricsMixin(SmallGlyphMetrics)
 # helper functionality for dealing with the data and getting a particular row
 # of bitwise data. Also helps implement fancy data export/import in XML.
 class BitAlignedBitmapMixin(object):
+
 	def _getBitRange(self, row, bitDepth, metrics):
 		rowBits = (bitDepth * metrics.width)
 		bitOffset = row * rowBits
-		return (bitOffset, bitOffset + rowBits)
+		return (bitOffset, bitOffset+rowBits)
 
 	def getRow(self, row, bitDepth=1, metrics=None, reverseBytes=False):
 		if metrics is None:
@@ -520,7 +520,7 @@ class BitAlignedBitmapMixin(object):
 		bitRange = self._getBitRange(row, bitDepth, metrics)
 		stepRange = bitRange + (8,)
 		for curBit in range(*stepRange):
-			endBit = min(curBit + 8, bitRange[1])
+			endBit = min(curBit+8, bitRange[1])
 			numBits = endBit - curBit
 			cutPoint = curBit % 8
 			firstByteLoc = curBit // 8
@@ -531,12 +531,12 @@ class BitAlignedBitmapMixin(object):
 				numBitsCut = endBit - curBit
 			curByte = _reverseBytes(self.imageData[firstByteLoc])
 			firstHalf = byteord(curByte) >> cutPoint
-			firstHalf = ((1 << numBitsCut) - 1) & firstHalf
+			firstHalf = ((1<<numBitsCut)-1) & firstHalf
 			newByte = firstHalf
 			if firstByteLoc < secondByteLoc and secondByteLoc < len(self.imageData):
 				curByte = _reverseBytes(self.imageData[secondByteLoc])
 				secondHalf = byteord(curByte) << numBitsCut
-				newByte = (firstHalf | secondHalf) & ((1 << numBits) - 1)
+				newByte = (firstHalf | secondHalf) & ((1<<numBits)-1)
 			dataList.append(bytechr(newByte))
 
 		# The way the data is kept is opposite the algorithm used.
@@ -559,7 +559,7 @@ class BitAlignedBitmapMixin(object):
 			bitRange = self._getBitRange(row, bitDepth, metrics)
 			stepRange = bitRange + (8,)
 			for curBit, curByte in zip(range(*stepRange), data):
-				endBit = min(curBit + 8, bitRange[1])
+				endBit = min(curBit+8, bitRange[1])
 				cutPoint = curBit % 8
 				firstByteLoc = curBit // 8
 				secondByteLoc = endBit // 8
@@ -568,20 +568,21 @@ class BitAlignedBitmapMixin(object):
 				else:
 					numBitsCut = endBit - curBit
 				curByte = byteord(curByte)
-				firstByte = curByte & ((1 << numBitsCut) - 1)
+				firstByte = curByte & ((1<<numBitsCut)-1)
 				ordDataList[firstByteLoc] |= (firstByte << cutPoint)
 				if firstByteLoc < secondByteLoc and secondByteLoc < numBytes:
-					secondByte = (curByte >> numBitsCut) & ((1 << 8 - numBitsCut) - 1)
+					secondByte = (curByte >> numBitsCut) & ((1<<8-numBitsCut)-1)
 					ordDataList[secondByteLoc] |= secondByte
 
 		# Save the image data with the bits going the correct way.
 		self.imageData = _reverseBytes(bytesjoin(map(bytechr, ordDataList)))
 
 class ByteAlignedBitmapMixin(object):
+
 	def _getByteRange(self, row, bitDepth, metrics):
 		rowBytes = (bitDepth * metrics.width + 7) // 8
 		byteOffset = row * rowBytes
-		return (byteOffset, byteOffset + rowBytes)
+		return (byteOffset, byteOffset+rowBytes)
 
 	def getRow(self, row, bitDepth=1, metrics=None, reverseBytes=False):
 		if metrics is None:
@@ -601,6 +602,7 @@ class ByteAlignedBitmapMixin(object):
 		self.imageData = bytesjoin(dataRows)
 
 class ebdt_bitmap_format_1(ByteAlignedBitmapMixin, BitmapPlusSmallMetricsMixin, BitmapGlyph):
+
 	def decompile(self):
 		self.metrics = SmallGlyphMetrics()
 		dummy, data = sstruct.unpack2(smallGlyphMetricsFormat, self.data, self.metrics)
@@ -612,6 +614,7 @@ class ebdt_bitmap_format_1(ByteAlignedBitmapMixin, BitmapPlusSmallMetricsMixin, 
 
 
 class ebdt_bitmap_format_2(BitAlignedBitmapMixin, BitmapPlusSmallMetricsMixin, BitmapGlyph):
+
 	def decompile(self):
 		self.metrics = SmallGlyphMetrics()
 		dummy, data = sstruct.unpack2(smallGlyphMetricsFormat, self.data, self.metrics)
@@ -623,6 +626,7 @@ class ebdt_bitmap_format_2(BitAlignedBitmapMixin, BitmapPlusSmallMetricsMixin, B
 
 
 class ebdt_bitmap_format_5(BitAlignedBitmapMixin, BitmapGlyph):
+
 	def decompile(self):
 		self.imageData = self.data
 
@@ -630,6 +634,7 @@ class ebdt_bitmap_format_5(BitAlignedBitmapMixin, BitmapGlyph):
 		return self.imageData
 
 class ebdt_bitmap_format_6(ByteAlignedBitmapMixin, BitmapPlusBigMetricsMixin, BitmapGlyph):
+
 	def decompile(self):
 		self.metrics = BigGlyphMetrics()
 		dummy, data = sstruct.unpack2(bigGlyphMetricsFormat, self.data, self.metrics)
@@ -641,6 +646,7 @@ class ebdt_bitmap_format_6(ByteAlignedBitmapMixin, BitmapPlusBigMetricsMixin, Bi
 
 
 class ebdt_bitmap_format_7(BitAlignedBitmapMixin, BitmapPlusBigMetricsMixin, BitmapGlyph):
+
 	def decompile(self):
 		self.metrics = BigGlyphMetrics()
 		dummy, data = sstruct.unpack2(bigGlyphMetricsFormat, self.data, self.metrics)
@@ -652,6 +658,7 @@ class ebdt_bitmap_format_7(BitAlignedBitmapMixin, BitmapPlusBigMetricsMixin, Bit
 
 
 class ComponentBitmapGlyph(BitmapGlyph):
+
 	def toXML(self, strikeIndex, glyphName, writer, ttFont):
 		writer.begintag(self.__class__.__name__, [('name', glyphName)])
 		writer.newline()
@@ -689,6 +696,7 @@ class ComponentBitmapGlyph(BitmapGlyph):
 
 
 class ebdt_bitmap_format_8(BitmapPlusSmallMetricsMixin, ComponentBitmapGlyph):
+
 	def decompile(self):
 		self.metrics = SmallGlyphMetrics()
 		dummy, data = sstruct.unpack2(smallGlyphMetricsFormat, self.data, self.metrics)
@@ -715,6 +723,7 @@ class ebdt_bitmap_format_8(BitmapPlusSmallMetricsMixin, ComponentBitmapGlyph):
 
 
 class ebdt_bitmap_format_9(BitmapPlusBigMetricsMixin, ComponentBitmapGlyph):
+
 	def decompile(self):
 		self.metrics = BigGlyphMetrics()
 		dummy, data = sstruct.unpack2(bigGlyphMetricsFormat, self.data, self.metrics)
@@ -740,11 +749,11 @@ class ebdt_bitmap_format_9(BitmapPlusBigMetricsMixin, ComponentBitmapGlyph):
 # Dictionary of bitmap formats to the class representing that format
 # currently only the ones listed in this map are the ones supported.
 ebdt_bitmap_classes = {
-	1: ebdt_bitmap_format_1,
-	2: ebdt_bitmap_format_2,
-	5: ebdt_bitmap_format_5,
-	6: ebdt_bitmap_format_6,
-	7: ebdt_bitmap_format_7,
-	8: ebdt_bitmap_format_8,
-	9: ebdt_bitmap_format_9,
-}
+		1: ebdt_bitmap_format_1,
+		2: ebdt_bitmap_format_2,
+		5: ebdt_bitmap_format_5,
+		6: ebdt_bitmap_format_6,
+		7: ebdt_bitmap_format_7,
+		8: ebdt_bitmap_format_8,
+		9: ebdt_bitmap_format_9,
+	}

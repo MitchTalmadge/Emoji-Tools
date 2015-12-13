@@ -1,11 +1,10 @@
 from __future__ import print_function, division, absolute_import
-
-import warnings
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
+from fontTools.misc import sstruct
 from fontTools.misc.textTools import safeEval, num2binary, binary2num
-
 from . import DefaultTable
+import warnings
+
 
 # panose classification
 
@@ -23,6 +22,7 @@ panoseFormat = """
 """
 
 class Panose(object):
+
 	def toXML(self, writer, ttFont):
 		formatstring, names, fixes = sstruct.getformat(panoseFormat)
 		for name in names:
@@ -69,12 +69,12 @@ OS2_format_0 = """
 	usWinDescent:           H       # Windows descender
 """
 
-OS2_format_1_addition = """
+OS2_format_1_addition =  """
 	ulCodePageRange1:   L
 	ulCodePageRange2:   L
 """
 
-OS2_format_2_addition = OS2_format_1_addition + """
+OS2_format_2_addition =  OS2_format_1_addition + """
 	sxHeight:           h
 	sCapHeight:         h
 	usDefaultChar:      H
@@ -82,7 +82,7 @@ OS2_format_2_addition = OS2_format_1_addition + """
 	usMaxContext:       H
 """
 
-OS2_format_5_addition = OS2_format_2_addition + """
+OS2_format_5_addition =  OS2_format_2_addition + """
 	usLowerOpticalPointSize:    H
 	usUpperOpticalPointSize:    H
 """
@@ -98,6 +98,7 @@ OS2_format_5_addition = bigendian + OS2_format_5_addition
 
 
 class table_O_S_2f_2(DefaultTable.DefaultTable):
+
 	"""the OS/2 table"""
 
 	def decompile(self, data, ttFont):
@@ -156,14 +157,14 @@ class table_O_S_2f_2(DefaultTable.DefaultTable):
 		formatstring, names, fixes = sstruct.getformat(format)
 		for name in names:
 			value = getattr(self, name)
-			if name == "panose":
+			if name=="panose":
 				writer.begintag("panose")
 				writer.newline()
 				value.toXML(writer, ttFont)
 				writer.endtag("panose")
 			elif name in ("ulUnicodeRange1", "ulUnicodeRange2",
-						  "ulUnicodeRange3", "ulUnicodeRange4",
-						  "ulCodePageRange1", "ulCodePageRange2"):
+					"ulUnicodeRange3", "ulUnicodeRange4",
+					"ulCodePageRange1", "ulCodePageRange2"):
 				writer.simpletag(name, value=num2binary(value))
 			elif name in ("fsType", "fsSelection"):
 				writer.simpletag(name, value=num2binary(value, 16))
@@ -181,9 +182,9 @@ class table_O_S_2f_2(DefaultTable.DefaultTable):
 					name, attrs, content = element
 					panose.fromXML(name, attrs, content, ttFont)
 		elif name in ("ulUnicodeRange1", "ulUnicodeRange2",
-					  "ulUnicodeRange3", "ulUnicodeRange4",
-					  "ulCodePageRange1", "ulCodePageRange2",
-					  "fsType", "fsSelection"):
+				"ulUnicodeRange3", "ulUnicodeRange4",
+				"ulCodePageRange1", "ulCodePageRange2",
+				"fsType", "fsSelection"):
 			setattr(self, name, binary2num(attrs["value"]))
 		elif name == "achVendID":
 			setattr(self, name, safeEval("'''" + attrs["value"] + "'''"))

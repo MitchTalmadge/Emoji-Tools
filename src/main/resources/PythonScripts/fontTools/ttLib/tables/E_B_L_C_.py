@@ -1,14 +1,12 @@
 from __future__ import print_function, division, absolute_import
-
-import itertools
-import struct
-from collections import deque
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
-from fontTools.misc.textTools import safeEval
-
+from fontTools.misc import sstruct
 from . import DefaultTable
-from .BitmapGlyphMetrics import BigGlyphMetrics, bigGlyphMetricsFormat, SmallGlyphMetrics
+from fontTools.misc.textTools import safeEval
+from .BitmapGlyphMetrics import BigGlyphMetrics, bigGlyphMetricsFormat, SmallGlyphMetrics, smallGlyphMetricsFormat
+import struct
+import itertools
+from collections import deque
 
 eblcHeaderFormat = """
 	> # big endian

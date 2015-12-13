@@ -1,12 +1,9 @@
 from __future__ import print_function, division, absolute_import
-
-import array
-import sys
-import warnings
 from fontTools.misc.py23 import *
-
 from . import DefaultTable
-
+import sys
+import array
+import warnings
 
 class table__l_o_c_a(DefaultTable.DefaultTable):
 

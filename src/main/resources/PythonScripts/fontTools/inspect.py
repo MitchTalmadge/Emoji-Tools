@@ -6,11 +6,9 @@
 """
 
 from __future__ import print_function, division, absolute_import
-
-import pygtk
-from fontTools import misc, ttLib, cffLib
 from fontTools.misc.py23 import *
-
+from fontTools import misc, ttLib, cffLib
+import pygtk
 pygtk.require('2.0')
 import gtk
 import sys

@@ -2,7 +2,6 @@
 # http://www.adobe.com/devnet/opentype/archives/aglfn.txt
 
 from __future__ import print_function, division, absolute_import
-
 from fontTools.misc.py23 import *
 
 _aglText = """\

@@ -1,11 +1,9 @@
 from __future__ import print_function, division, absolute_import
-
-import struct
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
-from fontTools.misc.textTools import safeEval
-
 from . import DefaultTable
+from fontTools.misc import sstruct
+from fontTools.misc.textTools import safeEval
+import struct
 
 VDMX_HeaderFmt = """
 	>                 # big endian

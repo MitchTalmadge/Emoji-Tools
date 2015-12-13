@@ -6,16 +6,15 @@
 """
 
 from __future__ import print_function, division, absolute_import
-
-import operator
-import sys
-import time
-from fontTools import ttLib
 from fontTools.misc.py23 import *
 from fontTools.misc.timeTools import timestampNow
+from fontTools import ttLib, cffLib
 from fontTools.ttLib.tables import otTables
 from fontTools.ttLib.tables.DefaultTable import DefaultTable
 from functools import reduce
+import sys
+import time
+import operator
 
 
 def _add_method(*clazzes, **kwargs):

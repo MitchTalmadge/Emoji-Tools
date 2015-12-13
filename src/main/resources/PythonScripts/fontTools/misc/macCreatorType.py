@@ -1,8 +1,6 @@
 from __future__ import print_function, division, absolute_import
-
-import sys
 from fontTools.misc.py23 import *
-
+import sys
 try:
 	import xattr
 except ImportError:

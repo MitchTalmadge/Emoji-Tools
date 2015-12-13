@@ -1,9 +1,7 @@
 from __future__ import print_function, division, absolute_import
-
-import struct
 from fontTools.misc.py23 import *
-
 from . import DefaultTable
+import struct
 
 tsi0Format = '>HHl'
 
@@ -12,6 +10,7 @@ def fixlongs(glyphID, textLength, textOffset):
 
 
 class table_T_S_I__0(DefaultTable.DefaultTable):
+
 	dependencies = ["TSI1"]
 
 	def decompile(self, data, ttFont):

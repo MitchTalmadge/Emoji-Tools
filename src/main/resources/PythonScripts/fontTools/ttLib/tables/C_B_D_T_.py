@@ -4,15 +4,12 @@
 
 
 from __future__ import print_function, division, absolute_import
-
-import struct
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
-
+from fontTools.misc import sstruct
 from . import E_B_D_T_
 from .BitmapGlyphMetrics import BigGlyphMetrics, bigGlyphMetricsFormat, SmallGlyphMetrics, smallGlyphMetricsFormat
 from .E_B_D_T_ import BitmapGlyph, BitmapPlusSmallMetricsMixin, BitmapPlusBigMetricsMixin
-
+import struct
 
 class table_C_B_D_T_(E_B_D_T_.table_E_B_D_T_):
 

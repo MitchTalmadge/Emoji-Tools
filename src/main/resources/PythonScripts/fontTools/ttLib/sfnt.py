@@ -13,12 +13,11 @@ a table's length chages you need to rewrite the whole file anyway.
 """
 
 from __future__ import print_function, division, absolute_import
-
+from fontTools.misc.py23 import *
+from fontTools.misc import sstruct
+from fontTools.ttLib import getSearchRange
 import struct
 from collections import OrderedDict
-from fontTools.misc import sstruct
-from fontTools.misc.py23 import *
-from fontTools.ttLib import getSearchRange
 
 
 class SFNTReader(object):

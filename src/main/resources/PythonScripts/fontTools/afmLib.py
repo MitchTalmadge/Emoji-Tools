@@ -5,9 +5,8 @@
 # File Format Specification). Still, it should read most "common" AFM files.
 
 from __future__ import print_function, division, absolute_import
-
-import re
 from fontTools.misc.py23 import *
+import re
 
 # every single line starts with a "word"
 identifierRE = re.compile("^([A-Za-z]+).*")

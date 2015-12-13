@@ -1,11 +1,8 @@
 from __future__ import print_function, division, absolute_import
-
+from fontTools.misc.py23 import *
+from .DefaultTable import DefaultTable
 import array
 import struct
-from fontTools.misc.py23 import *
-
-from .DefaultTable import DefaultTable
-
 
 class OverflowErrorRecord(object):
 	def __init__(self, overflowTuple):

@@ -74,17 +74,16 @@ usage: ttx [options] inputfile1 [... inputfileN]
       available at https://github.com/google/brotli
 """
 
-from __future__ import print_function, division, absolute_import
 
-import getopt
-import os
-import re
-import sys
-from fontTools.misc.macCreatorType import getMacCreatorAndType
+from __future__ import print_function, division, absolute_import
 from fontTools.misc.py23 import *
 from fontTools.ttLib import TTFont, TTLibError
+from fontTools.misc.macCreatorType import getMacCreatorAndType
 from fontTools.unicode import setUnicodeData
-
+import os
+import sys
+import getopt
+import re
 
 def usage():
 	from fontTools import version

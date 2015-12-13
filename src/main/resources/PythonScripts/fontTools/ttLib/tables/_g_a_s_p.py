@@ -1,10 +1,9 @@
 from __future__ import print_function, division, absolute_import
-
-import struct
 from fontTools.misc.py23 import *
 from fontTools.misc.textTools import safeEval
-
 from . import DefaultTable
+import struct
+
 
 GASP_SYMMETRIC_GRIDFIT = 0x0004
 GASP_SYMMETRIC_SMOOTHING = 0x0008

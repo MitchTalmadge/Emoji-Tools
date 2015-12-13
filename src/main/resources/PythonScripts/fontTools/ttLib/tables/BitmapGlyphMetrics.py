@@ -1,10 +1,10 @@
 # Since bitmap glyph metrics are shared between EBLC and EBDT
 # this class gets its own python file.
 from __future__ import print_function, division, absolute_import
-
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
+from fontTools.misc import sstruct
 from fontTools.misc.textTools import safeEval
+
 
 bigGlyphMetricsFormat = """
   > # big endian
@@ -28,6 +28,7 @@ smallGlyphMetricsFormat = """
 """
 
 class BitmapGlyphMetrics(object):
+
 	def toXML(self, writer, ttFont):
 		writer.begintag(self.__class__.__name__)
 		writer.newline()

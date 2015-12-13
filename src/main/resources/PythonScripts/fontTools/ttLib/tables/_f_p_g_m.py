@@ -1,10 +1,7 @@
 from __future__ import print_function, division, absolute_import
-
 from fontTools.misc.py23 import *
-
 from . import DefaultTable
 from . import ttProgram
-
 
 class table__f_p_g_m(DefaultTable.DefaultTable):
 

@@ -1,15 +1,14 @@
 from __future__ import print_function, division, absolute_import
-
-import array
-import sys
-import warnings
 from fontTools.misc.py23 import *
 from fontTools.misc.textTools import safeEval
-
 from . import DefaultTable
+import sys
+import array
+import warnings
 
 
 class table__h_m_t_x(DefaultTable.DefaultTable):
+
 	headerTag = 'hhea'
 	advanceName = 'width'
 	sideBearingName = 'lsb'
@@ -19,7 +18,7 @@ class table__h_m_t_x(DefaultTable.DefaultTable):
 		numGlyphs = ttFont['maxp'].numGlyphs
 		numberOfMetrics = int(getattr(ttFont[self.headerTag], self.numberOfMetricsName))
 		if numberOfMetrics > numGlyphs:
-			numberOfMetrics = numGlyphs  # We warn later.
+			numberOfMetrics = numGlyphs # We warn later.
 		# Note: advanceWidth is unsigned, but we read/write as signed.
 		metrics = array.array("h", data[:4 * numberOfMetrics])
 		if sys.byteorder != "big":
@@ -37,7 +36,7 @@ class table__h_m_t_x(DefaultTable.DefaultTable):
 		glyphOrder = ttFont.getGlyphOrder()
 		for i in range(numberOfMetrics):
 			glyphName = glyphOrder[i]
-			self.metrics[glyphName] = list(metrics[i * 2:i * 2 + 2])
+			self.metrics[glyphName] = list(metrics[i*2:i*2+2])
 		lastAdvance = metrics[-2]
 		for i in range(numberOfSideBearings):
 			glyphName = glyphOrder[i + numberOfMetrics]
@@ -49,7 +48,7 @@ class table__h_m_t_x(DefaultTable.DefaultTable):
 			metrics.append(self.metrics[glyphName])
 		lastAdvance = metrics[-1][0]
 		lastIndex = len(metrics)
-		while metrics[lastIndex - 2][0] == lastAdvance:
+		while metrics[lastIndex-2][0] == lastAdvance:
 			lastIndex -= 1
 			if lastIndex <= 1:
 				# all advances are equal
@@ -79,10 +78,10 @@ class table__h_m_t_x(DefaultTable.DefaultTable):
 		for glyphName in names:
 			advance, sb = self.metrics[glyphName]
 			writer.simpletag("mtx", [
-				("name", glyphName),
-				(self.advanceName, advance),
-				(self.sideBearingName, sb),
-			])
+					("name", glyphName),
+					(self.advanceName, advance),
+					(self.sideBearingName, sb),
+					])
 			writer.newline()
 
 	def fromXML(self, name, attrs, content, ttFont):
@@ -90,7 +89,7 @@ class table__h_m_t_x(DefaultTable.DefaultTable):
 			self.metrics = {}
 		if name == "mtx":
 			self.metrics[attrs["name"]] = [safeEval(attrs[self.advanceName]),
-										   safeEval(attrs[self.sideBearingName])]
+					safeEval(attrs[self.sideBearingName])]
 
 	def __delitem__(self, glyphName):
 		del self.metrics[glyphName]

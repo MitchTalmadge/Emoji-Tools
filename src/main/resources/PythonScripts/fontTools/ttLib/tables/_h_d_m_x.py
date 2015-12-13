@@ -1,10 +1,8 @@
 from __future__ import print_function, division, absolute_import
-
-import array
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
-
+from fontTools.misc import sstruct
 from . import DefaultTable
+import array
 
 hdmxHeaderFormat = """
 	>   # big endian!
@@ -18,8 +16,8 @@ try:
 except:
 	from UserDict import DictMixin as Mapping
 
-
 class _GlyphnamedList(Mapping):
+
 	def __init__(self, reverseGlyphOrder, data):
 		self._array = data
 		self._map = dict(reverseGlyphOrder)
@@ -37,6 +35,7 @@ class _GlyphnamedList(Mapping):
 		return self._map.keys()
 
 class table__h_d_m_x(DefaultTable.DefaultTable):
+
 	def decompile(self, data, ttFont):
 		numGlyphs = ttFont['maxp'].numGlyphs
 		glyphOrder = ttFont.getGlyphOrder()
@@ -45,7 +44,7 @@ class table__h_d_m_x(DefaultTable.DefaultTable):
 		for i in range(self.numRecords):
 			ppem = byteord(data[0])
 			maxSize = byteord(data[1])
-			widths = _GlyphnamedList(ttFont.getReverseGlyphMap(), array.array("B", data[2:2 + numGlyphs]))
+			widths = _GlyphnamedList(ttFont.getReverseGlyphMap(), array.array("B", data[2:2+numGlyphs]))
 			self.hdmx[ppem] = widths
 			data = data[self.recordSize:]
 		assert len(data) == 0, "too much hdmx data"

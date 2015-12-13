@@ -1,9 +1,9 @@
 from __future__ import print_function, division, absolute_import
-
+from fontTools.misc.py23 import *
 from fontTools.misc.arrayTools import updateBounds, pointInRect, unionRect
 from fontTools.misc.bezierTools import calcCubicBounds, calcQuadraticBounds
-from fontTools.misc.py23 import *
 from fontTools.pens.basePen import BasePen
+
 
 __all__ = ["BoundsPen", "ControlBoundsPen"]
 

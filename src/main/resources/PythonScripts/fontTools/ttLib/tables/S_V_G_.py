@@ -1,15 +1,13 @@
 from __future__ import print_function, division, absolute_import
-
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
-
+from fontTools.misc import sstruct
 from . import DefaultTable
-
 try:
 	import xml.etree.cElementTree as ET
 except ImportError:
 	import xml.etree.ElementTree as ET
 import struct
+import re
 
 __doc__="""
 Compiles/decompiles version 0 and 1 SVG tables from/to XML.

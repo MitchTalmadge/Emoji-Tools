@@ -1,7 +1,6 @@
 """Python 2/3 compat layer."""
 
 from __future__ import print_function, division, absolute_import
-
 import sys
 
 try:
@@ -94,6 +93,7 @@ except NameError:
 
 # the 'io' module provides the same I/O interface on both 2 and 3.
 # here we define an alias of io.StringIO to disambiguate it eternally...
+from io import BytesIO
 from io import StringIO as UnicodeIO
 try:
 	# in python 2, by 'StringIO' we still mean a stream of *byte* strings

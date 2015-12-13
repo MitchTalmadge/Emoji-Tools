@@ -1,8 +1,7 @@
 """ttLib.macUtils.py -- Various Mac-specific stuff."""
 from __future__ import print_function, division, absolute_import
-
-from fontTools.misc.macRes import ResourceReader, ResourceError
 from fontTools.misc.py23 import *
+from fontTools.misc.macRes import ResourceReader, ResourceError
 
 
 def getSFNTResIndices(path):

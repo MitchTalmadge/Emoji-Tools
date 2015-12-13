@@ -1,9 +1,7 @@
 from __future__ import print_function, division, absolute_import
-
-from fontTools.misc.fixedTools import fixedToFloat as fi2fl, floatToFixed as fl2fi
 from fontTools.misc.py23 import *
 from fontTools.misc.textTools import safeEval
-
+from fontTools.misc.fixedTools import fixedToFloat as fi2fl, floatToFixed as fl2fi
 from .otBase import ValueRecordFactory
 
 
@@ -55,17 +53,15 @@ def buildConverters(tableSpec, tableNamespace):
 class _MissingItem(tuple):
 	__slots__ = ()
 
-
 try:
 	from collections import UserList
 except:
 	from UserList import UserList
 
-
 class _LazyList(UserList):
+
 	def __getslice__(self, i, j):
 		return self.__getitem__(slice(i, j))
-
 	def __getitem__(self, k):
 		if isinstance(k, slice):
 			indices = range(*k.indices(len(self)))
@@ -77,8 +73,8 @@ class _LazyList(UserList):
 			self.data[k] = item
 		return item
 
-
 class BaseConverter(object):
+
 	"""Base class for converter objects. Apart from the constructor, this
 	is an abstract class."""
 
@@ -143,69 +139,52 @@ class SimpleValue(BaseConverter):
 	def xmlWrite(self, xmlWriter, font, value, name, attrs):
 		xmlWriter.simpletag(name, attrs + [("value", value)])
 		xmlWriter.newline()
-
 	def xmlRead(self, attrs, content, font):
 		return attrs["value"]
-
 
 class IntValue(SimpleValue):
 	def xmlRead(self, attrs, content, font):
 		return int(attrs["value"], 0)
 
-
 class Long(IntValue):
 	staticSize = 4
-
 	def read(self, reader, font, tableDict):
 		return reader.readLong()
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeLong(value)
 
-
 class ULong(IntValue):
 	staticSize = 4
-
 	def read(self, reader, font, tableDict):
 		return reader.readULong()
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeULong(value)
 
 class Short(IntValue):
 	staticSize = 2
-
 	def read(self, reader, font, tableDict):
 		return reader.readShort()
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeShort(value)
 
 class UShort(IntValue):
 	staticSize = 2
-
 	def read(self, reader, font, tableDict):
 		return reader.readUShort()
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeUShort(value)
 
-
 class UInt8(IntValue):
 	staticSize = 1
-
 	def read(self, reader, font, tableDict):
 		return reader.readUInt8()
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeUInt8(value)
 
 class UInt24(IntValue):
 	staticSize = 3
-
 	def read(self, reader, font, tableDict):
 		return reader.readUInt24()
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeUInt24(value)
 
@@ -216,17 +195,13 @@ class ComputedUShort(UShort):
 
 class Tag(SimpleValue):
 	staticSize = 4
-
 	def read(self, reader, font, tableDict):
 		return reader.readTag()
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeTag(value)
 
-
 class GlyphID(SimpleValue):
 	staticSize = 2
-
 	def readArray(self, reader, font, tableDict, count):
 		glyphOrder = font.getGlyphOrder()
 		gids = reader.readUShortArray(count)
@@ -236,61 +211,48 @@ class GlyphID(SimpleValue):
 			# Slower, but will not throw an IndexError on an invalid glyph id.
 			l = [font.getGlyphName(gid) for gid in gids]
 		return l
-
 	def read(self, reader, font, tableDict):
 		return font.getGlyphName(reader.readUShort())
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeUShort(font.getGlyphID(value))
-
 
 class FloatValue(SimpleValue):
 	def xmlRead(self, attrs, content, font):
 		return float(attrs["value"])
 
-
 class DeciPoints(FloatValue):
 	staticSize = 2
-
 	def read(self, reader, font, tableDict):
 		return reader.readUShort() / 10
 
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeUShort(int(round(value * 10)))
 
-
 class Fixed(FloatValue):
 	staticSize = 4
-
 	def read(self, reader, font, tableDict):
-		return fi2fl(reader.readLong(), 16)
-
+		return  fi2fl(reader.readLong(), 16)
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer.writeLong(fl2fi(value, 16))
 
-
 class Version(BaseConverter):
 	staticSize = 4
-
 	def read(self, reader, font, tableDict):
 		value = reader.readLong()
 		assert (value >> 16) == 1, "Unsupported version 0x%08x" % value
-		return fi2fl(value, 16)
-
+		return  fi2fl(value, 16)
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		if value < 0x10000:
 			value = fl2fi(value, 16)
 		value = int(round(value))
 		assert (value >> 16) == 1, "Unsupported version 0x%08x" % value
 		writer.writeLong(value)
-
 	def xmlRead(self, attrs, content, font):
 		value = attrs["value"]
 		value = float(int(value, 0)) if value.startswith("0") else float(value)
 		if value >= 0x10000:
 			value = fi2fl(value, 16)
 		return value
-
 	def xmlWrite(self, xmlWriter, font, value, name, attrs):
 		if value >= 0x10000:
 			value = fi2fl(value, 16)
@@ -302,6 +264,7 @@ class Version(BaseConverter):
 
 
 class Struct(BaseConverter):
+
 	def getRecordSize(self, reader):
 		return self.tableClass and self.tableClass.getRecordSize(reader)
 
@@ -322,7 +285,7 @@ class Struct(BaseConverter):
 				xmlWriter.simpletag(name, attrs + [("empty", 1)])
 				xmlWriter.newline()
 			else:
-				pass  # NULL table, ignore
+				pass # NULL table, ignore
 		else:
 			value.toXML(xmlWriter, font, attrs, name=name)
 
@@ -346,6 +309,7 @@ class Struct(BaseConverter):
 
 
 class Table(Struct):
+
 	longOffset = False
 	staticSize = 2
 
@@ -365,7 +329,7 @@ class Table(Struct):
 		if offset <= 3:
 			# XXX hack to work around buggy pala.ttf
 			print("*** Warning: offset is not 0, yet suspiciously low (%s). table: %s" \
-				  % (offset, self.tableClass.__name__))
+					% (offset, self.tableClass.__name__))
 			return None
 		table = self.tableClass()
 		reader = reader.getSubReader(offset)
@@ -389,6 +353,7 @@ class Table(Struct):
 			value.compile(subWriter, font)
 
 class LTable(Table):
+
 	longOffset = True
 	staticSize = 4
 
@@ -403,8 +368,9 @@ class SubTable(Table):
 
 
 class ExtSubTable(LTable, SubTable):
+
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
-		writer.Extension = 1  # actually, mere presence of the field flags it as an Ext Subtable writer.
+		writer.Extension = 1 # actually, mere presence of the field flags it as an Ext Subtable writer.
 		Table.write(self, writer, font, tableDict, value, repeatIndex)
 
 class FeatureParams(Table):
@@ -415,16 +381,13 @@ class FeatureParams(Table):
 
 class ValueFormat(IntValue):
 	staticSize = 2
-
 	def __init__(self, name, repeat, aux, tableClass):
 		BaseConverter.__init__(self, name, repeat, aux, tableClass)
 		self.which = "ValueFormat" + ("2" if name[-1] == "2" else "1")
-
 	def read(self, reader, font, tableDict):
 		format = reader.readUShort()
 		reader[self.which] = ValueRecordFactory(format)
 		return format
-
 	def write(self, writer, font, tableDict, format, repeatIndex=None):
 		writer.writeUShort(format)
 		writer[self.which] = ValueRecordFactory(format)
@@ -433,19 +396,15 @@ class ValueFormat(IntValue):
 class ValueRecord(ValueFormat):
 	def getRecordSize(self, reader):
 		return 2 * len(reader[self.which])
-
 	def read(self, reader, font, tableDict):
 		return reader[self.which].readValueRecord(reader, font)
-
 	def write(self, writer, font, tableDict, value, repeatIndex=None):
 		writer[self.which].writeValueRecord(writer, font, value)
-
 	def xmlWrite(self, xmlWriter, font, value, name, attrs):
 		if value is None:
 			pass  # NULL table, ignore
 		else:
 			value.toXML(xmlWriter, font, self.name, attrs)
-
 	def xmlRead(self, attrs, content, font):
 		from .otBase import ValueRecord
 		value = ValueRecord()
@@ -454,6 +413,7 @@ class ValueRecord(ValueFormat):
 
 
 class DeltaValue(BaseConverter):
+
 	def read(self, reader, font, tableDict):
 		StartSize = tableDict["StartSize"]
 		EndSize = tableDict["EndSize"]
@@ -508,19 +468,19 @@ class DeltaValue(BaseConverter):
 
 converterMapping = {
 	# type		class
-	"int16": Short,
-	"uint8": UInt8,
-	"uint16": UShort,
-	"uint24": UInt24,
-	"uint32": ULong,
-	"Version": Version,
-	"Tag": Tag,
-	"GlyphID": GlyphID,
-	"DeciPoints": DeciPoints,
-	"Fixed": Fixed,
-	"struct": Struct,
-	"Offset": Table,
-	"LOffset": LTable,
-	"ValueRecord": ValueRecord,
-	"DeltaValue": DeltaValue,
+	"int16":	Short,
+	"uint8":	UInt8,
+	"uint16":	UShort,
+	"uint24":	UInt24,
+	"uint32":	ULong,
+	"Version":	Version,
+	"Tag":		Tag,
+	"GlyphID":	GlyphID,
+	"DeciPoints":	DeciPoints,
+	"Fixed":	Fixed,
+	"struct":	Struct,
+	"Offset":	Table,
+	"LOffset":	LTable,
+	"ValueRecord":	ValueRecord,
+	"DeltaValue":	DeltaValue,
 }

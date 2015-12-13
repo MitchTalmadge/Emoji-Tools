@@ -1,11 +1,9 @@
 from __future__ import print_function, division, absolute_import
-
-import array
-import sys
 from fontTools.misc.py23 import *
 from fontTools.misc.textTools import safeEval
-
 from . import DefaultTable
+import sys
+import array
 
 
 class table_T_S_I__5(DefaultTable.DefaultTable):

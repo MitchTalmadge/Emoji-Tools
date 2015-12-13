@@ -1,14 +1,12 @@
 from __future__ import print_function, division, absolute_import
-
-import array
-import sys
 from fontTools.misc.py23 import *
 from fontTools.misc.textTools import safeEval
-
 from . import DefaultTable
-
+import sys
+import array
 
 class table__c_v_t(DefaultTable.DefaultTable):
+
 	def decompile(self, data, ttFont):
 		values = array.array("h")
 		values.fromstring(data)

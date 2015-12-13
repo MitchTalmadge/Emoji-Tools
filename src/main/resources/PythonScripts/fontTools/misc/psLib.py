@@ -1,12 +1,11 @@
 from __future__ import print_function, division, absolute_import
-
-import collections
-import re
-from fontTools.misc import eexec
 from fontTools.misc.py23 import *
+from fontTools.misc import eexec
+from .psOperators import *
+import re
+import collections
 from string import whitespace
 
-from .psOperators import *
 
 ps_special = b'()<>[]{}%'	# / is one too, but we take care of that one differently
 

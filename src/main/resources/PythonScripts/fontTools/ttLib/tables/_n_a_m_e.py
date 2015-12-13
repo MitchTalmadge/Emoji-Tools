@@ -1,12 +1,10 @@
 from __future__ import print_function, division, absolute_import
-
-import struct
-from fontTools.misc import sstruct
-from fontTools.misc.encodingTools import getEncoding
 from fontTools.misc.py23 import *
+from fontTools.misc import sstruct
 from fontTools.misc.textTools import safeEval
-
+from fontTools.misc.encodingTools import getEncoding
 from . import DefaultTable
+import struct
 
 nameRecordFormat = """
 		>	# big endian

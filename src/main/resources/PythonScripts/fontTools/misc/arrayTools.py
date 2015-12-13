@@ -5,10 +5,8 @@
 
 
 from __future__ import print_function, division, absolute_import
-
-import math
 from fontTools.misc.py23 import *
-
+import math
 
 def calcBounds(array):
     """Return the bounding rectangle of a 2D points array as a tuple:

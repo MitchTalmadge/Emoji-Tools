@@ -3,13 +3,11 @@
 # Google Author(s): Behdad Esfahbod
 
 from __future__ import print_function, division, absolute_import
-
-import operator
-import struct
 from fontTools.misc.py23 import *
 from fontTools.misc.textTools import safeEval
-
 from . import DefaultTable
+import operator
+import struct
 
 
 class table_C_O_L_R_(DefaultTable.DefaultTable):

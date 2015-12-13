@@ -1,10 +1,9 @@
 from __future__ import print_function, division, absolute_import
-
-import struct
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
-
+from fontTools.misc import sstruct
+from fontTools.misc.textTools import readHex
 from .sbixGlyph import *
+import struct
 
 sbixStrikeHeaderFormat = """
 	>

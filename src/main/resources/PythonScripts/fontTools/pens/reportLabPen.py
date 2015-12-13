@@ -1,5 +1,4 @@
 from __future__ import print_function, division, absolute_import
-
 from fontTools.misc.py23 import *
 from fontTools.pens.basePen import BasePen
 from reportlab.graphics.shapes import Path
@@ -60,7 +59,7 @@ if __name__=="__main__":
 
 	w, h = g.width, 1000
 	from reportlab.graphics import renderPM
-	from reportlab.graphics.shapes import Group, Drawing
+	from reportlab.graphics.shapes import Group, Drawing, scale
 
 	# Everything is wrapped in a group to allow transformations.
 	g = Group(pen.path)

@@ -1,14 +1,12 @@
 from __future__ import print_function, division, absolute_import
-
-import array
-import struct
-import warnings
-from fontTools.misc.fixedTools import fixedToFloat as fi2fl, floatToFixed as fl2fi
 from fontTools.misc.py23 import *
-from fontTools.misc.textTools import safeEval, readHex
 from fontTools.ttLib import getSearchRange
-
+from fontTools.misc.textTools import safeEval, readHex
+from fontTools.misc.fixedTools import fixedToFloat as fi2fl, floatToFixed as fl2fi
 from . import DefaultTable
+import struct
+import array
+import warnings
 
 
 class table__k_e_r_n(DefaultTable.DefaultTable):

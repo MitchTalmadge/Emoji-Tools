@@ -1,11 +1,9 @@
 from __future__ import print_function, division, absolute_import
-
-import operator
-import struct
 from fontTools.misc.py23 import *
 from fontTools.misc.textTools import safeEval
-
 from . import DefaultTable
+import operator
+import struct
 
 
 class table_V_O_R_G_(DefaultTable.DefaultTable):

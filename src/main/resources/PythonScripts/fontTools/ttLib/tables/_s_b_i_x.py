@@ -1,11 +1,11 @@
 from __future__ import print_function, division, absolute_import
-
-from fontTools.misc import sstruct
 from fontTools.misc.py23 import *
+from fontTools.misc import sstruct
 from fontTools.misc.textTools import safeEval, num2binary, binary2num
-
 from . import DefaultTable
+from .sbixGlyph import *
 from .sbixStrike import *
+
 
 sbixHeaderFormat = """
 	>
@@ -20,6 +20,7 @@ sbixHeaderFormat = """
 	numStrikes:    L	# Number of bitmap strikes to follow
 """
 sbixHeaderFormatSize = sstruct.calcsize(sbixHeaderFormat)
+
 
 sbixStrikeOffsetFormat = """
 	>
@@ -40,23 +41,23 @@ class table__s_b_i_x(DefaultTable.DefaultTable):
 
 	def decompile(self, data, ttFont):
 		# read table header
-		sstruct.unpack(sbixHeaderFormat, data[: sbixHeaderFormatSize], self)
+		sstruct.unpack(sbixHeaderFormat, data[ : sbixHeaderFormatSize], self)
 		# collect offsets to individual strikes in self.strikeOffsets
 		for i in range(self.numStrikes):
 			current_offset = sbixHeaderFormatSize + i * sbixStrikeOffsetFormatSize
 			offset_entry = sbixStrikeOffset()
 			sstruct.unpack(sbixStrikeOffsetFormat, \
-						   data[current_offset:current_offset + sbixStrikeOffsetFormatSize], \
-						   offset_entry)
+				data[current_offset:current_offset+sbixStrikeOffsetFormatSize], \
+				offset_entry)
 			self.strikeOffsets.append(offset_entry.strikeOffset)
 
 		# decompile Strikes
-		for i in range(self.numStrikes - 1, -1, -1):
+		for i in range(self.numStrikes-1, -1, -1):
 			current_strike = Strike(rawdata=data[self.strikeOffsets[i]:])
 			data = data[:self.strikeOffsets[i]]
 			current_strike.decompile(ttFont)
-			# print "  Strike length: %xh" % len(bitmapSetData)
-			# print "Number of Glyph entries:", len(current_strike.glyphs)
+			#print "  Strike length: %xh" % len(bitmapSetData)
+			#print "Number of Glyph entries:", len(current_strike.glyphs)
 			if current_strike.ppem in self.strikes:
 				from fontTools import ttLib
 				raise ttLib.TTLibError("Pixel 'ppem' must be unique for each Strike")
@@ -94,7 +95,7 @@ class table__s_b_i_x(DefaultTable.DefaultTable):
 			self.strikes[i].toXML(xmlWriter, ttFont)
 
 	def fromXML(self, name, attrs, content, ttFont):
-		if name == "version":
+		if name =="version":
 			setattr(self, name, safeEval(attrs["value"]))
 		elif name == "flags":
 			setattr(self, name, binary2num(attrs["value"]))

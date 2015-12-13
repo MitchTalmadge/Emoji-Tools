@@ -1,21 +1,19 @@
 """_g_l_y_f.py -- Converter classes for the 'glyf' table."""
 
 from __future__ import print_function, division, absolute_import
-
-import array
-import struct
-import sys
-import warnings
-from fontTools import ttLib
+from fontTools.misc.py23 import *
 from fontTools.misc import sstruct
+from fontTools import ttLib
+from fontTools.misc.textTools import safeEval, pad
 from fontTools.misc.arrayTools import calcBounds, calcIntBounds, pointInRect
 from fontTools.misc.bezierTools import calcQuadraticBounds
 from fontTools.misc.fixedTools import fixedToFloat as fi2fl, floatToFixed as fl2fi
-from fontTools.misc.py23 import *
-from fontTools.misc.textTools import safeEval, pad
-
 from . import DefaultTable
 from . import ttProgram
+import sys
+import struct
+import array
+import warnings
 
 #
 # The Apple and MS rasterizers behave differently for
@@ -27,10 +25,11 @@ from . import ttProgram
 # WE_HAVE_A_SCALE (eg. Chicago) case, and not when it's WE_HAVE_AN_X_AND_Y_SCALE
 # (eg. Charcoal)...
 #
-SCALE_COMPONENT_OFFSET_DEFAULT = 0  # 0 == MS, 1 == Apple
+SCALE_COMPONENT_OFFSET_DEFAULT = 0   # 0 == MS, 1 == Apple
 
 
 class table__g_l_y_f(DefaultTable.DefaultTable):
+
 	# this attribute controls the amount of padding applied to glyph data upon compile.
 	# Glyph lenghts are aligned to multiples of the specified value. 
 	# Allowed values are (0, 1, 2, 4). '0' means no padding; '1' (default) also means
@@ -43,13 +42,13 @@ class table__g_l_y_f(DefaultTable.DefaultTable):
 		noname = 0
 		self.glyphs = {}
 		self.glyphOrder = glyphOrder = ttFont.getGlyphOrder()
-		for i in range(0, len(loca) - 1):
+		for i in range(0, len(loca)-1):
 			try:
 				glyphName = glyphOrder[i]
 			except IndexError:
 				noname = noname + 1
 				glyphName = 'ttxautoglyph%s' % i
-			next = int(loca[i + 1])
+			next = int(loca[i+1])
 			glyphdata = data[last:next]
 			if len(glyphdata) != (next - last):
 				raise ttLib.TTLibError("not enough 'glyf' table data")
@@ -58,10 +57,10 @@ class table__g_l_y_f(DefaultTable.DefaultTable):
 			last = next
 		if len(data) - next >= 4:
 			warnings.warn("too much 'glyf' table data: expected %d, received %d bytes" %
-						  (next, len(data)))
+					(next, len(data)))
 		if noname:
 			warnings.warn('%s glyphs have no name' % noname)
-		if ttFont.lazy is False:  # Be lazy for None and True
+		if ttFont.lazy is False: # Be lazy for None and True
 			for glyph in self.glyphs.values():
 				glyph.expand(self)
 
@@ -87,13 +86,13 @@ class table__g_l_y_f(DefaultTable.DefaultTable):
 		if padding == 1 and currentLocation < 0x20000:
 			# See if we can pad any odd-lengthed glyphs to allow loca
 			# table to use the short offsets.
-			indices = [i for i, glyphData in enumerate(dataList) if len(glyphData) % 2 == 1]
+			indices = [i for i,glyphData in enumerate(dataList) if len(glyphData) % 2 == 1]
 			if indices and currentLocation + len(indices) < 0x20000:
 				# It fits.  Do it.
 				for i in indices:
 					dataList[i] += b'\0'
 				currentLocation = 0
-				for i, glyphData in enumerate(dataList):
+				for i,glyphData in enumerate(dataList):
 					locations[i] = currentLocation
 					currentLocation += len(glyphData)
 				locations[len(dataList)] = currentLocation
@@ -122,12 +121,12 @@ class table__g_l_y_f(DefaultTable.DefaultTable):
 			glyph = self[glyphName]
 			if glyph.numberOfContours:
 				writer.begintag('TTGlyph', [
-					("name", glyphName),
-					("xMin", glyph.xMin),
-					("yMin", glyph.yMin),
-					("xMax", glyph.xMax),
-					("yMax", glyph.yMax),
-				])
+						("name", glyphName),
+						("xMin", glyph.xMin),
+						("yMin", glyph.yMin),
+						("xMax", glyph.xMax),
+						("yMax", glyph.yMax),
+						])
 				writer.newline()
 				glyph.toXML(writer, ttFont)
 				writer.endtag('TTGlyph')
@@ -211,7 +210,7 @@ flagOnCurve = 0x01
 flagXShort = 0x02
 flagYShort = 0x04
 flagRepeat = 0x08
-flagXsame = 0x10
+flagXsame =  0x10
 flagYsame = 0x20
 flagReserved1 = 0x40
 flagReserved2 = 0x80
@@ -219,13 +218,12 @@ flagReserved2 = 0x80
 _flagSignBytes = {
 	0: 2,
 	flagXsame: 0,
-	flagXShort | flagXsame: +1,
+	flagXShort|flagXsame: +1,
 	flagXShort: -1,
 	flagYsame: 0,
-	flagYShort | flagYsame: +1,
+	flagYShort|flagYsame: +1,
 	flagYShort: -1,
 }
-
 
 def flagBest(x, y, onCurve):
 	"""For a given x,y delta pair, returns the flag that packs this pair
@@ -255,18 +253,15 @@ def flagBest(x, y, onCurve):
 		cost += 2
 	return flag, cost
 
-
 def flagFits(newFlag, oldFlag, mask):
 	newBytes = _flagSignBytes[newFlag & mask]
 	oldBytes = _flagSignBytes[oldFlag & mask]
 	return newBytes == oldBytes or abs(newBytes) > abs(oldBytes)
 
-
 def flagSupports(newFlag, oldFlag):
 	return ((oldFlag & flagOnCurve) == (newFlag & flagOnCurve) and
-			flagFits(newFlag, oldFlag, flagXsame | flagXShort) and
-			flagFits(newFlag, oldFlag, flagYsame | flagYShort))
-
+		flagFits(newFlag, oldFlag, flagXsame|flagXShort) and
+		flagFits(newFlag, oldFlag, flagYsame|flagYShort))
 
 def flagEncodeCoord(flag, mask, coord, coordBytes):
 	byteCount = _flagSignBytes[flag & mask]
@@ -278,28 +273,28 @@ def flagEncodeCoord(flag, mask, coord, coordBytes):
 		coordBytes.append((coord >> 8) & 0xFF)
 		coordBytes.append(coord & 0xFF)
 
-
 def flagEncodeCoords(flag, x, y, xBytes, yBytes):
-	flagEncodeCoord(flag, flagXsame | flagXShort, x, xBytes)
-	flagEncodeCoord(flag, flagYsame | flagYShort, y, yBytes)
+	flagEncodeCoord(flag, flagXsame|flagXShort, x, xBytes)
+	flagEncodeCoord(flag, flagYsame|flagYShort, y, yBytes)
 
 
-ARG_1_AND_2_ARE_WORDS = 0x0001  # if set args are words otherwise they are bytes
-ARGS_ARE_XY_VALUES = 0x0002  # if set args are xy values, otherwise they are points
-ROUND_XY_TO_GRID = 0x0004  # for the xy values if above is true
-WE_HAVE_A_SCALE = 0x0008  # Sx = Sy, otherwise scale == 1.0
-NON_OVERLAPPING = 0x0010  # set to same value for all components (obsolete!)
-MORE_COMPONENTS = 0x0020  # indicates at least one more glyph after this one
-WE_HAVE_AN_X_AND_Y_SCALE = 0x0040  # Sx, Sy
-WE_HAVE_A_TWO_BY_TWO = 0x0080  # t00, t01, t10, t11
-WE_HAVE_INSTRUCTIONS = 0x0100  # instructions follow
-USE_MY_METRICS = 0x0200  # apply these metrics to parent glyph
-OVERLAP_COMPOUND = 0x0400  # used by Apple in GX fonts
-SCALED_COMPONENT_OFFSET = 0x0800  # composite designed to have the component offset scaled (designed for Apple)
-UNSCALED_COMPONENT_OFFSET = 0x1000  # composite designed not to have the component offset scaled (designed for MS)
+ARG_1_AND_2_ARE_WORDS		= 0x0001  # if set args are words otherwise they are bytes
+ARGS_ARE_XY_VALUES		= 0x0002  # if set args are xy values, otherwise they are points
+ROUND_XY_TO_GRID		= 0x0004  # for the xy values if above is true
+WE_HAVE_A_SCALE			= 0x0008  # Sx = Sy, otherwise scale == 1.0
+NON_OVERLAPPING			= 0x0010  # set to same value for all components (obsolete!)
+MORE_COMPONENTS			= 0x0020  # indicates at least one more glyph after this one
+WE_HAVE_AN_X_AND_Y_SCALE	= 0x0040  # Sx, Sy
+WE_HAVE_A_TWO_BY_TWO		= 0x0080  # t00, t01, t10, t11
+WE_HAVE_INSTRUCTIONS		= 0x0100  # instructions follow
+USE_MY_METRICS			= 0x0200  # apply these metrics to parent glyph
+OVERLAP_COMPOUND		= 0x0400  # used by Apple in GX fonts
+SCALED_COMPONENT_OFFSET		= 0x0800  # composite designed to have the component offset scaled (designed for Apple)
+UNSCALED_COMPONENT_OFFSET	= 0x1000  # composite designed not to have the component offset scaled (designed for MS)
 
 
 class Glyph(object):
+
 	def __init__(self, data=""):
 		if not data:
 			# empty char
@@ -367,9 +362,9 @@ class Glyph(object):
 				writer.newline()
 				for j in range(last, self.endPtsOfContours[i] + 1):
 					writer.simpletag("pt", [
-						("x", self.coordinates[j][0]),
-						("y", self.coordinates[j][1]),
-						("on", self.flags[j] & flagOnCurve)])
+							("x", self.coordinates[j][0]),
+							("y", self.coordinates[j][1]),
+							("on", self.flags[j] & flagOnCurve)])
 					writer.newline()
 				last = self.endPtsOfContours[i] + 1
 				writer.endtag("contour")
@@ -399,11 +394,11 @@ class Glyph(object):
 			if not hasattr(self, "coordinates"):
 				self.coordinates = coordinates
 				self.flags = flags
-				self.endPtsOfContours = [len(coordinates) - 1]
+				self.endPtsOfContours = [len(coordinates)-1]
 			else:
-				self.coordinates.extend(coordinates)
+				self.coordinates.extend (coordinates)
 				self.flags.extend(flags)
-				self.endPtsOfContours.append(len(self.coordinates) - 1)
+				self.endPtsOfContours.append(len(self.coordinates)-1)
 		elif name == "component":
 			if self.numberOfContours > 0:
 				raise ttLib.TTLibError("can't mix composites and contours in glyph")
@@ -433,7 +428,7 @@ class Glyph(object):
 				nP, nC = baseGlyph.getMaxpValues()
 			else:
 				nP, nC, maxComponentDepth = baseGlyph.getCompositeMaxpValues(
-					glyfTable, maxComponentDepth + 1)
+						glyfTable, maxComponentDepth + 1)
 			nPoints = nPoints + nP
 			nContours = nContours + nC
 		return nPoints, nContours, maxComponentDepth
@@ -462,12 +457,12 @@ class Glyph(object):
 
 	def decompileCoordinates(self, data):
 		endPtsOfContours = array.array("h")
-		endPtsOfContours.fromstring(data[:2 * self.numberOfContours])
+		endPtsOfContours.fromstring(data[:2*self.numberOfContours])
 		if sys.byteorder != "big":
 			endPtsOfContours.byteswap()
 		self.endPtsOfContours = endPtsOfContours.tolist()
 
-		data = data[2 * self.numberOfContours:]
+		data = data[2*self.numberOfContours:]
 
 		instructionLength, = struct.unpack(">h", data[:2])
 		data = data[2:]
@@ -476,7 +471,7 @@ class Glyph(object):
 		data = data[instructionLength:]
 		nCoordinates = self.endPtsOfContours[-1] + 1
 		flags, xCoordinates, yCoordinates = \
-			self.decompileCoordinatesRaw(nCoordinates, data)
+				self.decompileCoordinatesRaw(nCoordinates, data)
 
 		# fill in repetitions and apply signs
 		self.coordinates = coordinates = GlyphCoordinates.zeros(nCoordinates)
@@ -521,8 +516,8 @@ class Glyph(object):
 		# Warning: deep Python trickery going on. We use the struct module to unpack
 		# the coordinates. We build a format string based on the flags, so we can
 		# unpack the coordinates in one struct.unpack() call.
-		xFormat = ">"  # big endian
-		yFormat = ">"  # big endian
+		xFormat = ">" # big endian
+		yFormat = ">" # big endian
 		i = j = 0
 		while True:
 			flag = byteord(data[i])
@@ -552,7 +547,7 @@ class Glyph(object):
 		if len(data) - (xDataLen + yDataLen) >= 4:
 			warnings.warn("too much glyph data: %d excess bytes" % (len(data) - (xDataLen + yDataLen)))
 		xCoordinates = struct.unpack(xFormat, data[:xDataLen])
-		yCoordinates = struct.unpack(yFormat, data[xDataLen:xDataLen + yDataLen])
+		yCoordinates = struct.unpack(yFormat, data[xDataLen:xDataLen+yDataLen])
 		return flags, xCoordinates, yCoordinates
 
 	def compileComponents(self, glyfTable):
@@ -591,7 +586,7 @@ class Glyph(object):
 
 		# TODO(behdad): Add a configuration option for this?
 		deltas = self.compileDeltasGreedy(self.flags, deltas)
-		# deltas = self.compileDeltasOptimal(self.flags, deltas)
+		#deltas = self.compileDeltasOptimal(self.flags, deltas)
 
 		data.extend(deltas)
 		return bytesjoin(data)
@@ -604,7 +599,7 @@ class Glyph(object):
 		yPoints = []
 		lastflag = None
 		repeat = 0
-		for flag, (x, y) in zip(flags, deltas):
+		for flag,(x,y) in zip(flags, deltas):
 			# Oh, the horrors of TrueType
 			# do x
 			if x == 0:
@@ -654,20 +649,19 @@ class Glyph(object):
 		bestTuple = None
 		bestCost = 0
 		repeat = 0
-		for flag, (x, y) in zip(flags, deltas):
+		for flag,(x,y) in zip(flags, deltas):
 			# Oh, the horrors of TrueType
 			flag, coordBytes = flagBest(x, y, flag)
 			bestCost += 1 + coordBytes
 			newCandidates = [(bestCost, bestTuple, flag, coordBytes),
-							 (bestCost + 1, bestTuple, (flag | flagRepeat), coordBytes)]
-			for lastCost, lastTuple, lastFlag, coordBytes in candidates:
-				if lastCost + coordBytes <= bestCost + 1 and (lastFlag & flagRepeat) and (
-					lastFlag < 0xff00) and flagSupports(lastFlag, flag):
-					if (lastFlag & 0xFF) == (flag | flagRepeat) and lastCost == bestCost + 1:
+							(bestCost+1, bestTuple, (flag|flagRepeat), coordBytes)]
+			for lastCost,lastTuple,lastFlag,coordBytes in candidates:
+				if lastCost + coordBytes <= bestCost + 1 and (lastFlag & flagRepeat) and (lastFlag < 0xff00) and flagSupports(lastFlag, flag):
+					if (lastFlag & 0xFF) == (flag|flagRepeat) and lastCost == bestCost + 1:
 						continue
-					newCandidates.append((lastCost + coordBytes, lastTuple, lastFlag + 256, coordBytes))
+					newCandidates.append((lastCost + coordBytes, lastTuple, lastFlag+256, coordBytes))
 			candidates = newCandidates
-			bestTuple = min(candidates, key=lambda t: t[0])
+			bestTuple = min(candidates, key=lambda t:t[0])
 			bestCost = bestTuple[0]
 
 		flags = []
@@ -685,12 +679,12 @@ class Glyph(object):
 			repeatCount, flag = flag >> 8, flag & 0xFF
 			compressedFlags.append(flag)
 			if flag & flagRepeat:
-				assert (repeatCount > 0)
+				assert(repeatCount > 0)
 				compressedFlags.append(repeatCount)
 			else:
-				assert (repeatCount == 0)
+				assert(repeatCount == 0)
 			for i in range(1 + repeatCount):
-				x, y = next(coords)
+				x,y = next(coords)
 				flagEncodeCoords(flag, x, y, compressedXs, compressedYs)
 				ff.append(flag)
 		try:
@@ -719,7 +713,7 @@ class Glyph(object):
 
 				# Collect on-curve points
 				onCurveCoords = [coords[j] for j in range(len(coords))
-								 if flags[j] & flagOnCurve]
+								if flags[j] & flagOnCurve]
 				# Add implicit on-curve points
 				start = 0
 				for end in endPts:
@@ -728,7 +722,7 @@ class Glyph(object):
 						if not ((flags[j] | flags[last]) & flagOnCurve):
 							x = (coords[last][0] + coords[j][0]) / 2
 							y = (coords[last][1] + coords[j][1]) / 2
-							onCurveCoords.append((x, y))
+							onCurveCoords.append((x,y))
 						last = j
 					start = end + 1
 				# Add bounds for curves without an explicit extrema
@@ -746,13 +740,13 @@ class Glyph(object):
 								pthis = coords[j]
 								plast = coords[last]
 								if not (flags[last] & flagOnCurve):
-									plast = ((pthis[0] + plast[0]) / 2, (pthis[1] + plast[1]) / 2)
+									plast = ((pthis[0]+plast[0])/2, (pthis[1]+plast[1])/2)
 								pnext = coords[next]
 								if not (flags[next] & flagOnCurve):
-									pnext = ((pthis[0] + pnext[0]) / 2, (pthis[1] + pnext[1]) / 2)
+									pnext = ((pthis[0]+pnext[0])/2, (pthis[1]+pnext[1])/2)
 								bbox = calcQuadraticBounds(plast, pthis, pnext)
-								onCurveCoords.append((bbox[0], bbox[1]))
-								onCurveCoords.append((bbox[2], bbox[3]))
+								onCurveCoords.append((bbox[0],bbox[1]))
+								onCurveCoords.append((bbox[2],bbox[3]))
 						last = j
 					start = end + 1
 
@@ -787,9 +781,9 @@ class Glyph(object):
 				coordinates, endPts, flags = g.getCoordinates(glyfTable)
 				if hasattr(compo, "firstPt"):
 					# move according to two reference points
-					x1, y1 = allCoords[compo.firstPt]
-					x2, y2 = coordinates[compo.secondPt]
-					move = x1 - x2, y1 - y2
+					x1,y1 = allCoords[compo.firstPt]
+					x2,y2 = coordinates[compo.secondPt]
+					move = x1-x2, y1-y2
 				else:
 					move = compo.x, compo.y
 
@@ -837,21 +831,16 @@ class Glyph(object):
 		components = []
 		more = 1
 		while more:
-			flags, glyphID = struct.unpack(">HH", data[i:i + 4])
+			flags, glyphID = struct.unpack(">HH", data[i:i+4])
 			i += 4
 			flags = int(flags)
 			components.append(glyfTable.getGlyphName(int(glyphID)))
 
-			if flags & ARG_1_AND_2_ARE_WORDS:
-				i += 4
-			else:
-				i += 2
-			if flags & WE_HAVE_A_SCALE:
-				i += 2
-			elif flags & WE_HAVE_AN_X_AND_Y_SCALE:
-				i += 4
-			elif flags & WE_HAVE_A_TWO_BY_TWO:
-				i += 8
+			if flags & ARG_1_AND_2_ARE_WORDS: i += 4
+			else: i += 2
+			if flags & WE_HAVE_A_SCALE: i += 2
+			elif flags & WE_HAVE_AN_X_AND_Y_SCALE: i += 4
+			elif flags & WE_HAVE_A_TWO_BY_TWO: i += 8
 			more = flags & MORE_COMPONENTS
 
 		return components
@@ -872,16 +861,16 @@ class Glyph(object):
 		data = array.array("B", self.data)
 		i = 10
 		if numContours >= 0:
-			i += 2 * numContours  # endPtsOfContours
-			nCoordinates = ((data[i - 2] << 8) | data[i - 1]) + 1
-			instructionLen = (data[i] << 8) | data[i + 1]
+			i += 2 * numContours # endPtsOfContours
+			nCoordinates = ((data[i-2] << 8) | data[i-1]) + 1
+			instructionLen = (data[i] << 8) | data[i+1]
 			if remove_hinting:
 				# Zero instruction length
-				data[i] = data[i + 1] = 0
+				data[i] = data [i+1] = 0
 				i += 2
 				if instructionLen:
 					# Splice it out
-					data = data[:i] + data[i + instructionLen:]
+					data = data[:i] + data[i+instructionLen:]
 				instructionLen = 0
 			else:
 				i += 2 + instructionLen
@@ -916,29 +905,24 @@ class Glyph(object):
 			more = 1
 			we_have_instructions = False
 			while more:
-				flags = (data[i] << 8) | data[i + 1]
+				flags =(data[i] << 8) | data[i+1]
 				if remove_hinting:
 					flags &= ~WE_HAVE_INSTRUCTIONS
 				if flags & WE_HAVE_INSTRUCTIONS:
 					we_have_instructions = True
-				data[i + 0] = flags >> 8
-				data[i + 1] = flags & 0xFF
+				data[i+0] = flags >> 8
+				data[i+1] = flags & 0xFF
 				i += 4
 				flags = int(flags)
 
-				if flags & ARG_1_AND_2_ARE_WORDS:
-					i += 4
-				else:
-					i += 2
-				if flags & WE_HAVE_A_SCALE:
-					i += 2
-				elif flags & WE_HAVE_AN_X_AND_Y_SCALE:
-					i += 4
-				elif flags & WE_HAVE_A_TWO_BY_TWO:
-					i += 8
+				if flags & ARG_1_AND_2_ARE_WORDS: i += 4
+				else: i += 2
+				if flags & WE_HAVE_A_SCALE: i += 2
+				elif flags & WE_HAVE_AN_X_AND_Y_SCALE: i += 4
+				elif flags & WE_HAVE_A_TWO_BY_TWO: i += 8
 				more = flags & MORE_COMPONENTS
 			if we_have_instructions:
-				instructionLen = (data[i] << 8) | data[i + 1]
+				instructionLen = (data[i] << 8) | data[i+1]
 				i += 2 + instructionLen
 			# Remove padding
 			data = data[:i]
@@ -946,7 +930,7 @@ class Glyph(object):
 		self.data = data.tostring()
 
 	def removeHinting(self):
-		self.trim(remove_hinting=True)
+		self.trim (remove_hinting=True)
 
 	def draw(self, pen, glyfTable, offset=0):
 
@@ -992,7 +976,6 @@ class Glyph(object):
 
 	def __ne__(self, other):
 		return not self.__eq__(other)
-
 	def __eq__(self, other):
 		if type(self) != type(other):
 			return NotImplemented
@@ -1000,6 +983,7 @@ class Glyph(object):
 
 
 class GlyphComponent(object):
+
 	def __init__(self):
 		pass
 
@@ -1022,7 +1006,7 @@ class GlyphComponent(object):
 		self.flags = int(flags)
 		glyphID = int(glyphID)
 		self.glyphName = glyfTable.getGlyphName(int(glyphID))
-		# print ">>", reprflag(self.flags)
+		#print ">>", reprflag(self.flags)
 		data = data[4:]
 
 		if self.flags & ARG_1_AND_2_ARE_WORDS:
@@ -1042,23 +1026,23 @@ class GlyphComponent(object):
 
 		if self.flags & WE_HAVE_A_SCALE:
 			scale, = struct.unpack(">h", data[:2])
-			self.transform = [[fi2fl(scale, 14), 0], [0, fi2fl(scale, 14)]]  # fixed 2.14
+			self.transform = [[fi2fl(scale,14), 0], [0, fi2fl(scale,14)]]  # fixed 2.14
 			data = data[2:]
 		elif self.flags & WE_HAVE_AN_X_AND_Y_SCALE:
 			xscale, yscale = struct.unpack(">hh", data[:4])
-			self.transform = [[fi2fl(xscale, 14), 0], [0, fi2fl(yscale, 14)]]  # fixed 2.14
+			self.transform = [[fi2fl(xscale,14), 0], [0, fi2fl(yscale,14)]]  # fixed 2.14
 			data = data[4:]
 		elif self.flags & WE_HAVE_A_TWO_BY_TWO:
 			(xscale, scale01,
-			 scale10, yscale) = struct.unpack(">hhhh", data[:8])
-			self.transform = [[fi2fl(xscale, 14), fi2fl(scale01, 14)],
-							  [fi2fl(scale10, 14), fi2fl(yscale, 14)]]  # fixed 2.14
+					scale10, yscale) = struct.unpack(">hhhh", data[:8])
+			self.transform = [[fi2fl(xscale,14), fi2fl(scale01,14)],
+							[fi2fl(scale10,14), fi2fl(yscale,14)]] # fixed 2.14
 			data = data[8:]
 		more = self.flags & MORE_COMPONENTS
 		haveInstructions = self.flags & WE_HAVE_INSTRUCTIONS
 		self.flags = self.flags & (ROUND_XY_TO_GRID | USE_MY_METRICS |
-								   SCALED_COMPONENT_OFFSET | UNSCALED_COMPONENT_OFFSET |
-								   NON_OVERLAPPING)
+				SCALED_COMPONENT_OFFSET | UNSCALED_COMPONENT_OFFSET |
+				NON_OVERLAPPING)
 		return more, haveInstructions, data
 
 	def compile(self, more, haveInstructions, glyfTable):
@@ -1066,8 +1050,8 @@ class GlyphComponent(object):
 
 		# reset all flags we will calculate ourselves
 		flags = self.flags & (ROUND_XY_TO_GRID | USE_MY_METRICS |
-							  SCALED_COMPONENT_OFFSET | UNSCALED_COMPONENT_OFFSET |
-							  NON_OVERLAPPING)
+				SCALED_COMPONENT_OFFSET | UNSCALED_COMPONENT_OFFSET |
+				NON_OVERLAPPING)
 		if more:
 			flags = flags | MORE_COMPONENTS
 		if haveInstructions:
@@ -1088,20 +1072,20 @@ class GlyphComponent(object):
 				flags = flags | ARG_1_AND_2_ARE_WORDS
 
 		if hasattr(self, "transform"):
-			transform = [[fl2fi(x, 14) for x in row] for row in self.transform]
+			transform = [[fl2fi(x,14) for x in row] for row in self.transform]
 			if transform[0][1] or transform[1][0]:
 				flags = flags | WE_HAVE_A_TWO_BY_TWO
 				data = data + struct.pack(">hhhh",
-										  transform[0][0], transform[0][1],
-										  transform[1][0], transform[1][1])
+						transform[0][0], transform[0][1],
+						transform[1][0], transform[1][1])
 			elif transform[0][0] != transform[1][1]:
 				flags = flags | WE_HAVE_AN_X_AND_Y_SCALE
 				data = data + struct.pack(">hh",
-										  transform[0][0], transform[1][1])
+						transform[0][0], transform[1][1])
 			else:
 				flags = flags | WE_HAVE_A_SCALE
 				data = data + struct.pack(">h",
-										  transform[0][0])
+						transform[0][0])
 
 		glyphID = glyfTable.getGlyphID(self.glyphName)
 		return struct.pack(">HH", flags, glyphID) + data
@@ -1117,13 +1101,13 @@ class GlyphComponent(object):
 			transform = self.transform
 			if transform[0][1] or transform[1][0]:
 				attrs = attrs + [
-					("scalex", transform[0][0]), ("scale01", transform[0][1]),
-					("scale10", transform[1][0]), ("scaley", transform[1][1]),
-				]
+						("scalex", transform[0][0]), ("scale01", transform[0][1]),
+						("scale10", transform[1][0]), ("scaley", transform[1][1]),
+						]
 			elif transform[0][0] != transform[1][1]:
 				attrs = attrs + [
-					("scalex", transform[0][0]), ("scaley", transform[1][1]),
-				]
+						("scalex", transform[0][0]), ("scaley", transform[1][1]),
+						]
 			else:
 				attrs = attrs + [("scale", transform[0][0])]
 		attrs = attrs + [("flags", hex(self.flags))]
@@ -1155,13 +1139,13 @@ class GlyphComponent(object):
 
 	def __ne__(self, other):
 		return not self.__eq__(other)
-
 	def __eq__(self, other):
 		if type(self) != type(other):
 			return NotImplemented
 		return self.__dict__ == other.__dict__
 
 class GlyphCoordinates(object):
+
 	def __init__(self, iterable=[]):
 		self._a = array.array("h")
 		self.extend(iterable)
@@ -1184,7 +1168,7 @@ class GlyphCoordinates(object):
 
 	@staticmethod
 	def zeros(count):
-		return GlyphCoordinates([(0, 0)] * count)
+		return GlyphCoordinates([(0,0)] * count)
 
 	def copy(self):
 		c = GlyphCoordinates()
@@ -1198,21 +1182,21 @@ class GlyphCoordinates(object):
 		if isinstance(k, slice):
 			indices = range(*k.indices(len(self)))
 			return [self[i] for i in indices]
-		return self._a[2 * k], self._a[2 * k +1]
+		return self._a[2*k],self._a[2*k+1]
 
 	def __setitem__(self, k, v):
 		if isinstance(k, slice):
 			indices = range(*k.indices(len(self)))
 			# XXX This only works if len(v) == len(indices)
 			# TODO Implement __delitem__
-			for j, i in enumerate(indices):
+			for j,i in enumerate(indices):
 				self[i] = v[j]
 			return
 		v = self._checkFloat(v)
-		self._a[2 * k], self._a[2 * k + 1] = v
+		self._a[2*k],self._a[2*k+1] = v
 
 	def __repr__(self):
-		return 'GlyphCoordinates([' + ','.join(str(c) for c in self) + '])'
+		return 'GlyphCoordinates(['+','.join(str(c) for c in self)+'])'
 
 	def append(self, p):
 		p = self._checkFloat(p)
@@ -1225,41 +1209,40 @@ class GlyphCoordinates(object):
 
 	def relativeToAbsolute(self):
 		a = self._a
-		x, y = 0, 0
+		x,y = 0,0
 		for i in range(len(a) // 2):
-			a[2 * i] = x = a[2 * i] + x
-			a[2 * i + 1] = y = a[2 * i + 1] + y
+			a[2*i  ] = x = a[2*i  ] + x
+			a[2*i+1] = y = a[2*i+1] + y
 
 	def absoluteToRelative(self):
 		a = self._a
-		x, y = 0, 0
+		x,y = 0,0
 		for i in range(len(a) // 2):
-			dx = a[2 * i] - x
-			dy = a[2 * i + 1] - y
-			x = a[2 * i]
-			y = a[2 * i + 1]
-			a[2 * i] = dx
-			a[2 * i + 1] = dy
+			dx = a[2*i  ] - x
+			dy = a[2*i+1] - y
+			x = a[2*i  ]
+			y = a[2*i+1]
+			a[2*i  ] = dx
+			a[2*i+1] = dy
 
 	def translate(self, p):
-		(x, y) = p
+		(x,y) = p
 		a = self._a
 		for i in range(len(a) // 2):
-			a[2 * i] += x
-			a[2 * i + 1] += y
+			a[2*i  ] += x
+			a[2*i+1] += y
 
 	def transform(self, t):
 		a = self._a
 		for i in range(len(a) // 2):
-			x = a[2 * i]
-			y = a[2 * i + 1]
+			x = a[2*i  ]
+			y = a[2*i+1]
 			px = x * t[0][0] + y * t[1][0]
 			py = x * t[0][1] + y * t[1][1]
 			self[i] = (px, py)
 
 	def __ne__(self, other):
 		return not self.__eq__(other)
-
 	def __eq__(self, other):
 		if type(self) != type(other):
 			return NotImplemented
