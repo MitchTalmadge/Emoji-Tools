@@ -24,7 +24,6 @@ import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.Extraction.Extractors.AppleExtractionThread;
 import net.liveforcode.EmojiTools.Extraction.Extractors.ExtractionThread;
 import net.liveforcode.EmojiTools.Extraction.Extractors.GoogleExtractionThread;
-import net.liveforcode.EmojiTools.Extraction.Extractors.StandardExtractionThread;
 import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
 import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
@@ -38,33 +37,13 @@ import java.util.List;
 
 public class ExtractionManager extends OperationManager implements EmojiTools.JythonListener {
 
-    public enum TTXType
-    {
-        ANDROID("android.ttx"),
-        IOS("ios.ttx"),
-        OSX("osx.ttx");
-
-        private String fileName;
-
-        TTXType(String fileName) {
-
-            this.fileName = fileName;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-    }
-
     private final File font;
     private final File extractionDirectory;
     private final EmojiToolsGUI gui;
     private final ExtractionDialog extractionDialog;
-
     private List<String> tableNames;
     private List<Integer> tableOffsets;
     private List<Integer> tableLengths;
-
     private ExtractionThread extractionThread;
 
     public ExtractionManager(File font, File extractionDirectory, EmojiToolsGUI gui, ExtractionDialog extractionDialog) {
@@ -117,14 +96,22 @@ public class ExtractionManager extends OperationManager implements EmojiTools.Jy
             extractionThread = new AppleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog, jythonHandler);
         else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
             extractionThread = new GoogleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog, jythonHandler);
-        else
-            extractionThread = new StandardExtractionThread(font, extractionDirectory, this, extractionDialog, jythonHandler);
+        else {
+            gui.showMessageDialog("The selected font cannot be extracted. Contact developer for help.");
+            return;
+        }
         this.gui.getConsoleManager().addConsoleListener(extractionThread);
         extractionThread.start();
     }
 
-    public enum TTXType
-    {
+    @Override
+    public void stop() {
+        if (extractionThread != null && extractionThread.isAlive()) {
+            extractionThread.endExtraction();
+        }
+    }
+
+    public enum TTXType {
         ANDROID("android.ttx"),
         IOS("ios.ttx"),
         OSX("osx.ttx");
@@ -138,11 +125,6 @@ public class ExtractionManager extends OperationManager implements EmojiTools.Jy
 
         public String getFileName() {
             return fileName;
-        }
-    }    @Override
-    public void stop() {
-        if (extractionThread != null && extractionThread.isAlive()) {
-            extractionThread.endExtraction();
         }
     }
 }

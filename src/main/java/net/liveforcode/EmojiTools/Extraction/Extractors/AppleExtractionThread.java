@@ -56,6 +56,29 @@ public class AppleExtractionThread extends ExtractionThread {
                 extractionDirectory.mkdir();
             }
 
+            /*//---- ttx.py ----//
+            extractionDialog.setIndeterminate(true);
+            extractionDialog.appendToStatus("Converting Emoji Font... Please wait...");
+
+            //Set sys.argv
+            ArrayList<String> argvList = new ArrayList<>();
+            argvList.add("package.py");                                         //Python Script Name
+            argvList.add("-o");                                                 //Output flag
+            argvList.add(extractionDirectory.getAbsolutePath()
+                    + "/" + ExtractionManager.TTXType.IOS.getFileName());       //Output ttx path
+            argvList.add(font.getAbsolutePath());                               //Input ttf path
+
+            jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
+
+            if (!running)
+                return;
+
+            //Execute
+            jythonHandler.getPythonInterpreter().execfile(jythonHandler.getTempDirectory().getAbsolutePath()
+                    + "/PythonScripts/package.py");
+
+            extractionDialog.setIndeterminate(false);*/
+
             appendToStatus("Searching for Emojis - Please wait until complete!");
 
             //Get numGlyphs, ordinal numbers, and glyphNames from post table
