@@ -79,9 +79,9 @@ public class EmojiTools {
         if (jythonHandler != null) {
             jythonHandler.getPythonInterpreter().close();
 
-            if (jythonHandler.getScriptDirectory().exists()) {
+            if (jythonHandler.getTempDirectory().exists()) {
                 try {
-                    org.apache.commons.io.FileUtils.deleteDirectory(jythonHandler.getScriptDirectory());
+                    org.apache.commons.io.FileUtils.deleteDirectory(jythonHandler.getTempDirectory());
                 } catch (IOException e) {
                     EmojiTools.submitError(Thread.currentThread(), e);
                 }
@@ -137,7 +137,7 @@ public class EmojiTools {
     private static class JythonLoader extends SwingWorker<JythonHandler, Void> {
         @Override
         protected JythonHandler doInBackground() throws Exception {
-            File scriptsDirectory = extractScriptsToTempDir();
+            File tempDirectory = extractScriptsToTempDir();
 
             //Create Interpreter
             PySystemState pySystemState = new PySystemState();
@@ -154,10 +154,10 @@ public class EmojiTools {
             pythonInterpreter.setErr(System.err);
 
             //Set sys.path
-            String pythonScriptsPath = scriptsDirectory.getAbsolutePath() + "/PythonScripts";
+            String pythonScriptsPath = tempDirectory.getAbsolutePath() + "/PythonScripts";
             pySystemState.path.append(new PyString(pythonScriptsPath));
 
-            return new JythonHandler(pySystemState, pythonInterpreter, scriptsDirectory);
+            return new JythonHandler(pySystemState, pythonInterpreter, tempDirectory);
         }
 
         private File extractScriptsToTempDir() throws Exception {

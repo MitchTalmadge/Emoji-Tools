@@ -74,7 +74,7 @@ public class GoogleExtractionThread1_8 extends ExtractionThread {
             return;
 
         //Execute
-        jythonHandler.getPythonInterpreter().execfile(jythonHandler.getScriptDirectory().getAbsolutePath() + "/PythonScripts/package.py");
+        jythonHandler.getPythonInterpreter().execfile(jythonHandler.getTempDirectory().getAbsolutePath() + "/PythonScripts/package.py");
 
         extractionDialog.setIndeterminate(false);
 

@@ -26,12 +26,21 @@ import net.liveforcode.EmojiTools.GUI.PackagingDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
 import net.liveforcode.EmojiTools.Packaging.LigatureSet;
 import net.liveforcode.EmojiTools.Packaging.PackagingManager;
+import org.python.core.PyList;
+import org.python.core.PyType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,17 +64,21 @@ public class AndroidPackagingThread extends PackagingThread {
             packagingDialog.setIndeterminate(false);
 
             packagingDialog.appendToStatus("Rewriting Emojis...");
-            HashMap<String, String> glyphCodeNameMap = new HashMap<>();
-            HashMap<File, String> glyphFileNameMap = new HashMap<>();
 
-            Document infoFile = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(pngDirectory, "info.ttx"));
-            Element rootElement = infoFile.getDocumentElement();
+            ////////////////////////////// STEP 1: Identify all glyph names by png names //////////////////////////////
+
+            //Open up info.ttx for reading and writing
+            Document infoDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(pngDirectory, "info.ttx"));
+
+            //Check for ttFont element
+            Element rootElement = infoDocument.getDocumentElement();
             if (!rootElement.getTagName().equals("ttFont")) {
                 packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 1)");
                 packagingDialog.dispose();
                 return;
             }
 
+            //Check for cmap element
             Element cmapElement = (Element) rootElement.getElementsByTagName("cmap").item(0);
             if (cmapElement == null) {
                 packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 2)");
@@ -73,6 +86,7 @@ public class AndroidPackagingThread extends PackagingThread {
                 return;
             }
 
+            //Check for cmap_format_12 element
             Element cmapFormat12Element = (Element) cmapElement.getElementsByTagName("cmap_format_12").item(0);
             if (cmapFormat12Element == null) {
                 packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 3)");
@@ -80,6 +94,8 @@ public class AndroidPackagingThread extends PackagingThread {
                 return;
             }
 
+            //Begin mapping unicode names to glyphs
+            HashMap<String, String> glyphCodeNameMap = new HashMap<>();
             NodeList mappingList = cmapFormat12Element.getElementsByTagName("map");
             for (int i = 0; i < mappingList.getLength(); i++) {
                 Element mappingElement = (Element) mappingList.item(i);
@@ -91,14 +107,15 @@ public class AndroidPackagingThread extends PackagingThread {
                 if (matcher.find()) {
                     code = matcher.group(1);
                     if (code.length() < 4) {
+                        //Unicode names are at least 4 long, padded with zeros in the beginning.
                         code = new String(new char[4 - code.length()]).replace("\0", "0") + code;
                     }
                     glyphCodeNameMap.put(code, name);
                 }
             }
 
+            //Create a glyph substitution mapping if the gsub element exists.
             HashMap<String, LigatureSet> ligatureSetMap = null;
-
             Element gsubTableElement = (Element) rootElement.getElementsByTagName("GSUB").item(0);
             if (gsubTableElement != null) {
                 Element lookupListElement = (Element) gsubTableElement.getElementsByTagName("LookupList").item(0);
@@ -129,6 +146,8 @@ public class AndroidPackagingThread extends PackagingThread {
                 }
             }
 
+            //Begin mapping png file names to known glyph names
+            HashMap<String, File> glyphNameFileMap = new HashMap<>();
             for (File file : pngDirectory.listFiles()) {
                 String fileName = file.getName();
                 Pattern pattern = Pattern.compile("^(uni[A-Fa-f0-9]+(_uni[A-Fa-f0-9]+)*?)\\.png$");
@@ -141,7 +160,7 @@ public class AndroidPackagingThread extends PackagingThread {
                         if (splitFileName[i].startsWith("uni"))
                             splitFileName[i] = splitFileName[i].substring(3);
                     }
-                    if (splitFileName.length > 1) {
+                    if (splitFileName.length > 1) { //This png file name was the result of a glyph substitution (flags, etc).
                         if (ligatureSetMap != null) {
                             String mainGlyphName = glyphCodeNameMap.get(splitFileName[0]);
                             String[] componentsUnicode = Arrays.copyOfRange(splitFileName, 1, splitFileName.length);
@@ -153,21 +172,106 @@ public class AndroidPackagingThread extends PackagingThread {
 
                             LigatureSet ligatureSet = ligatureSetMap.get(mainGlyphName);
                             String glyphNameFromComponents = ligatureSet.getGlyphNameFromComponents(components);
-                            glyphFileNameMap.put(file, glyphNameFromComponents);
+                            glyphNameFileMap.put(glyphNameFromComponents, file);
                             System.out.println("File " + file.getName() + " has been assigned to " + glyphNameFromComponents);
                         }
-                    } else {
+                    } else { //This png file name came directly from the cmap table.
                         if (glyphCodeNameMap.get(splitFileName[0]) != null) {
-                            glyphFileNameMap.put(file, glyphCodeNameMap.get(splitFileName[0]));
+                            glyphNameFileMap.put(glyphCodeNameMap.get(splitFileName[0]), file);
                             System.out.println("File " + file.getName() + " has been assigned to " + glyphCodeNameMap.get(splitFileName[0]));
                         }
                     }
                 }
             }
 
+            packagingDialog.setProgress(25);
 
-            packagingDialog.appendToStatus("Extracting Scripts...");
+            ////////////////////////////// STEP 2: Re-write png files to ttx file //////////////////////////////
+            Element cbdtElement = (Element) rootElement.getElementsByTagName("CBDT").item(0);
+            if (cbdtElement == null) {
+                packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 4)");
+                packagingDialog.dispose();
+                return;
+            }
 
+            Element strikeDataElement = (Element) cbdtElement.getElementsByTagName("strikedata").item(0);
+            if (strikeDataElement == null) {
+                packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 5)");
+                packagingDialog.dispose();
+                return;
+            }
+
+            NodeList cbdtBitmapFormat17ElementList = cbdtElement.getElementsByTagName("cbdt_bitmap_format_17");
+            for (int i = 0; i < cbdtBitmapFormat17ElementList.getLength(); i++) {
+                Element cbdtBitmapFormat17Element = (Element) cbdtBitmapFormat17ElementList.item(i);
+                String glyphName = cbdtBitmapFormat17Element.getAttribute("name");
+
+                //Get png file from glyph name
+                File pngFile = glyphNameFileMap.get(glyphName);
+
+                if (pngFile == null) {
+                    packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 6)");
+                    packagingDialog.dispose();
+                    return;
+                }
+
+                //Create a hex string out of the png file
+                FileInputStream fileInputStream = new FileInputStream(pngFile);
+                int value = 0;
+                StringBuilder hexStringBuilder = new StringBuilder();
+
+                while ((value = fileInputStream.read()) != -1) {
+                    hexStringBuilder.append(String.format("%02X ", value));
+                }
+
+                fileInputStream.close();
+                String hexString = hexStringBuilder.toString();
+
+                //Rewrite content of rawimagedata element with the hex string generated from the png file
+                Element rawImageDataElement = (Element) cbdtBitmapFormat17Element.getElementsByTagName("rawimagedata").item(0);
+                if (rawImageDataElement == null) {
+                    packagingManager.showMessageDialog("Invalid info.ttx file! Cannot package. Did you modify the file? (Code 7)");
+                    packagingDialog.dispose();
+                    return;
+                }
+
+                rawImageDataElement.setTextContent(hexString);
+
+                System.out.println("Packaged " + pngFile.getName());
+                packagingDialog.setProgress(25 + (int) (((float) i / cbdtBitmapFormat17ElementList.getLength()) * 50));
+            }
+
+            ////////////////////////////// STEP 3: Store modified ttx file in tmp dir //////////////////////////////
+
+            System.out.println("Saving info.ttx...");
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Result output = new StreamResult(new File(jythonHandler.getTempDirectory(), "info.ttx"));
+            Source input = new DOMSource(infoDocument);
+
+            transformer.transform(input, output);
+
+            ////////////////////////////// STEP 4: Convert info.ttx to NotoColorEmoji.ttf //////////////////////////////
+
+            System.out.println("Converting info.ttx... (This can take a while - Please wait)");
+
+            //---- ttx.py ----//
+
+            //Set sys.argv
+            ArrayList<String> argvList = new ArrayList<>();
+            argvList.add("package.py");                                                     //Python Script Name
+            argvList.add("-o");                                                             //Output flag
+            argvList.add(outputDirectory.getAbsolutePath() + "/NotoColorEmoji.ttf");        //Output ttf path
+            argvList.add(jythonHandler.getTempDirectory().getAbsolutePath() + "/info.ttx"); //Input ttx path
+
+            jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
+
+            if (!running)
+                return;
+
+            //Execute
+            jythonHandler.getPythonInterpreter().execfile(jythonHandler.getTempDirectory().getAbsolutePath() + "/PythonScripts/package.py");
+
+            packagingDialog.setProgress(100);
 
         } catch (Exception e) {
             EmojiTools.submitError(Thread.currentThread(), e);

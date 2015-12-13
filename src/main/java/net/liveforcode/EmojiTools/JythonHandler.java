@@ -29,12 +29,12 @@ public class JythonHandler {
 
     private final PySystemState pySystemState;
     private final PythonInterpreter pythonInterpreter;
-    private final File scriptDirectory;
+    private final File tempDirectory;
 
-    public JythonHandler(PySystemState pySystemState, PythonInterpreter pythonInterpreter, File scriptDirectory) {
+    public JythonHandler(PySystemState pySystemState, PythonInterpreter pythonInterpreter, File tempDirectory) {
         this.pySystemState = pySystemState;
         this.pythonInterpreter = pythonInterpreter;
-        this.scriptDirectory = scriptDirectory;
+        this.tempDirectory = tempDirectory;
     }
 
     public PySystemState getPySystemState() {
@@ -45,7 +45,7 @@ public class JythonHandler {
         return pythonInterpreter;
     }
 
-    public File getScriptDirectory() {
-        return scriptDirectory;
+    public File getTempDirectory() {
+        return tempDirectory;
     }
 }
