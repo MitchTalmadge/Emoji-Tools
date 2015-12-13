@@ -1,11 +1,12 @@
 package net.liveforcode.EmojiTools.Packaging;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class LigatureSet {
 
     private final String mainGlyphName;
-    private final HashMap<String[], String> ligatureComponentsGlyphMap = new HashMap<>();
+    private final HashMap<List<String>, String> ligatureComponentsGlyphMap = new HashMap<>();
 
     public LigatureSet(String mainGlyphName)
     {
@@ -17,12 +18,12 @@ public class LigatureSet {
         return mainGlyphName;
     }
 
-    public void assignComponentsToGlyph(String[] components, String glyph)
+    public void assignComponentsToGlyph(List<String> components, String glyph)
     {
         ligatureComponentsGlyphMap.put(components, glyph);
     }
 
-    public String getGlyphNameFromComponents(String[] components)
+    public String getGlyphNameFromComponents(List<String> components)
     {
         return ligatureComponentsGlyphMap.get(components);
     }

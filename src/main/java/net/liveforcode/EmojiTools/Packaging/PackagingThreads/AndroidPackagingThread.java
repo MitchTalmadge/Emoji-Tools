@@ -32,7 +32,10 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -94,13 +97,36 @@ public class AndroidPackagingThread extends PackagingThread {
                 }
             }
 
-            HashMap<String, LigatureSet> ligatureSetMap = new HashMap<>();
+            HashMap<String, LigatureSet> ligatureSetMap = null;
 
-            Element gsubTable = (Element) rootElement.getElementsByTagName("GSUB").item(0);
-            boolean gsubEnabled = gsubTable != null;
-            if(gsubEnabled)
-            {
+            Element gsubTableElement = (Element) rootElement.getElementsByTagName("GSUB").item(0);
+            if (gsubTableElement != null) {
+                Element lookupListElement = (Element) gsubTableElement.getElementsByTagName("LookupList").item(0);
+                if (lookupListElement != null) {
+                    Element lookupElement = (Element) lookupListElement.getElementsByTagName("Lookup").item(0);
+                    if (lookupElement != null) {
+                        Element ligatureSubstElement = (Element) lookupElement.getElementsByTagName("LigatureSubst").item(0);
+                        if (ligatureSubstElement != null) {
+                            ligatureSetMap = new HashMap<>();
+                            NodeList ligatureSetElementList = ligatureSubstElement.getElementsByTagName("LigatureSet");
+                            for (int i = 0; i < ligatureSetElementList.getLength(); i++) {
+                                Element ligatureSetElement = (Element) ligatureSetElementList.item(i);
+                                String mainGlyphName = ligatureSetElement.getAttribute("glyph");
+                                LigatureSet ligatureSet = new LigatureSet(mainGlyphName);
 
+                                NodeList ligatureList = ligatureSetElement.getElementsByTagName("Ligature");
+                                for (int j = 0; j < ligatureList.getLength(); j++) {
+                                    Element ligatureElement = (Element) ligatureList.item(j);
+                                    List<String> components = Arrays.asList(ligatureElement.getAttribute("components").split(","));
+                                    String glyph = ligatureElement.getAttribute("glyph");
+
+                                    ligatureSet.assignComponentsToGlyph(components, glyph);
+                                }
+                                ligatureSetMap.put(mainGlyphName, ligatureSet);
+                            }
+                        }
+                    }
+                }
             }
 
             for (File file : pngDirectory.listFiles()) {
@@ -114,16 +140,23 @@ public class AndroidPackagingThread extends PackagingThread {
                     for (int i = 0; i < splitFileName.length; i++) {
                         if (splitFileName[i].startsWith("uni"))
                             splitFileName[i] = splitFileName[i].substring(3);
-
-                        System.out.println(splitFileName[i]);
                     }
                     if (splitFileName.length > 1) {
-                        if(gsubEnabled)
-                        {
+                        if (ligatureSetMap != null) {
+                            String mainGlyphName = glyphCodeNameMap.get(splitFileName[0]);
+                            String[] componentsUnicode = Arrays.copyOfRange(splitFileName, 1, splitFileName.length);
 
+                            ArrayList<String> components = new ArrayList<>();
+                            for (String component : componentsUnicode) {
+                                components.add(glyphCodeNameMap.get(component));
+                            }
+
+                            LigatureSet ligatureSet = ligatureSetMap.get(mainGlyphName);
+                            String glyphNameFromComponents = ligatureSet.getGlyphNameFromComponents(components);
+                            glyphFileNameMap.put(file, glyphNameFromComponents);
+                            System.out.println("File " + file.getName() + " has been assigned to " + glyphNameFromComponents);
                         }
                     } else {
-                        System.out.println("Split: " + splitFileName[0]);
                         if (glyphCodeNameMap.get(splitFileName[0]) != null) {
                             glyphFileNameMap.put(file, glyphCodeNameMap.get(splitFileName[0]));
                             System.out.println("File " + file.getName() + " has been assigned to " + glyphCodeNameMap.get(splitFileName[0]));
@@ -132,10 +165,8 @@ public class AndroidPackagingThread extends PackagingThread {
                 }
             }
 
-            //TODO: For each image, check if it has underscores; if it does, place it in the gsub table.
 
             packagingDialog.appendToStatus("Extracting Scripts...");
-
 
 
         } catch (Exception e) {
