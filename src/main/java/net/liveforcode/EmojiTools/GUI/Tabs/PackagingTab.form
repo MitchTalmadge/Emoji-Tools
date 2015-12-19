@@ -81,7 +81,7 @@
           <component id="3fa3b" class="javax.swing.JLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-              <forms/>
+              <forms top="0" left="5" bottom="0" right="5"/>
             </constraints>
             <properties>
               <text value="&lt;html&gt;Note: iOS and OSX Emoji fonts cannot be created yet. This feature is in development.&lt;/html&gt;"/>

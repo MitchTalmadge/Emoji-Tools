@@ -77,7 +77,7 @@ public class PackagingTab extends OperationTab implements ActionListener {
         }
 
         if (ttxFile == null) {
-            gui.showMessageDialog("The selected directory is not a valid Emoji Tools extraction directory!");
+            gui.showMessageDialog("The selected directory cannot be packaged!");
             return;
         }
 

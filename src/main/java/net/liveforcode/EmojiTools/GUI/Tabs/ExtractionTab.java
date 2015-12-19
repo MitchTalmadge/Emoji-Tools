@@ -151,10 +151,10 @@ public class ExtractionTab extends OperationTab implements ActionListener, TextF
     }
 
     private void updateStartButton() {
-        if (this.extractionDirectoryField.getText().length() > 0 && this.fileNameField.getText().equals(defaultFileNameFieldText))
+        if (this.extractionDirectoryField.getText().length() > 0 && !this.fileNameField.getText().equals(defaultFileNameFieldText))
             this.startExtractionButton.setEnabled(true);
         else
-            this.startExtractionButton.setEnabled(true);
+            this.startExtractionButton.setEnabled(false);
     }
 
     @Override
