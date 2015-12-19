@@ -23,6 +23,8 @@ package net.liveforcode.EmojiTools.Renaming;
 import net.liveforcode.EmojiTools.GUI.RenamingDialog;
 
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class RenamingThread extends Thread {
 
@@ -77,11 +79,11 @@ class RenamingThread extends Thread {
 
             if (prefixButtons != null) {
                 if (prefixButtons[1])
-                    newFileName = stripPrefixes(file);
+                    newFileName = changePrefix(file.getName(), "");
                 else if (prefixButtons[2])
-                    newFileName = changePrefix(file, "uni");
+                    newFileName = changePrefix(file.getName(), "uni");
                 else if (prefixButtons[3])
-                    newFileName = changePrefix(file, "u");
+                    newFileName = changePrefix(file.getName(), "u");
             }
 
             if (capitalizationButtons != null) {
@@ -104,38 +106,59 @@ class RenamingThread extends Thread {
         renamingDialog.dispose();
     }
 
-    private String stripPrefixes(File file) {
-        if (file.getName().startsWith("uni") || file.getName().startsWith("UNI"))
-            return file.getName().substring(3, file.getName().length());
-        else if (file.getName().startsWith("u") || file.getName().startsWith("U"))
-            return file.getName().substring(1, file.getName().length());
-        return file.getName();
-    }
+    private String changePrefix(String fileName, String newPrefix) {
+        String[] fileNameSplit = fileName.split("\\.");
+        String[] unicodeNames = fileNameSplit[0].split("_");
+        StringBuilder stringBuilder = new StringBuilder();
 
-    private String changePrefix(File file, String newPrefix) {
-        if (file.getName().startsWith("uni") || file.getName().startsWith("UNI"))
-            return newPrefix + file.getName().substring(3, file.getName().length());
-        else if (file.getName().startsWith("u") || file.getName().startsWith("U"))
-            return newPrefix + file.getName().substring(1, file.getName().length());
-        else
-            return newPrefix + file.getName();
+        for(int i = 0; i < unicodeNames.length; i++)
+        {
+            String name = unicodeNames[i].replaceAll("(?i)(_?)(uni?|u?)([A-Fa-f0-9]+)", "$1"+newPrefix+"$3");
+            if(i > 0)
+                stringBuilder.append("_").append(name);
+            else
+                stringBuilder.append(name);
+        }
+
+        StringBuilder newFileNameBuilder = new StringBuilder(stringBuilder.toString());
+        for(int i = 1; i < fileNameSplit.length; i++)
+        {
+            newFileNameBuilder.append(".").append(fileNameSplit[i]);
+        }
+        return newFileNameBuilder.toString();
     }
 
     private String capitalize(String fileName, boolean capitalizePrefix) {
-        String capitalized = "";
-        if (!capitalizePrefix) {
-            if (fileName.startsWith("uni") || fileName.startsWith("UNI"))
-                capitalized = "uni" + fileName.substring(3, fileName.length()).toUpperCase();
-            else if (fileName.startsWith("u") || fileName.startsWith("U"))
-                capitalized = "u" + fileName.substring(1, fileName.length()).toUpperCase();
-            if (capitalized.length() > 0) {
-                capitalized = capitalized.substring(0, capitalized.length() - 3) + capitalized.substring(capitalized.length() - 3, capitalized.length()).toLowerCase();
-                return capitalized;
+        String[] fileNameSplit = fileName.split("\\.");
+        String[] unicodeNames = fileNameSplit[0].split("_");
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Pattern pattern = Pattern.compile("(?i)(_?)(uni?|u?)([A-Fa-f0-9]+)");
+        for(int i = 0; i < unicodeNames.length; i++)
+        {
+            Matcher matcher = pattern.matcher(unicodeNames[i]);
+            StringBuffer stringBuffer = new StringBuffer();
+            while(matcher.find())
+            {
+                if(capitalizePrefix)
+                    matcher.appendReplacement(stringBuffer, matcher.group(1) + (matcher.group(2) + matcher.group(3)).toUpperCase());
+                else
+                    matcher.appendReplacement(stringBuffer, matcher.group(1) + matcher.group(2) + matcher.group(3).toUpperCase());
             }
+            matcher.appendTail(stringBuffer);
+
+            if(i > 0)
+                stringBuilder.append("_").append(stringBuffer.toString());
+            else
+                stringBuilder.append(stringBuffer.toString());
         }
-        capitalized = fileName.toUpperCase();
-        capitalized = capitalized.substring(0, capitalized.length() - 3) + capitalized.substring(capitalized.length() - 3, capitalized.length()).toLowerCase();
-        return capitalized;
+
+        StringBuilder newFileNameBuilder = new StringBuilder(stringBuilder.toString());
+        for(int i = 1; i < fileNameSplit.length; i++)
+        {
+            newFileNameBuilder.append(".").append(fileNameSplit[i]);
+        }
+        return newFileNameBuilder.toString();
     }
 
     private void updateProgress() {

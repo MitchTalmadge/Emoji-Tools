@@ -166,7 +166,7 @@ public class AndroidPackagingThread extends PackagingThread {
                     return;
 
                 String fileName = file.getName();
-                Pattern pattern = Pattern.compile("^(uni[A-Fa-f0-9]+(_uni[A-Fa-f0-9]+)*?)\\.png$");
+                Pattern pattern = Pattern.compile("^((_?uni[A-Fa-f0-9]+)+)\\.png$");
                 Matcher matcher = pattern.matcher(fileName);
                 if (matcher.matches()) {
                     fileName = matcher.group(1);
