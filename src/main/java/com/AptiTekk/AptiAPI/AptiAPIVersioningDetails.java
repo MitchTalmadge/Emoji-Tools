@@ -12,4 +12,6 @@ public interface AptiAPIVersioningDetails {
 
     int getAptiAPIProjectID();
 
+    int getAptiAPIVersionID();
+
 }

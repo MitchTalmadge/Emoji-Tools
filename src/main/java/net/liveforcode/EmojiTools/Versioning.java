@@ -29,6 +29,7 @@ public class Versioning implements AptiAPIVersioningDetails {
     private static final String PROGRAM_NAME = "Emoji Tools";
     private static final String PROGRAM_NAME_WITH_VERSION = PROGRAM_NAME + " V" + VERSION_STRING;
     private static final int APTIAPI_PROJECT_ID = 1;
+    private static final int APTIAPI_VERSION_ID = 0;
 
     @Override
     public double getVersion() {
@@ -53,5 +54,10 @@ public class Versioning implements AptiAPIVersioningDetails {
     @Override
     public int getAptiAPIProjectID() {
         return APTIAPI_PROJECT_ID;
+    }
+
+    @Override
+    public int getAptiAPIVersionID() {
+        return APTIAPI_VERSION_ID;
     }
 }

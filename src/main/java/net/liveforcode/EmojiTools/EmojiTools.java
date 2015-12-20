@@ -73,6 +73,8 @@ public class EmojiTools {
                 new EmojiToolsGUI(aptiAPI, font);
             }
         });
+
+        aptiAPI.checkForUpdates();
     }
 
     public static void shutDown() {

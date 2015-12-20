@@ -21,6 +21,7 @@
 package com.AptiTekk.AptiAPI;
 
 import com.AptiTekk.AptiAPI.GUI.ErrorReportProgressDialog;
+import com.AptiTekk.AptiAPI.GUI.UpdateNoticeDialog;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -36,11 +37,13 @@ import java.util.ArrayList;
 public class AptiAPI {
 
     private static final String API_URL = "http://AptiTekk.com/AptiAPI/";
-    private static final String API_VERSION = "V1";
+    private static final String API_VERSION = "V2";
     private static final String TOKEN_GENERATOR = "TokenGenerator.php";
     private static final String ERROR_REPORTER = "ErrorReporter.php";
+    private static final String UPDATE_CHECKER = "UpdateChecker.php";
     protected final ArrayList<AptiAPIListener> APIListeners = new ArrayList<>();
     private final ErrorHandler errorHandler;
+    private AptiCrypto aptiCrypto;
     private AptiAPIVersioningDetails versioningDetails;
     private Image imageIcon;
 
@@ -48,63 +51,6 @@ public class AptiAPI {
         this.versioningDetails = versioningDetails;
         this.imageIcon = imageIcon;
         this.errorHandler = new ErrorHandler(this);
-    }
-
-    public boolean sendErrorReport(ErrorReport report) {
-
-        ErrorReportProgressDialog progressDialog = new ErrorReportProgressDialog(this, imageIcon);
-        progressDialog.setVisible(true);
-
-        try {
-            //Step 1 -- Generate Token
-            String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectID=" + versioningDetails.getAptiAPIProjectID());
-
-            if (tokenResponse == null) {
-                displayError("Could not generate token -- Null response!");
-                return false;
-            }
-
-            String[] responseSplit = tokenResponse.split(":");
-            if (responseSplit.length < 3) {
-                displayError("Token response length is < 3!");
-                return false;
-            }
-
-            if (responseSplit[1].equals("FAILURE")) {
-                displayError("Could not submit report: " + responseSplit[2]);
-                return false;
-            }
-
-            String token = responseSplit[2];
-
-            String encryptedReport = new AptiCrypto(token.substring(0, 16)).encrypt(report.generateReport());
-
-            //Step 2 -- Submit Report
-            String errorReportResponse = POSTData(API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + versioningDetails.getAptiAPIProjectID() + "&token=" + token + "&report=" + encryptedReport);
-
-            if (errorReportResponse == null) {
-                displayError("Could not submit report: Null response");
-                return false;
-            }
-
-            responseSplit = tokenResponse.split(":");
-            if (responseSplit.length < 2) {
-                displayError("Could not submit report: Token response length is < 2");
-                return false;
-            }
-
-            if (responseSplit[1].equals("FAILURE")) {
-                displayError("Could not submit report: " + responseSplit[2]);
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
-    public ErrorHandler getErrorHandler() {
-        return errorHandler;
     }
 
     public void addAPIListener(AptiAPIListener listener) {
@@ -116,7 +62,6 @@ public class AptiAPI {
         if (APIListeners.contains(listener))
             APIListeners.remove(listener);
     }
-
 
     protected void displayInfo(String message) {
         for (AptiAPIListener listener : APIListeners) {
@@ -136,7 +81,7 @@ public class AptiAPI {
         }
     }
 
-    private String POSTData(String url, String data) {
+    private String POSTData(String token, String url, String data) {
         try {
 
             URL obj = new URL(url);
@@ -148,7 +93,7 @@ public class AptiAPI {
 
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(data);
+            wr.writeBytes(data + (token != null ? "&token=" + token : ""));
             wr.flush();
             wr.close();
 
@@ -162,14 +107,133 @@ public class AptiAPI {
             }
             in.close();
 
-            return response.toString();
+            String rawResponse = response.toString();
+
+            if (token != null && aptiCrypto != null) { //Data will be encrypted
+                try {
+                    return aptiCrypto.decrypt(rawResponse);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            } else {
+                return rawResponse;
+            }
+
         } catch (UnknownHostException e) {
-            displayError("Could not connect to Error Reporter. Is your Internet working?");
-            System.exit(0);
+            System.out.println("Could not connect to AptiTekk.");
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private String getToken() {
+        String tokenResponse = POSTData(null, API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectID=" + versioningDetails.getAptiAPIProjectID());
+
+        if (tokenResponse == null) {
+            System.out.println("Could not generate token: Null response!");
+            return null;
+        }
+
+        String[] responseSplit = tokenResponse.split("§");
+        if (responseSplit.length < 3) {
+            displayError("Could not generate token: Response length is < 3!");
+            return null;
+        }
+
+        if (responseSplit[1].equals("FAILURE")) {
+            displayError("Could not generate token: " + responseSplit[2]);
+            return null;
+        }
+
+        String token = responseSplit[2];
+
+        try {
+            aptiCrypto = new AptiCrypto(token.substring(0, 16));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return token;
+    }
+
+    public void checkForUpdates() {
+        int currentVersionID = versioningDetails.getAptiAPIVersionID();
+
+        String token = getToken();
+
+        if (token != null) {
+            try {
+                String versionIDEncrypted = aptiCrypto.encrypt(currentVersionID + "");
+                String updateInfo = POSTData(token, API_URL + API_VERSION + "/" + UPDATE_CHECKER, "projectID=" + versioningDetails.getAptiAPIProjectID() + "&currentVersionID=" + versionIDEncrypted);
+
+                if (updateInfo == null) {
+                    System.out.println("Could not check for updates: Null response!");
+                    return;
+                }
+
+                String[] response = updateInfo.split("§");
+                if (response[1].equals("FAILURE")) {
+                    displayError("Could not check for updates: " + response[2]);
+                    return;
+                }
+
+                if (response[2].equals("1")) {
+                    if (response.length < 7) {
+                        displayError("Could not check for updates: Response length is < 7!");
+                        return;
+                    }
+
+                    new UpdateNoticeDialog(this, response[4], response[5], response[6]).setVisible(true);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public boolean sendErrorReport(ErrorReport report) {
+
+        ErrorReportProgressDialog progressDialog = new ErrorReportProgressDialog(this, imageIcon);
+        progressDialog.setVisible(true);
+
+        try {
+            String token = getToken();
+
+            if (token != null) {
+                String encryptedReport = aptiCrypto.encrypt(report.generateReport());
+
+                String errorReportResponse = POSTData(token, API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + versioningDetails.getAptiAPIProjectID() + "&report=" + encryptedReport);
+
+                if (errorReportResponse == null) {
+                    displayError("Could not submit report: Null response!");
+                    return false;
+                }
+
+                String[] response = errorReportResponse.split("§");
+                if (response.length < 2) {
+                    displayError("Could not submit report: Response length is < 2!");
+                    return false;
+                }
+
+                if (response[1].equals("FAILURE")) {
+                    displayError("Could not submit report: " + response[2]);
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public ErrorHandler getErrorHandler() {
+        return errorHandler;
     }
 
     public AptiAPIVersioningDetails getVersioningDetails() {
