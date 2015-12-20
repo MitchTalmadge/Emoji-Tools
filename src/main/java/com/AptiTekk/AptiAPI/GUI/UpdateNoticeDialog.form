@@ -40,6 +40,7 @@
                     <properties>
                       <contentType value="text/html"/>
                       <editable value="false"/>
+                      <font/>
                     </properties>
                   </component>
                 </children>

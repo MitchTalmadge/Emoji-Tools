@@ -49,6 +49,7 @@ public class UpdateNoticeDialog extends JDialog {
         this.changeLog = changeLog;
         this.downloadURL = downloadURL;
 
+        setTitle("Update Released!");
         setIconImage(aptiAPI.getIconImage());
         setContentPane(contentPane);
         setModal(true);
@@ -56,7 +57,7 @@ public class UpdateNoticeDialog extends JDialog {
         getRootPane().setDefaultButton(okButton);
 
         headerLabel.setText("Emoji Tools V"+versionName+" has been Released!");
-        changeLogTextPane.setText(changeLog);
+        changeLogTextPane.setText("<html><body style=\"font-family: Arial, Helvetica, sans-serif\">"+changeLog+"</body></html>");
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
