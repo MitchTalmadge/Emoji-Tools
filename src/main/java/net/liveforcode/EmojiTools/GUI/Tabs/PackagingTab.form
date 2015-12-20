@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="net.liveforcode.EmojiTools.GUI.Tabs.PackagingTab">
   <grid id="27dc6" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="377" height="301"/>
+      <xy x="20" y="20" width="384" height="301"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -73,7 +73,7 @@
       </grid>
       <grid id="b32b2" layout-manager="FormLayout">
         <rowspec value="center:d:noGrow"/>
-        <colspec value="fill:d:noGrow"/>
+        <colspec value="fill:350px:noGrow"/>
         <constraints border-constraint="Center"/>
         <properties/>
         <border type="none"/>
@@ -84,7 +84,7 @@
               <forms top="0" left="5" bottom="0" right="5"/>
             </constraints>
             <properties>
-              <text value="&lt;html&gt;Note: iOS and OSX Emoji fonts cannot be created yet. This feature is in development.&lt;/html&gt;"/>
+              <text value="&lt;html&gt;&lt;i&gt;Note: iOS and OSX Emoji Fonts cannot be created yet.&lt;br&gt;This feature is in development.&lt;/i&gt;&lt;br&gt;&lt;br&gt;The type of Emoji Font that will be created depends upon the type of Emoji Font that was used during extraction.&lt;br&gt;For example, the Emojis in a directory created by extracting an Android Emoji Font will be packaged into an Android Emoji Font.&lt;/html&gt;"/>
             </properties>
           </component>
         </children>
