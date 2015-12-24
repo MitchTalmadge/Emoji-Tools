@@ -43,9 +43,17 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.headerLabel.setText(new Versioning().getProgramNameWithVersion());
 
-        //TODO: Instantiate and add tabs
+        addTabs();
+    }
+
+    private void addTabs()
+    {
         try {
-            tabPane.getTabs().addAll(new Tab("Extractor", (Parent)FXMLLoader.load(getClass().getResource("/GUI/Tabs/Extractor.fxml"))));
+            tabPane.getTabs().addAll(
+                    new Tab("Extractor", (Parent)FXMLLoader.load(getClass().getResource("/GUI/Tabs/Extractor.fxml"))),
+                    new Tab("Renamer", (Parent)FXMLLoader.load(getClass().getResource("/GUI/Tabs/Renamer.fxml"))),
+                    new Tab("Converter", (Parent)FXMLLoader.load(getClass().getResource("/GUI/Tabs/Converter.fxml"))),
+                    new Tab("Packager", (Parent)FXMLLoader.load(getClass().getResource("/GUI/Tabs/Packager.fxml"))));
         } catch (IOException e) {
             e.printStackTrace();
         }

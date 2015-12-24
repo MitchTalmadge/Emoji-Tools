@@ -25,7 +25,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<BorderPane prefHeight="347.0" prefWidth="390.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane prefHeight="425" prefWidth="400" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.liveforcode.EmojiTools.GUI.MainController">
     <top>
         <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
