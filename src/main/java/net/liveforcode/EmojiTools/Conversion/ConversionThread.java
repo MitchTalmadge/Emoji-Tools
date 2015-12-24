@@ -21,7 +21,7 @@
 package net.liveforcode.EmojiTools.Conversion;
 
 import net.liveforcode.EmojiTools.Conversion.Converter.Converter;
-import net.liveforcode.EmojiTools.GUI.ConversionDialog;
+import net.liveforcode.EmojiTools.OldGUI.ConversionDialog;
 
 import java.io.File;
 

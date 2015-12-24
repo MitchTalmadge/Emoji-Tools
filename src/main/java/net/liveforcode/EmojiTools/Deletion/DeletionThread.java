@@ -20,7 +20,7 @@
 
 package net.liveforcode.EmojiTools.Deletion;
 
-import net.liveforcode.EmojiTools.GUI.DeletionDialog;
+import net.liveforcode.EmojiTools.OldGUI.DeletionDialog;
 
 import java.io.File;
 

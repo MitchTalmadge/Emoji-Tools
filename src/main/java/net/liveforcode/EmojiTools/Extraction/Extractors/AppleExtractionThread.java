@@ -23,7 +23,7 @@ package net.liveforcode.EmojiTools.Extraction.Extractors;
 import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.Extraction.ExtractionManager;
 import net.liveforcode.EmojiTools.Extraction.ExtractionUtilites;
-import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
+import net.liveforcode.EmojiTools.OldGUI.ExtractionDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
 
 import java.io.*;

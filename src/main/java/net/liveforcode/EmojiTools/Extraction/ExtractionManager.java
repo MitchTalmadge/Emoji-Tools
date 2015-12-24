@@ -24,8 +24,8 @@ import net.liveforcode.EmojiTools.EmojiTools;
 import net.liveforcode.EmojiTools.Extraction.Extractors.AppleExtractionThread;
 import net.liveforcode.EmojiTools.Extraction.Extractors.ExtractionThread;
 import net.liveforcode.EmojiTools.Extraction.Extractors.GoogleExtractionThread;
-import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
-import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
+import net.liveforcode.EmojiTools.OldGUI.EmojiToolsGUI;
+import net.liveforcode.EmojiTools.OldGUI.ExtractionDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
 import net.liveforcode.EmojiTools.OperationManager;
 

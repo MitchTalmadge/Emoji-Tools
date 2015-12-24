@@ -18,7 +18,7 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package net.liveforcode.EmojiTools.OldGUI;
 
 import javax.swing.text.*;
 import java.util.ArrayList;

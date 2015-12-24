@@ -18,14 +18,24 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package net.liveforcode.EmojiTools.GUI.TabControllers;
 
-import net.liveforcode.EmojiTools.GUI.Tabs.OperationTab;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
-public class ExtractionDialog extends ProgressDialog {
+import java.net.URL;
+import java.util.ResourceBundle;
 
-    public ExtractionDialog(OperationTab gui) {
-        super(gui, "Extracting Emojis");
+public class TabController implements Initializable {
+
+    public TextField filePathField;
+    public Button browseButton;
+
+    public Button openRootDirectoryButton;
+    public Button startButton;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
     }
-
 }

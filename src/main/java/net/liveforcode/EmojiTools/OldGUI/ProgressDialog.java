@@ -18,10 +18,10 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package net.liveforcode.EmojiTools.OldGUI;
 
 import net.liveforcode.EmojiTools.EmojiTools;
-import net.liveforcode.EmojiTools.GUI.Tabs.OperationTab;
+import net.liveforcode.EmojiTools.OldGUI.Tabs.OperationTab;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,7 +39,6 @@ public class ProgressDialog extends JDialog implements ActionListener {
     ProgressDialog(OperationTab gui, String tileText) {
         this.gui = gui;
 
-        this.setIconImage(EmojiTools.getLogoImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);

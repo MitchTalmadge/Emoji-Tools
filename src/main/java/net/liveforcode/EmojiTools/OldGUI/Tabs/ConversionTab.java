@@ -18,13 +18,13 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI.Tabs;
+package net.liveforcode.EmojiTools.OldGUI.Tabs;
 
 import net.liveforcode.EmojiTools.Conversion.ConversionManager;
 import net.liveforcode.EmojiTools.EmojiTools;
-import net.liveforcode.EmojiTools.GUI.ConversionDialog;
-import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
-import net.liveforcode.EmojiTools.GUI.FinishedDialog;
+import net.liveforcode.EmojiTools.OldGUI.ConversionDialog;
+import net.liveforcode.EmojiTools.OldGUI.EmojiToolsGUI;
+import net.liveforcode.EmojiTools.OldGUI.FinishedDialog;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

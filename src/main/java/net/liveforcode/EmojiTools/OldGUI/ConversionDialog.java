@@ -18,14 +18,14 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package net.liveforcode.EmojiTools.OldGUI;
 
-import net.liveforcode.EmojiTools.GUI.Tabs.OperationTab;
+import net.liveforcode.EmojiTools.OldGUI.Tabs.OperationTab;
 
-public class DeletionDialog extends ProgressDialog {
+public class ConversionDialog extends ProgressDialog {
 
-    public DeletionDialog(OperationTab gui) {
-        super(gui, "Deleting Extraction Directory Contents");
+    public ConversionDialog(OperationTab gui) {
+        super(gui, "Converting Emojis");
     }
 
 }

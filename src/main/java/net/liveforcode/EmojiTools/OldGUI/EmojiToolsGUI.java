@@ -18,13 +18,13 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package net.liveforcode.EmojiTools.OldGUI;
 
 import com.AptiTekk.AptiAPI.AptiAPI;
 import com.AptiTekk.AptiAPI.AptiAPIListener;
 import net.liveforcode.EmojiTools.ConsoleManager;
 import net.liveforcode.EmojiTools.EmojiTools;
-import net.liveforcode.EmojiTools.GUI.Tabs.*;
+import net.liveforcode.EmojiTools.OldGUI.Tabs.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,26 +53,6 @@ public class EmojiToolsGUI extends JFrame implements MouseListener, AptiAPIListe
 
     public EmojiToolsGUI(AptiAPI aptiAPI, File fontFile) {
         this.aptiAPI = aptiAPI;
-
-        setTitle(aptiAPI.getVersioningDetails().getProgramName());
-        setContentPane(contentPane);
-        setResizable(false);
-
-        this.setIconImage(EmojiTools.getLogoImage());
-
-        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                int tabCount = tabbedPane.getTabCount();
-                for (int i = 0; i < tabCount; i++) {
-                    Component component = tabbedPane.getComponentAt(i);
-                    if (component instanceof OperationTab)
-                        ((OperationTab) component).stopOperations();
-                }
-                EmojiTools.shutDown();
-            }
-        });
 
         this.headerLabel.setText(aptiAPI.getVersioningDetails().getProgramNameWithVersion());
 

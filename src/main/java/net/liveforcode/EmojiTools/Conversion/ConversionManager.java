@@ -20,8 +20,8 @@
 
 package net.liveforcode.EmojiTools.Conversion;
 
-import net.liveforcode.EmojiTools.GUI.ConversionDialog;
-import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
+import net.liveforcode.EmojiTools.OldGUI.ConversionDialog;
+import net.liveforcode.EmojiTools.OldGUI.EmojiToolsGUI;
 import net.liveforcode.EmojiTools.OperationManager;
 
 import java.io.File;

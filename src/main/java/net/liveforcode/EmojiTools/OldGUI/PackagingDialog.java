@@ -18,9 +18,9 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package net.liveforcode.EmojiTools.OldGUI;
 
-import net.liveforcode.EmojiTools.GUI.Tabs.OperationTab;
+import net.liveforcode.EmojiTools.OldGUI.Tabs.OperationTab;
 
 public class PackagingDialog extends ProgressDialog {
 

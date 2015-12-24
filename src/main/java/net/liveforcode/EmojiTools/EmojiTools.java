@@ -22,13 +22,17 @@ package net.liveforcode.EmojiTools;
 
 import com.AptiTekk.AptiAPI.AptiAPI;
 import com.AptiTekk.AptiAPI.ErrorHandler;
-import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -36,9 +40,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
-public class EmojiTools {
+public class EmojiTools extends Application {
 
-    private static final Image logoImage = new ImageIcon(EmojiTools.class.getResource("/Images/EmojiToolsLogo.png")).getImage();
+    private static final Image logoImage = new Image(EmojiTools.class.getResourceAsStream("/Images/EmojiToolsLogo.png"));
     private static final AptiAPI aptiAPI = new AptiAPI(new Versioning(), logoImage);
     private static final ErrorHandler errorHandler = aptiAPI.getErrorHandler();
 
@@ -59,38 +63,13 @@ public class EmojiTools {
 
         new JythonLoader().execute();
 
-        try {
-            UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            submitError(Thread.currentThread(), e);
-        }
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                new EmojiToolsGUI(aptiAPI, font);
-            }
-        });
+        launch(args);
 
         aptiAPI.checkForUpdates();
     }
 
-    public static void shutDown() {
-        if (jythonHandler != null) {
-            jythonHandler.getPythonInterpreter().close();
+    public static void shutdown() {
 
-            if (jythonHandler.getTempDirectory().exists()) {
-                try {
-                    org.apache.commons.io.FileUtils.deleteDirectory(jythonHandler.getTempDirectory());
-                } catch (IOException e) {
-                    EmojiTools.submitError(Thread.currentThread(), e);
-                }
-            }
-        }
-
-        System.exit(0);
     }
 
     public static Image getLogoImage() {
@@ -129,6 +108,36 @@ public class EmojiTools {
                 listener.onJythonReady(jythonHandler);
             else
                 iterator.remove();
+        }
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        stage.setTitle(new Versioning().getProgramNameWithVersion());
+        stage.setResizable(false);
+        stage.getIcons().add(EmojiTools.getLogoImage());
+
+        Parent root = FXMLLoader.load(getClass().getResource("/GUI/MainGUI.fxml"));
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        //TODO: Stop tab operations
+
+        if (jythonHandler != null) {
+            jythonHandler.getPythonInterpreter().close();
+
+            if (jythonHandler.getTempDirectory().exists()) {
+                try {
+                    org.apache.commons.io.FileUtils.deleteDirectory(jythonHandler.getTempDirectory());
+                } catch (IOException e) {
+                    EmojiTools.submitError(Thread.currentThread(), e);
+                }
+            }
         }
     }
 

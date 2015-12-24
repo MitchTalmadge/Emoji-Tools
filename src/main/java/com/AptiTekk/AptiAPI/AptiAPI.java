@@ -22,8 +22,8 @@ package com.AptiTekk.AptiAPI;
 
 import com.AptiTekk.AptiAPI.GUI.ErrorReportProgressDialog;
 import com.AptiTekk.AptiAPI.GUI.UpdateNoticeDialog;
+import javafx.scene.image.Image;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -45,11 +45,11 @@ public class AptiAPI {
     private final ErrorHandler errorHandler;
     private AptiCrypto aptiCrypto;
     private AptiAPIVersioningDetails versioningDetails;
-    private Image imageIcon;
+    private Image icon;
 
-    public AptiAPI(AptiAPIVersioningDetails versioningDetails, Image imageIcon) {
+    public AptiAPI(AptiAPIVersioningDetails versioningDetails, Image icon) {
         this.versioningDetails = versioningDetails;
-        this.imageIcon = imageIcon;
+        this.icon = icon;
         this.errorHandler = new ErrorHandler(this);
     }
 
@@ -199,7 +199,7 @@ public class AptiAPI {
 
     public boolean sendErrorReport(ErrorReport report) {
 
-        ErrorReportProgressDialog progressDialog = new ErrorReportProgressDialog(this, imageIcon);
+        ErrorReportProgressDialog progressDialog = new ErrorReportProgressDialog(this, icon);
         progressDialog.setVisible(true);
 
         try {
@@ -241,6 +241,6 @@ public class AptiAPI {
     }
 
     public Image getIconImage() {
-        return imageIcon;
+        return icon;
     }
 }

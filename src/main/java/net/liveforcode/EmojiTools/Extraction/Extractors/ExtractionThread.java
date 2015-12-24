@@ -21,7 +21,7 @@
 package net.liveforcode.EmojiTools.Extraction.Extractors;
 
 import net.liveforcode.EmojiTools.ConsoleManager;
-import net.liveforcode.EmojiTools.GUI.ExtractionDialog;
+import net.liveforcode.EmojiTools.OldGUI.ExtractionDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
 
 import java.io.File;

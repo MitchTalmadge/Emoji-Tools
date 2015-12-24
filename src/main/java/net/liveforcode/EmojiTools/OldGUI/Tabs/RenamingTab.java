@@ -18,12 +18,12 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI.Tabs;
+package net.liveforcode.EmojiTools.OldGUI.Tabs;
 
 import net.liveforcode.EmojiTools.EmojiTools;
-import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
-import net.liveforcode.EmojiTools.GUI.FinishedDialog;
-import net.liveforcode.EmojiTools.GUI.RenamingDialog;
+import net.liveforcode.EmojiTools.OldGUI.EmojiToolsGUI;
+import net.liveforcode.EmojiTools.OldGUI.FinishedDialog;
+import net.liveforcode.EmojiTools.OldGUI.RenamingDialog;
 import net.liveforcode.EmojiTools.Renaming.RenamingManager;
 
 import javax.swing.*;

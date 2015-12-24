@@ -21,8 +21,8 @@
 package net.liveforcode.EmojiTools.Packaging.PackagingThreads;
 
 import net.liveforcode.EmojiTools.ConsoleManager;
-import net.liveforcode.EmojiTools.GUI.EmojiToolsGUI;
-import net.liveforcode.EmojiTools.GUI.PackagingDialog;
+import net.liveforcode.EmojiTools.OldGUI.EmojiToolsGUI;
+import net.liveforcode.EmojiTools.OldGUI.PackagingDialog;
 import net.liveforcode.EmojiTools.JythonHandler;
 import net.liveforcode.EmojiTools.Packaging.PackagingManager;
 

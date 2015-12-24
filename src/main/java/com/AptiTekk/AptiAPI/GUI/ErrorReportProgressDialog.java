@@ -33,12 +33,11 @@ public class ErrorReportProgressDialog extends JDialog implements ActionListener
     private JProgressBar progressBar;
     private AptiAPI api;
 
-    public ErrorReportProgressDialog(AptiAPI api, Image imageIcon) {
+    public ErrorReportProgressDialog(AptiAPI api, javafx.scene.image.Image imageIcon) {
         this.api = api;
 
         setContentPane(contentPane);
         getRootPane().setDefaultButton(cancelButton);
-        setIconImage(imageIcon);
 
         setResizable(false);
 

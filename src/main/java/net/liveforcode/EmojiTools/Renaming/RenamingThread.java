@@ -20,7 +20,7 @@
 
 package net.liveforcode.EmojiTools.Renaming;
 
-import net.liveforcode.EmojiTools.GUI.RenamingDialog;
+import net.liveforcode.EmojiTools.OldGUI.RenamingDialog;
 
 import java.io.File;
 import java.util.regex.Matcher;

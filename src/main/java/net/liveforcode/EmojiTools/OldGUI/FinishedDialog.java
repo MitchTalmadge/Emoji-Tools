@@ -18,49 +18,53 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package net.liveforcode.EmojiTools.OldGUI;
 
 import net.liveforcode.EmojiTools.EmojiTools;
-import net.liveforcode.EmojiTools.GUI.Tabs.ExtractionTab;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 
-public class OverwriteWarningDialog extends JDialog implements ActionListener {
-    private final ExtractionTab gui;
+public class FinishedDialog extends JDialog implements ActionListener {
+    private final File outputDirectory;
     private JPanel contentPane;
-    private JButton backButton;
-    private JButton continuebutton;
-    private JTextField extractionDirectoryField;
+    private JLabel headerField;
+    private JLabel descriptionField;
+    private JTextField locationField;
+    private JButton OKButton;
+    private JButton openOutputDirectoryButton;
 
-    public OverwriteWarningDialog(ExtractionTab gui, File extractionDirectory) {
+    public FinishedDialog(EmojiToolsGUI gui, String headerText, String descriptionText, File outputDirectory) {
+        this.outputDirectory = outputDirectory;
 
-        this.gui = gui;
-
-        this.setIconImage(EmojiTools.getLogoImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);
-        getRootPane().setDefaultButton(backButton);
+        getRootPane().setDefaultButton(OKButton);
 
-        this.extractionDirectoryField.setText(extractionDirectory.getName());
+        this.headerField.setText(headerText);
+        this.descriptionField.setText(descriptionText);
 
-        backButton.addActionListener(this);
-        continuebutton.addActionListener(this);
+        this.locationField.setText(this.outputDirectory.getAbsolutePath());
 
-        // call onBack() when cross is clicked
+        OKButton.addActionListener(this);
+        openOutputDirectoryButton.addActionListener(this);
+
+        // call onOK() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                onBack();
+                onOK();
             }
         });
 
-        // call onBack() on ESCAPE
+        // call onOK() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onBack();
+                onOK();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
@@ -68,20 +72,21 @@ public class OverwriteWarningDialog extends JDialog implements ActionListener {
         this.setLocationRelativeTo(gui);
     }
 
-    private void onBack() {
-        gui.stopOperations();
-        this.dispose();
-    }
-
-    private void onContinue() {
+    private void onOK() {
         this.dispose();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource().equals(this.backButton))
-            onBack();
-        else if (e.getSource().equals(continuebutton))
-            onContinue();
+        if (e.getSource().equals(OKButton)) {
+            onOK();
+        } else if (e.getSource().equals(openOutputDirectoryButton)) {
+            try {
+                Desktop.getDesktop().open(outputDirectory);
+            } catch (IOException e1) {
+                EmojiTools.submitError(Thread.currentThread(), e1);
+            }
+            this.dispose();
+        }
     }
 }

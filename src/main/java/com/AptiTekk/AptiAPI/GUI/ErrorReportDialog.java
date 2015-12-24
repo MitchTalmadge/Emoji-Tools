@@ -43,7 +43,6 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
         this.aptiAPI = aptiAPI;
         this.report = report;
 
-        setIconImage(aptiAPI.getIconImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);
@@ -83,7 +82,7 @@ public class ErrorReportDialog extends JDialog implements ActionListener {
         this.report.setEmail(this.emailAddressField.getText());
         this.aptiAPI.sendErrorReport(report);
 
-        JOptionPane.showMessageDialog(this, "Error Report has been sent successfully! Thank you for your support!", "Error Report Sent!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(aptiAPI.getIconImage()));
+        JOptionPane.showMessageDialog(this, "Error Report has been sent successfully! Thank you for your support!", "Error Report Sent!", JOptionPane.INFORMATION_MESSAGE);
 
         this.dispose();
         System.exit(0);

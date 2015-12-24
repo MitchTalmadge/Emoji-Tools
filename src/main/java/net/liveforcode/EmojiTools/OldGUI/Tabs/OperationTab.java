@@ -18,14 +18,21 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.EmojiTools.GUI;
+package net.liveforcode.EmojiTools.OldGUI.Tabs;
 
-import net.liveforcode.EmojiTools.GUI.Tabs.OperationTab;
+import net.liveforcode.EmojiTools.OperationManager;
 
-public class RenamingDialog extends ProgressDialog {
+import javax.swing.*;
 
-    public RenamingDialog(OperationTab gui) {
-        super(gui, "Renaming Emojis");
+public class OperationTab extends JPanel {
+
+    OperationManager currentOperationManager;
+    boolean cancelled;
+
+    public void stopOperations() {
+        if (this.currentOperationManager != null)
+            this.currentOperationManager.stop();
+        this.cancelled = true;
     }
 
 }

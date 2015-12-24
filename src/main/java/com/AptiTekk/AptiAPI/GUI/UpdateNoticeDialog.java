@@ -50,7 +50,6 @@ public class UpdateNoticeDialog extends JDialog {
         this.downloadURL = downloadURL;
 
         setTitle("Update Released!");
-        setIconImage(aptiAPI.getIconImage());
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);
