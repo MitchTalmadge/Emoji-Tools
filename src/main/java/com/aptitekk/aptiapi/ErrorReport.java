@@ -18,7 +18,7 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.AptiTekk2.AptiAPI2;
+package com.aptitekk.aptiapi;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

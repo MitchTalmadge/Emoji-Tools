@@ -18,27 +18,14 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.AptiTekk2.AptiAPI2;
+package com.aptitekk.aptiapi;
 
-import com.AptiTekk2.AptiAPI2.GUI.ErrorReportDialog;
+public interface AptiAPIListener {
 
-public class ErrorHandler implements Thread.UncaughtExceptionHandler {
+    void displayInfo(String message);
 
-    private final AptiAPI aptiAPI;
+    void displayError(String message);
 
-    public ErrorHandler(AptiAPI aptiAPI) {
-        this.aptiAPI = aptiAPI;
-    }
+    void shutdown();
 
-    @Override
-    public void uncaughtException(Thread t, Throwable e) {
-        ErrorReport errorReport = new ErrorReport(t, e);
-        errorReport.setVersion(aptiAPI.getVersioningDetails().getVersionString());
-
-        System.out.println("ERROR OCCURRED!");
-        System.out.println("Thread Name: " + t.getName());
-        System.out.println("Exception:\n" + errorReport.getStackTrace());
-
-        new ErrorReportDialog(aptiAPI, errorReport).setVisible(true);
-    }
 }

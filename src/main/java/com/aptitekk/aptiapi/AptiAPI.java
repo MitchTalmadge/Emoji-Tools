@@ -18,10 +18,10 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.AptiTekk2.AptiAPI2;
+package com.aptitekk.aptiapi;
 
-import com.AptiTekk2.AptiAPI2.GUI.ErrorReportProgressDialog;
-import com.AptiTekk2.AptiAPI2.GUI.UpdateNoticeDialog;
+import com.aptitekk.aptiapi.GUI2.ErrorReportProgressDialog;
+import com.aptitekk.aptiapi.GUI2.UpdateNoticeDialog;
 import javafx.scene.image.Image;
 
 import java.io.BufferedReader;

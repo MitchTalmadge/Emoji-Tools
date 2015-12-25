@@ -18,8 +18,11 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.AptiTekk2.AptiAPI2;
+package com.AptiTekk.aptiapi;
 
+import com.aptitekk.aptiapi.AptiAPI;
+import com.aptitekk.aptiapi.AptiAPIListener;
+import com.aptitekk.aptiapi.ErrorReport;
 import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.Versioning;
 import org.junit.Before;

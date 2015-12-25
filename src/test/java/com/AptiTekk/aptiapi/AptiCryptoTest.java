@@ -18,8 +18,9 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.AptiTekk2.AptiAPI2;
+package com.AptiTekk.aptiapi;
 
+import com.aptitekk.aptiapi.AptiCrypto;
 import org.junit.Before;
 import org.junit.Test;
 

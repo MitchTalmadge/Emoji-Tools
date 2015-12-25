@@ -20,8 +20,8 @@
 
 package net.liveforcode.emojitools;
 
-import com.AptiTekk2.AptiAPI2.AptiAPI;
-import com.AptiTekk2.AptiAPI2.ErrorHandler;
+import com.aptitekk.aptiapi.AptiAPI;
+import com.aptitekk.aptiapi.ErrorHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

@@ -18,7 +18,7 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.AptiTekk2.AptiAPI2;
+package com.aptitekk.aptiapi;
 
 public interface AptiAPIVersioningDetails {
 

@@ -20,7 +20,7 @@
 
 package net.liveforcode.emojitools;
 
-import com.AptiTekk2.AptiAPI2.AptiAPIVersioningDetails;
+import com.aptitekk.aptiapi.AptiAPIVersioningDetails;
 
 public class Versioning implements AptiAPIVersioningDetails {
 

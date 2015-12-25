@@ -18,9 +18,9 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.AptiTekk2.AptiAPI2.GUI;
+package com.aptitekk.aptiapi.GUI2;
 
-import com.AptiTekk2.AptiAPI2.AptiAPI;
+import com.aptitekk.aptiapi.AptiAPI;
 
 import javax.swing.*;
 import java.awt.event.*;
