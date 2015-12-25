@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="net.liveforcode.emojitools.oldgui.tabs.PackagingTab">
+  <grid id="27dc6" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="384" height="301"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="7221f" layout-manager="FormLayout">
+        <rowspec value="center:35px:noGrow"/>
+        <rowspec value="center:max(d;4px):noGrow"/>
+        <rowspec value="center:d:grow"/>
+        <colspec value="fill:200px:noGrow"/>
+        <colspec value="fill:max(d;4px):noGrow"/>
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="etched" title="Folder Location"/>
+        <children>
+          <component id="a9ef" class="javax.swing.JTextField" binding="fileNameField">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+              <forms defaultalign-horz="false"/>
+            </constraints>
+            <properties>
+              <columns value="15"/>
+              <editable value="false"/>
+              <text value="Folder Name"/>
+            </properties>
+          </component>
+          <component id="f5f1" class="javax.swing.JButton" binding="browseButton" default-binding="true">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <text value="&amp;Browse..."/>
+            </properties>
+          </component>
+          <component id="e1b8" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <text value="&lt;html&gt;Select a folder of Emoji .png files to package.&lt;br&gt;&#10;(Must have been extracted using Emoji Tools)&lt;/html&gt;"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="f9f00" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="948e" class="javax.swing.JButton" binding="startPackagingButton">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <enabled value="false"/>
+              <hideActionText value="false"/>
+              <text value="&amp;Start Packaging"/>
+            </properties>
+          </component>
+          <component id="70d06" class="javax.swing.JButton" binding="openRootDirectoryButton">
+            <constraints border-constraint="West"/>
+            <properties>
+              <text value="&amp;Open Root Directory"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="b32b2" layout-manager="FormLayout">
+        <rowspec value="center:d:noGrow"/>
+        <colspec value="fill:350px:noGrow"/>
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="3fa3b" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <forms top="0" left="5" bottom="0" right="5"/>
+            </constraints>
+            <properties>
+              <text value="&lt;html&gt;&lt;i&gt;Note: iOS and OSX Emoji Fonts cannot be created yet.&lt;br&gt;This feature is in development.&lt;/i&gt;&lt;br&gt;&lt;br&gt;The type of Emoji Font that will be created depends upon the type of Emoji Font that was used during extraction.&lt;br&gt;For example, the Emojis in a directory created by extracting an Android Emoji Font will be packaged into an Android Emoji Font.&lt;/html&gt;"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+  <buttonGroups>
+    <group name="outputFontGroup">
+      <member id="9b3e1"/>
+      <member id="74549"/>
+      <member id="9b2a1"/>
+    </group>
+  </buttonGroups>
+</form>
