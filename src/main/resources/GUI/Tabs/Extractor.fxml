@@ -28,9 +28,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<?import net.liveforcode.emojitools.gui.RegexLimitingTextField?>
+<?import net.liveforcode.emojitools.gui2.RegexLimitingTextField?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.tabcontrollers.ExtractorTabController">
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui2.tabcontrollers2.ExtractorTabController">
     <top>
       <VBox spacing="10.0">
          <children>
