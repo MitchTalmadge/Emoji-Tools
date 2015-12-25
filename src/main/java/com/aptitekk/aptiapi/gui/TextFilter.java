@@ -18,7 +18,7 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.aptitekk.aptiapi.GUI2;
+package com.aptitekk.aptiapi.gui;
 
 import javax.swing.text.*;
 import java.util.ArrayList;

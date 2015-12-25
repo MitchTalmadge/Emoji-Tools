@@ -20,8 +20,8 @@
 
 package com.aptitekk.aptiapi;
 
-import com.aptitekk.aptiapi.GUI2.ErrorReportProgressDialog;
-import com.aptitekk.aptiapi.GUI2.UpdateNoticeDialog;
+import com.aptitekk.aptiapi.gui.ErrorReportProgressDialog;
+import com.aptitekk.aptiapi.gui.UpdateNoticeDialog;
 import javafx.scene.image.Image;
 
 import java.io.BufferedReader;

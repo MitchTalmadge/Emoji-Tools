@@ -20,7 +20,7 @@
 
 package com.aptitekk.aptiapi;
 
-import com.aptitekk.aptiapi.GUI2.ErrorReportDialog;
+import com.aptitekk.aptiapi.gui.ErrorReportDialog;
 
 public class ErrorHandler implements Thread.UncaughtExceptionHandler {
 

@@ -18,7 +18,7 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.aptitekk.aptiapi.GUI2;
+package com.aptitekk.aptiapi.gui;
 
 import com.aptitekk.aptiapi.AptiAPI;
 import com.aptitekk.aptiapi.ErrorReport;
