@@ -28,27 +28,32 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="128.0" prefWidth="362.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.EmojiTools.GUI.TabControllers.ExtractorTabController">
+<?import net.liveforcode.EmojiTools2.GUI.RegexLimitingTextField?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.EmojiTools2.GUI.TabControllers.ExtractorTabController">
     <top>
       <VBox spacing="10.0">
          <children>
               <GridPane hgap="10.0" BorderPane.alignment="CENTER">
                   <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0" />
                   </columnConstraints>
                   <rowConstraints>
                       <RowConstraints />
-                      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                      <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                   </rowConstraints>
                   <children>
-                      <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="1" />
-                      <Button fx:id="browseButton" mnemonicParsing="false" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                      <Label text="Emoji Font .ttf Path">
+                      <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="3" />
+                      <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                      <Label fx:id="filePathTitleLabel" text="Emoji Font .ttf Path">
                           <font>
                               <Font name="System Bold" size="12.0" />
                           </font>
                       </Label>
+                  <Label text="Select an Emoji Font to Extract." GridPane.rowIndex="2" />
                   </children>
               </GridPane>
             <GridPane>
@@ -100,7 +105,7 @@
                             </font>
                         </Label>
                         <Label text="Allowed Characters: A-Z, a-z, 0-9, underscore, hyphen" />
-                        <TextField fx:id="extractionDirectoryNameField" text="ExtractedEmojis" />
+                        <RegexLimitingTextField fx:id="extractionDirectoryNameField" text="ExtractedEmojis" />
                     </children>
                 </VBox>
          </children>
@@ -112,17 +117,20 @@
     <bottom>
         <GridPane hgap="10.0" BorderPane.alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="50.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0" />
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
                 <ColumnConstraints />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Open Root Directory" />
-                <Button fx:id="startButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Start Extraction" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory" />
+                <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButtonFired" text="Start Extraction" GridPane.columnIndex="1" GridPane.columnSpan="2" />
             </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
         </GridPane>
     </bottom>
 </BorderPane>

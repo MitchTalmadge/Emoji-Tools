@@ -20,8 +20,8 @@
 
 package com.AptiTekk.AptiAPI;
 
-import net.liveforcode.EmojiTools.EmojiTools;
-import net.liveforcode.EmojiTools.Versioning;
+import net.liveforcode.EmojiTools2.EmojiTools;
+import net.liveforcode.EmojiTools2.Versioning;
 import org.junit.Before;
 import org.junit.Test;
 
