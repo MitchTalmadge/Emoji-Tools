@@ -28,7 +28,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="187.0" prefWidth="86.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.EmojiTools2.GUI.TabControllers.ConverterTabController">
+<BorderPane prefHeight="187.0" prefWidth="86.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.tabcontrollers.ConverterTabController">
     <top>
       <VBox spacing="10.0">
          <children>

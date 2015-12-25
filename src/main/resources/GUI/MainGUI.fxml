@@ -31,7 +31,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="425" prefWidth="400" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.EmojiTools2.GUI.MainController">
+<BorderPane prefHeight="425" prefWidth="400" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.MainController">
     <top>
         <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
             <children>
