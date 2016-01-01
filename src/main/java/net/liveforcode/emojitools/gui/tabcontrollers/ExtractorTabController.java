@@ -22,9 +22,15 @@ package net.liveforcode.emojitools.gui.tabcontrollers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
+import net.liveforcode.emojitools.EmojiTools;
+import net.liveforcode.emojitools.conversion.ConversionManager;
+import net.liveforcode.emojitools.deletion.DeletionManager;
+import net.liveforcode.emojitools.extraction.ExtractionManager;
+import net.liveforcode.emojitools.gui.LimitingTextField;
+import net.liveforcode.emojitools.gui.dialogs.OverwriteWarningDialog;
+import net.liveforcode.emojitools.renaming.RenamingManager;
 
 import java.io.File;
 
@@ -49,27 +55,17 @@ public class ExtractorTabController extends TabController {
     private RadioButton convertTrueToggle;
 
     @FXML
-    private TextField extractionDirectoryNameField;
+    private LimitingTextField extractionDirectoryNameField;
 
     @Override
     void initializeTab() {
-        extractionDirectoryNameField = new TextField("ExtractedEmojis")
-        {
-            @Override
-            public void replaceText(int start, int end, String text) {
-                if(text.matches("(\\w|[_-])+"))
-                    super.replaceText(start, end, text);
-            }
-
-            @Override
-            public void replaceSelection(String replacement) {
-                if(replacement.matches("(\\w|[_-])+"))
-                    super.replaceSelection(replacement);
-            }
-        };
+        extractionDirectoryNameField.setRegexLimiter("(\\w|[_-])*");
+        extractionDirectoryNameField.setMaxLength(32);
+        extractionDirectoryNameField.setOnKeyTyped(e -> validateStartButton());
     }
 
-    private void validateStartButton()
+    @Override
+    protected void validateStartButton()
     {
         if(extractionDirectoryNameField.getText().matches("(\\w|[_-])+"))
         {
@@ -96,6 +92,42 @@ public class ExtractorTabController extends TabController {
 
     @Override
     void startOperations() {
+        this.operationsCancelled = false;
 
+        File extractionDirectoryFile = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryNameField.getText());
+        if (extractionDirectoryFile.exists()) {
+            if(new OverwriteWarningDialog(extractionDirectoryFile).getResult())
+            {
+                /*DeletionDialog deletionDialog = new DeletionDialog(this);
+                this.currentOperationManager = new DeletionManager(extractionDirectoryFile, this.gui, deletionDialog);
+                currentOperationManager.start();
+                deletionDialog.setVisible(true);*/
+            }
+        }
+
+        if (!operationsCancelled) {
+            /*ExtractionDialog extractionDialog = new ExtractionDialog(this);
+            this.currentOperationManager = new ExtractionManager(this.selectedFile, extractionDirectoryFile, this.gui, extractionDialog);
+            currentOperationManager.start();
+            extractionDialog.setVisible(true);*/
+        } else {
+            return;
+        }
+
+        if (this.renameTrueToggle.isSelected() && !operationsCancelled) {
+            /*RenamingDialog renamingDialog = new RenamingDialog(this);
+            this.currentOperationManager = new RenamingManager(extractionDirectoryFile, this.gui, renamingDialog, new boolean[]{false, true, false, false}, new boolean[]{true, false, false, false});
+            currentOperationManager.start();
+            renamingDialog.setVisible(true);*/
+        }
+
+        if (this.convertTrueToggle.isSelected() && !operationsCancelled) {
+            /*ConversionDialog conversionDialog = new ConversionDialog(this);
+            this.currentOperationManager = new ConversionManager(extractionDirectoryFile, this.gui, conversionDialog, true);
+            currentOperationManager.start();
+            conversionDialog.setVisible(true);*/
+        }
+
+        //new FinishedDialog(this.gui, "Emoji Extraction Complete!", "Your Extracted Emojis can be found in:", extractionDirectoryFile).setVisible(true);
     }
 }

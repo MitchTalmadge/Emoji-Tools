@@ -32,6 +32,11 @@ public class PackagerTabController extends TabController {
     }
 
     @Override
+    protected void validateStartButton() {
+
+    }
+
+    @Override
     protected FileChooser.ExtensionFilter getFileChooserExtensionFilter() {
         return null;
     }

@@ -88,7 +88,10 @@ public abstract class TabController implements Initializable {
                 this.filePathField.setText(selectedFile.getName());
             }
         }
+        validateStartButton();
     }
+
+    protected abstract void validateStartButton();
 
     protected abstract FileChooser.ExtensionFilter getFileChooserExtensionFilter();
 
@@ -106,6 +109,15 @@ public abstract class TabController implements Initializable {
 
     @FXML
     void onStartButtonFired(ActionEvent actionEvent) {
+        //Make sure file still exists
+        if(selectedFile == null || !selectedFile.exists())
+        {
+            selectedFile = null;
+            filePathField.clear();
+            validateStartButton();
+            return;
+        }
+
         startOperations();
     }
 

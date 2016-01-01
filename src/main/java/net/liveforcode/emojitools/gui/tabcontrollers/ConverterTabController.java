@@ -26,6 +26,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 public class ConverterTabController extends TabController {
 
@@ -41,6 +42,10 @@ public class ConverterTabController extends TabController {
     @Override
     void initializeTab() {
 
+    }
+
+    @Override
+    protected void validateStartButton() {
     }
 
     @Override

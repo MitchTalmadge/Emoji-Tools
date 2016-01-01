@@ -25,19 +25,21 @@ import javafx.scene.control.TextField;
 /**
  * This custom Java FX TextField allows for the developer to specify a regex string which all inputted text
  * must match in order to pass. Text which does not match the specified regex string will not be processed.
+ * The developer can also specify a maximum length for the input using setMaxLength(int)
  * <p>
- * Use setRegexLimiter(String regex) to specify the regex limiter after instantiation.
+ * Use setRegexLimiter(String) to specify the regex limiter after instantiation.
  * By default it is ".*" (Any character).
  */
-public class RegexLimitingTextField extends TextField {
+public class LimitingTextField extends TextField {
 
     private String regexLimiter = ".*";
+    private int maxLength;
 
-    public RegexLimitingTextField() {
+    public LimitingTextField() {
         super();
     }
 
-    public RegexLimitingTextField(String text) {
+    public LimitingTextField(String text) {
         super(text);
     }
 
@@ -50,15 +52,18 @@ public class RegexLimitingTextField extends TextField {
         this.regexLimiter = regex;
     }
 
-    @Override
-    public void replaceText(int start, int end, String text) {
-        if (text.matches(regexLimiter))
-            super.replaceText(start, end, text);
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
     }
 
     @Override
-    public void replaceSelection(String replacement) {
-        if (replacement.matches(regexLimiter))
-            super.replaceSelection(replacement);
+    public void replaceText(int start, int end, String text) {
+        int amountToAdd = text.length() - (end - start);
+        int newLength = getText().length() + amountToAdd;
+        boolean isAtOrBelowMaxLength =  newLength <= maxLength;
+
+        if (text.matches(regexLimiter))
+            super.replaceText(start, end, isAtOrBelowMaxLength ? text : text.substring(0, text.length() - (newLength - maxLength)));
     }
+
 }

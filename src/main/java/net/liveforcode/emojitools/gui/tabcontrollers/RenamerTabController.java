@@ -66,6 +66,10 @@ public class RenamerTabController extends TabController {
 
     @Override
     void initializeTab() {
+    }
+
+    @Override
+    protected void validateStartButton() {
 
     }
 
