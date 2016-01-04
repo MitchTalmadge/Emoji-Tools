@@ -24,28 +24,28 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.JythonHandler;
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 
 import java.util.concurrent.ExecutionException;
 
-public abstract class OperationWorker extends Task<Boolean> implements ProgressDialog.CancelListener, EmojiTools.JythonListener {
+public abstract class OperationWorker extends Task<Boolean> implements EmojiTools.JythonListener {
 
     private String threadName;
     private Operation operation;
-    private ProgressDialog progressDialog;
+    private OperationProgressDialog operationProgressDialog;
     private boolean requireJython;
     private JythonHandler jythonHandler;
 
     private String messageBlock = "";
 
-    public OperationWorker(Operation operation, ProgressDialog progressDialog, boolean requireJython) {
+    public OperationWorker(Operation operation, OperationProgressDialog operationProgressDialog, boolean requireJython) {
         this.operation = operation;
-        this.progressDialog = progressDialog;
+        this.operationProgressDialog = operationProgressDialog;
         this.requireJython = requireJython;
         this.threadName = getClass().getSimpleName() + "Thread";
-        progressDialog.addCancelListener(this);
-        progressDialog.bindProgressToProperty(this.progressProperty());
-        progressDialog.bindMessagesToProperty(this.messageProperty());
+        operationProgressDialog.addCloseListener(() -> this.cancel(false));
+        operationProgressDialog.bindProgressToProperty(this.progressProperty());
+        operationProgressDialog.bindMessagesToProperty(this.messageProperty());
     }
 
     public final void executeWorker() {
@@ -56,7 +56,7 @@ public abstract class OperationWorker extends Task<Boolean> implements ProgressD
         } else {
             new Thread(this).start();
         }
-        this.progressDialog.display();
+        this.operationProgressDialog.display();
     }
 
     @Override
@@ -91,7 +91,7 @@ public abstract class OperationWorker extends Task<Boolean> implements ProgressD
      */
     @Override
     protected final void done() {
-        Platform.runLater(() -> progressDialog.close());
+        Platform.runLater(() -> operationProgressDialog.close());
         try {
             if (isCancelled()) {
                 System.out.println("Operation " + threadName + " has been cancelled by user.");
@@ -104,11 +104,6 @@ public abstract class OperationWorker extends Task<Boolean> implements ProgressD
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onCancelButtonFired() {
-        this.cancel(false);
     }
 
     /**

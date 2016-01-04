@@ -26,49 +26,46 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OverwriteWarningDialogController;
+import net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OperationFinishedDialogController;
 
 import java.io.File;
 import java.io.IOException;
 
-public class OverwriteWarningDialog {
+public class OperationFinishedDialog {
 
-    private File extractionDirectoryFile;
-    private OverwriteWarningDialogController controller;
+    private final Stage stage;
+    private final String headerText;
+    private final String descriptionText;
+    private OperationFinishedDialogController controller;
 
-    private Stage stage;
-    private boolean result = false;
+    public OperationFinishedDialog(String headerText, String descriptionText, File outputDirectory) {
+        this.headerText = headerText;
+        this.descriptionText = descriptionText;
 
-    public OverwriteWarningDialog(File extractionDirectoryFile) {
-        this.extractionDirectoryFile = extractionDirectoryFile;
-
-        this.stage = new Stage();
-        stage.setTitle("Overwrite Warning");
+        stage = new Stage();
+        stage.setTitle(headerText);
         stage.getIcons().add(EmojiTools.getLogoImage());
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/Dialogs/OverwriteWarningDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/Dialogs/OperationFinishedDialog.fxml"));
             Parent root = loader.load();
 
             this.controller = loader.getController();
-            controller.setParent(this);
-            controller.setExtractionDirectoryFile(extractionDirectoryFile);
+            controller.setHeaderText(headerText);
+            controller.setDescriptionText(descriptionText);
+            controller.setOutputDirectory(outputDirectory);
 
             stage.setScene(new Scene(root));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
-    public boolean getResult() {
+    public void display() {
         stage.showAndWait();
-        return result;
     }
 
-    public void onResultAcquired(boolean result) {
-        this.result = result;
-        stage.close();
-    }
 }

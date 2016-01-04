@@ -25,6 +25,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 import net.liveforcode.emojitools.EmojiTools;
+import net.liveforcode.emojitools.gui.dialogs.OperationFinishedDialog;
 import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
 
 import java.io.File;
@@ -76,7 +77,7 @@ public class ConverterTabController extends TabController {
 
     @Override
     void startOperations() {
-        boolean shouldContinue = true;
+        boolean shouldContinue;
 
         int conversionDirection = 0;
         if (conversionCgBItoRGBAToggle.isSelected())
@@ -86,8 +87,8 @@ public class ConverterTabController extends TabController {
 
         shouldContinue = EmojiTools.performConversionOperation(selectedFile, new ConversionInfo(conversionDirection));
 
-        //TODO: Show completion dialog, or tell user that it did not complete successfully based on shouldContinue value.
-
-        //new FinishedDialog(this.gui, "Emoji Conversion Complete!", "Your Converted Emojis can be found in:", conversionFile).setVisible(true);
+        if (shouldContinue)
+            new OperationFinishedDialog("Conversion Complete!", "Your converted emojis can be found in:", selectedFile).display();
+        //TODO: Show unsuccessful dialog
     }
 }

@@ -8,59 +8,57 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.ProgressDialogController;
+import net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OperationProgressDialogController;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProgressDialog implements ProgressDialogController.ProgressDialogListener {
+public class OperationProgressDialog {
 
     private Stage stage;
-    private ProgressDialogController controller;
+    private OperationProgressDialogController controller;
 
-    private List<CancelListener> cancelListenerList = new ArrayList<>();
+    private List<DialogCloseListener> closeListeners = new ArrayList<>();
 
-    public ProgressDialog(String headerText) {
+    public OperationProgressDialog(String headerText) {
         this.stage = new Stage();
         stage.setTitle(headerText);
         stage.getIcons().add(EmojiTools.getLogoImage());
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+
         stage.setOnCloseRequest(e -> {
-            onCancelButtonFired();
+            cancel();
             e.consume();
         });
 
         try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/GUI/Dialogs/ProgressDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/Dialogs/OperationProgressDialog.fxml"));
             Parent root = loader.load();
 
             this.controller = loader.getController();
-            controller.setProgressDialogListener(this);
+            controller.setParent(this);
             controller.setHeaderText(headerText);
 
             stage.setScene(new Scene(root));
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void addCancelListener(CancelListener listener) {
-        if (!cancelListenerList.contains(listener))
-            cancelListenerList.add(listener);
+    public void addCloseListener(DialogCloseListener listener) {
+        if (!closeListeners.contains(listener))
+            closeListeners.add(listener);
     }
 
     public void display() {
         stage.showAndWait();
     }
 
-    @Override
-    public void onCancelButtonFired() {
-        cancelListenerList.forEach(CancelListener::onCancelButtonFired);
-        stage.close();
+    public void cancel() {
+        closeListeners.forEach(DialogCloseListener::onDialogClosing);
+        close();
     }
 
     public void close() {
@@ -75,9 +73,8 @@ public class ProgressDialog implements ProgressDialogController.ProgressDialogLi
         controller.bindMessagesToProperty(property);
     }
 
-    public interface CancelListener {
-
-        void onCancelButtonFired();
-
+    public interface DialogCloseListener {
+        void onDialogClosing();
     }
+
 }

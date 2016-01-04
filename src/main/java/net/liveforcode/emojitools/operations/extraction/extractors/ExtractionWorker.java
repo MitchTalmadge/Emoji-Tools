@@ -20,7 +20,7 @@
 
 package net.liveforcode.emojitools.operations.extraction.extractors;
 
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 
@@ -294,8 +294,8 @@ public abstract class ExtractionWorker extends OperationWorker {
     final List<Integer> tableOffsets;
     final List<Integer> tableLengths;
 
-    public ExtractionWorker(Operation operation, ProgressDialog progressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, boolean requireJython) {
-        super(operation, progressDialog, requireJython);
+    public ExtractionWorker(Operation operation, OperationProgressDialog operationProgressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, boolean requireJython) {
+        super(operation, operationProgressDialog, requireJython);
         this.fontFile = fontFile;
         this.extractionDirectory = extractionDirectory;
         this.tableNames = tableNames;

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <!--
   ~ Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
   ~ Copyright (C) 2015 Mitch Talmadge
@@ -21,41 +20,37 @@
   ~ Contact Mitch Talmadge at mitcht@liveforcode.net
   -->
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0"
-            prefWidth="349.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.ProgressDialogController">
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OperationProgressDialogController">
     <top>
-        <Label fx:id="headerLabel" text="Extracting Emojis" BorderPane.alignment="CENTER">
+        <Label fx:id="headerLabel" text="Extracting Emojis..." BorderPane.alignment="CENTER">
             <font>
-                <Font size="18.0"/>
+                <Font size="18.0" />
             </font>
         </Label>
     </top>
     <center>
-        <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
+        <VBox spacing="5.0" BorderPane.alignment="CENTER">
             <children>
                 <Label text="Progress">
                     <font>
-                        <Font name="System Bold" size="12.0"/>
+                        <Font name="System Bold" size="12.0" />
                     </font>
                 </Label>
-                <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0"/>
-                <TextArea fx:id="outputTextArea" prefHeight="200.0" prefWidth="200.0"/>
+                <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
+                <TextArea fx:id="outputTextArea" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="350.0" />
+              <Button fx:id="cancelButton" cancelButton="true" defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onCancelButtonFired" text="Cancel" />
             </children>
-            <padding>
-                <Insets bottom="5.0"/>
-            </padding>
         </VBox>
     </center>
-    <bottom>
-        <Button fx:id="cancelButton" cancelButton="true" defaultButton="true" maxWidth="1.7976931348623157E308"
-                mnemonicParsing="false" onAction="#onCancelButtonFired" text="Cancel" BorderPane.alignment="CENTER"/>
-    </bottom>
     <padding>
-        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
     </padding>
 </BorderPane>

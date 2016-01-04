@@ -21,7 +21,7 @@
 package net.liveforcode.emojitools.operations.extraction.extractors;
 
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.extraction.ExtractionUtilites;
 
@@ -30,8 +30,8 @@ import java.util.List;
 
 public class AppleExtractionWorker extends ExtractionWorker {
 
-    public AppleExtractionWorker(Operation operation, ProgressDialog progressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths) {
-        super(operation, progressDialog, fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths, false);
+    public AppleExtractionWorker(Operation operation, OperationProgressDialog operationProgressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths) {
+        super(operation, operationProgressDialog, fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths, false);
     }
 
     @Override

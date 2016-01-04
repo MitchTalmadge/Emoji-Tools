@@ -21,7 +21,7 @@
 package net.liveforcode.emojitools.operations.extraction;
 
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 import net.liveforcode.emojitools.operations.extraction.extractors.AppleExtractionWorker;
@@ -77,9 +77,9 @@ public class ExtractionOperation extends Operation {
     @Override
     protected OperationWorker getWorker() {
         if (tableNames.contains("sbix"))
-            return new AppleExtractionWorker(this, new ProgressDialog("Extracting Apple Emojis..."), fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths);
+            return new AppleExtractionWorker(this, new OperationProgressDialog("Extracting Apple Emojis..."), fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths);
         else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
-            return new GoogleExtractionWorker(this, new ProgressDialog("Extracting Android Emojis..."), fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths);
+            return new GoogleExtractionWorker(this, new OperationProgressDialog("Extracting Android Emojis..."), fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths);
         else {
             //gui.showMessageDialog("The selected font cannot be extracted. Contact developer for help.");
             return null;

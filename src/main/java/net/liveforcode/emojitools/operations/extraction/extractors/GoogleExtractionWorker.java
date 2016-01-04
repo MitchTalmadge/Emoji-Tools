@@ -21,7 +21,7 @@
 package net.liveforcode.emojitools.operations.extraction.extractors;
 
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
 import net.liveforcode.emojitools.operations.extraction.ExtractionUtilites;
@@ -35,8 +35,8 @@ import java.util.List;
 
 public class GoogleExtractionWorker extends ExtractionWorker {
 
-    public GoogleExtractionWorker(Operation operation, ProgressDialog progressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths) {
-        super(operation, progressDialog, fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths, true);
+    public GoogleExtractionWorker(Operation operation, OperationProgressDialog operationProgressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths) {
+        super(operation, operationProgressDialog, fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths, true);
     }
 
     @Override

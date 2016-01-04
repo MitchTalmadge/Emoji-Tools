@@ -20,7 +20,7 @@
 
 package net.liveforcode.emojitools.operations.conversion;
 
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 
@@ -38,6 +38,6 @@ public class ConversionOperation extends Operation {
 
     @Override
     protected OperationWorker getWorker() {
-        return new ConversionWorker(this, new ProgressDialog("Converting Emojis..."), conversionDirectory, conversionInfo);
+        return new ConversionWorker(this, new OperationProgressDialog("Converting Emojis..."), conversionDirectory, conversionInfo);
     }
 }

@@ -26,6 +26,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.LimitingTextField;
+import net.liveforcode.emojitools.gui.dialogs.OperationFinishedDialog;
 import net.liveforcode.emojitools.gui.dialogs.OverwriteWarningDialog;
 import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
 import net.liveforcode.emojitools.operations.renaming.RenamingInfo;
@@ -128,8 +129,8 @@ public class ExtractorTabController extends TabController {
             shouldContinue = EmojiTools.performConversionOperation(extractionDirectory, new ConversionInfo(ConversionInfo.DIRECTION_CGBI_RGBA));
         }
 
-        //TODO: Show completion dialog, or tell user that it did not complete successfully based on shouldContinue value.
-
-        //new FinishedDialog(this.gui, "Emoji Extraction Complete!", "Your Extracted Emojis can be found in:", extractionDirectoryFile).setVisible(true);
+        if(shouldContinue)
+            new OperationFinishedDialog("Extraction Complete!", "Your emojis have been extracted to:", extractionDirectory).display();
+        //TODO: Show unsuccessful dialog
     }
 }

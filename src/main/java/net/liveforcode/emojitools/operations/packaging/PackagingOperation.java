@@ -20,7 +20,7 @@
 
 package net.liveforcode.emojitools.operations.packaging;
 
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
@@ -43,7 +43,7 @@ public class PackagingOperation extends Operation {
     protected OperationWorker getWorker() {
         switch (ttxType) {
             case ANDROID:
-                return new AndroidPackagingWorker(this, new ProgressDialog("Packaging to NotoColorEmoji.ttf..."), packagingDirectory);
+                return new AndroidPackagingWorker(this, new OperationProgressDialog("Packaging to NotoColorEmoji.ttf..."), packagingDirectory);
             case IOS:
             case OSX:
                 //showMessageDialog("iOS and OSX Emoji Fonts cannot be created yet. This feature is in development.");

@@ -20,7 +20,7 @@
 
 package net.liveforcode.emojitools.operations.conversion;
 
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 import net.liveforcode.emojitools.operations.conversion.converter.Converter;
@@ -32,8 +32,8 @@ public class ConversionWorker extends OperationWorker {
     private final File conversionDirectory;
     private final ConversionInfo conversionInfo;
 
-    public ConversionWorker(Operation operation, ProgressDialog progressDialog, File conversionDirectory, ConversionInfo conversionInfo) {
-        super(operation, progressDialog, false);
+    public ConversionWorker(Operation operation, OperationProgressDialog operationProgressDialog, File conversionDirectory, ConversionInfo conversionInfo) {
+        super(operation, operationProgressDialog, false);
         this.conversionDirectory = conversionDirectory;
         this.conversionInfo = conversionInfo;
     }

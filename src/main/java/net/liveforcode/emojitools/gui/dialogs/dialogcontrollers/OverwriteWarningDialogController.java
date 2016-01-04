@@ -22,43 +22,34 @@ package net.liveforcode.emojitools.gui.dialogs.dialogcontrollers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import net.liveforcode.emojitools.gui.dialogs.OverwriteWarningDialog;
 
 import java.io.File;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class OverwriteWarningDialogController {
 
     @FXML
-    private Button cancelButton;
+    protected Button cancelButton;
 
     @FXML
-    private Button continueButton;
+    protected Button continueButton;
 
     @FXML
-    private TextField extractionDirectoryNameField;
+    protected TextField extractionDirectoryNameField;
 
     private File extractionDirectoryFile;
-    private ResultListener resultListener;
+    private OverwriteWarningDialog parent;
 
     @FXML
-    private void onCancelButtonFired(ActionEvent actionEvent) {
-        if(resultListener != null)
-            resultListener.onResultAcquired(false);
+    protected void onCancelButtonFired(ActionEvent actionEvent) {
+        parent.onResultAcquired(false);
     }
 
     @FXML
-    private void onContinueButtonFired(ActionEvent actionEvent) {
-        if(resultListener != null)
-            resultListener.onResultAcquired(true);
-    }
-
-    public void setResultListener(ResultListener listener)
-    {
-        this.resultListener = listener;
+    protected void onContinueButtonFired(ActionEvent actionEvent) {
+        parent.onResultAcquired(true);
     }
 
     public void setExtractionDirectoryFile(File extractionDirectoryFile) {
@@ -66,7 +57,7 @@ public class OverwriteWarningDialogController {
         this.extractionDirectoryNameField.setText(extractionDirectoryFile.getName());
     }
 
-    public interface ResultListener {
-        void onResultAcquired(boolean result);
+    public void setParent(OverwriteWarningDialog parent) {
+        this.parent = parent;
     }
 }

@@ -20,7 +20,7 @@
 
 package net.liveforcode.emojitools.operations.renaming;
 
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 
@@ -39,6 +39,6 @@ public class RenamingOperation extends Operation {
 
     @Override
     protected OperationWorker getWorker() {
-        return new RenamingWorker(this, new ProgressDialog("Renaming Emojis..."), renamingDirectory, renamingInfo);
+        return new RenamingWorker(this, new OperationProgressDialog("Renaming Emojis..."), renamingDirectory, renamingInfo);
     }
 }

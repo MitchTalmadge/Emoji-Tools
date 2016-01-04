@@ -20,7 +20,7 @@
 
 package net.liveforcode.emojitools.operations.deletion;
 
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 
@@ -32,8 +32,8 @@ public class DeletionWorker extends OperationWorker {
     private int currentFileNum = 0;
     private File deletionDirectory;
 
-    public DeletionWorker(Operation operation, ProgressDialog progressDialog, File deletionDirectory) {
-        super(operation, progressDialog, false);
+    public DeletionWorker(Operation operation, OperationProgressDialog operationProgressDialog, File deletionDirectory) {
+        super(operation, operationProgressDialog, false);
         this.deletionDirectory = deletionDirectory;
     }
 

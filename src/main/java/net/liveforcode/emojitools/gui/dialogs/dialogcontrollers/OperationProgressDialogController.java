@@ -28,31 +28,27 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 
-public class ProgressDialogController {
-
-    @FXML
-    private Button cancelButton;
+public class OperationProgressDialogController {
 
     @FXML
-    private ProgressBar progressBar;
+    protected Button cancelButton;
 
     @FXML
-    private TextArea outputTextArea;
+    protected ProgressBar progressBar;
 
     @FXML
-    private Label headerLabel;
-
-    private ProgressDialogListener listener;
+    protected TextArea outputTextArea;
 
     @FXML
-    void onCancelButtonFired(ActionEvent event) {
-        if (this.listener != null)
-            listener.onCancelButtonFired();
-    }
+    protected Label headerLabel;
 
-    public void setProgressDialogListener(ProgressDialogListener listener) {
-        this.listener = listener;
+    private OperationProgressDialog parent;
+
+    @FXML
+    protected void onCancelButtonFired(ActionEvent event) {
+        parent.cancel();
     }
 
     public void setHeaderText(String headerText) {
@@ -68,9 +64,7 @@ public class ProgressDialogController {
         property.addListener((observable, oldValue, newValue) -> outputTextArea.setScrollTop(Double.MAX_VALUE));
     }
 
-    public interface ProgressDialogListener {
-
-        void onCancelButtonFired();
-
+    public void setParent(OperationProgressDialog parent) {
+        this.parent = parent;
     }
 }

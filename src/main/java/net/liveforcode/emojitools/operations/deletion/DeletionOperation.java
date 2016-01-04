@@ -20,13 +20,11 @@
 
 package net.liveforcode.emojitools.operations.deletion;
 
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 
-import javax.swing.*;
 import java.io.File;
-import java.util.ResourceBundle;
 
 public class DeletionOperation extends Operation {
 
@@ -38,6 +36,6 @@ public class DeletionOperation extends Operation {
 
     @Override
     protected OperationWorker getWorker() {
-        return new DeletionWorker(this, new ProgressDialog("Deleting Directory Contents..."), deletionDirectory);
+        return new DeletionWorker(this, new OperationProgressDialog("Deleting Directory Contents..."), deletionDirectory);
     }
 }

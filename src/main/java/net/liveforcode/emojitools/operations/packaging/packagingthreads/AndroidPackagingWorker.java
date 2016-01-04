@@ -21,7 +21,7 @@
 package net.liveforcode.emojitools.operations.packaging.packagingthreads;
 
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
@@ -52,8 +52,8 @@ public class AndroidPackagingWorker extends OperationWorker {
 
     private final File packagingDirectory;
 
-    public AndroidPackagingWorker(Operation operation, ProgressDialog progressDialog, File packagingDirectory) {
-        super(operation, progressDialog, true);
+    public AndroidPackagingWorker(Operation operation, OperationProgressDialog operationProgressDialog, File packagingDirectory) {
+        super(operation, operationProgressDialog, true);
         this.packagingDirectory = packagingDirectory;
     }
 

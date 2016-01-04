@@ -71,11 +71,11 @@
                               </Label>
                               <RadioButton fx:id="caseNoChangeToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" selected="true" text="Don't Change Case">
                            <toggleGroup>
-                              <ToggleGroup fx:id="capitalization" />
+                              <ToggleGroup fx:id="caseGroup" />
                            </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="caseUpperToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Capitalize" toggleGroup="$capitalization" />
-                        <RadioButton fx:id="caseLowerToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Lowercase" toggleGroup="$capitalization" />
+                              <RadioButton fx:id="caseUpperToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Capitalize" toggleGroup="$caseGroup" />
+                        <RadioButton fx:id="caseLowerToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Lowercase" toggleGroup="$caseGroup" />
                         <CheckBox fx:id="casePrefixOppositeCheckBox" disable="true" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Make Prefix Case Opposite" />
                           </children>
                       </VBox>

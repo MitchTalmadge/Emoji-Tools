@@ -28,6 +28,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 import net.liveforcode.emojitools.EmojiTools;
+import net.liveforcode.emojitools.gui.dialogs.OperationFinishedDialog;
 import net.liveforcode.emojitools.operations.renaming.RenamingInfo;
 
 import java.io.File;
@@ -207,9 +208,9 @@ public class RenamerTabController extends TabController {
 
         shouldContinue = EmojiTools.performRenamingOperation(selectedFile, new RenamingInfo(prefixOption, caseOption, casePrefixOppositeCheckBox.isSelected()));
 
-        //TODO: Show completion dialog, or tell user that it did not complete successfully based on shouldContinue value.
-
-        //new FinishedDialog(this.gui, "Emoji Renaming Complete!", "Your Renamed Emojis can be found in:", renameFile).setVisible(true);
+        if (shouldContinue)
+            new OperationFinishedDialog("Renaming Complete!", "Your renamed emojis can be found in:", selectedFile).display();
+        //TODO: Show unsuccessful dialog
     }
 
     @FXML
