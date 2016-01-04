@@ -59,7 +59,7 @@ public class ConversionWorker extends OperationWorker {
                 System.out.println("Converting " + file.getName());
                 appendMessageToDialog("Converting " + file.getName());
 
-                converter.convertDirectory(file, conversionInfo);
+                converter.convertFile(file, conversionInfo);
             }
         }
 

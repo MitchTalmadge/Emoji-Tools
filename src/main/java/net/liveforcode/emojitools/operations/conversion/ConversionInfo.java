@@ -25,16 +25,16 @@ public class ConversionInfo {
     public static final int DIRECTION_CGBI_RGBA = 0;
     public static final int DIRECTION_RGBA_CGBI = 1;
 
-    private int direction;
+    private int conversionDirection;
 
-    public ConversionInfo(int direction) {
-        if (direction < 0 || direction > 1) {
-            direction = 0;
+    public ConversionInfo(int conversionDirection) {
+        if (conversionDirection < 0 || conversionDirection > 1) {
+            conversionDirection = 0;
         }
-        this.direction = direction;
+        this.conversionDirection = conversionDirection;
     }
 
-    public int getDirection() {
-        return direction;
+    public int getConversionDirection() {
+        return conversionDirection;
     }
 }

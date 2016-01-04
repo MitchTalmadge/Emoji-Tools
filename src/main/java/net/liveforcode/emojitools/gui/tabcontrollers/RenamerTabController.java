@@ -216,12 +216,14 @@ public class RenamerTabController extends TabController {
     void onCaseTogglesChanged(ActionEvent event) {
         updatePrefixOppositeCaseCheckbox();
         updateExample();
+        validateStartButton();
     }
 
     @FXML
     void onPrefixTogglesChanged(ActionEvent event) {
         updatePrefixOppositeCaseCheckbox();
         updateExample();
+        validateStartButton();
     }
 
 }
