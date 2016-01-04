@@ -32,6 +32,7 @@ import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
 import net.liveforcode.emojitools.operations.conversion.ConversionOperation;
 import net.liveforcode.emojitools.operations.deletion.DeletionOperation;
 import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
+import net.liveforcode.emojitools.operations.packaging.PackagingOperation;
 import net.liveforcode.emojitools.operations.renaming.RenamingInfo;
 import net.liveforcode.emojitools.operations.renaming.RenamingOperation;
 import org.python.core.PyString;
@@ -179,6 +180,16 @@ public class EmojiTools extends Application {
      */
     public static boolean performConversionOperation(File conversionDirectory, ConversionInfo conversionInfo) {
         return new ConversionOperation(conversionDirectory, conversionInfo).runOperation();
+    }
+
+    /**
+     * Starts an Operation to package all emojis within the specified directory into a new emoji font with a ProgressDialog.
+     *
+     * @param packagingDirectory The directory containing emojis to package.
+     * @return True if operation completed successfully, False if unsuccessful or cancelled.
+     */
+    public static boolean performPackagingOperation(File packagingDirectory) {
+        return new PackagingOperation(packagingDirectory).runOperation();
     }
 
     @Override

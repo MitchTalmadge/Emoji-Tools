@@ -35,8 +35,10 @@ public abstract class Operation {
 
         OperationWorker worker = getWorker();
 
-        if (worker == null)
+        if (worker == null) {
+            System.out.println("Tried to perform operation, but no worker was given!");
             return false;
+        }
 
         worker.executeWorker();
         return successfullyCompleted;

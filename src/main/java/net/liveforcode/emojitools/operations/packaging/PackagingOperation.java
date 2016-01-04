@@ -32,15 +32,40 @@ public class PackagingOperation extends Operation {
 
     private final File packagingDirectory;
 
-    private ExtractionOperation.TTXType ttxType;
-
-    public PackagingOperation(File packagingDirectory, ExtractionOperation.TTXType ttxType) {
+    public PackagingOperation(File packagingDirectory) {
         this.packagingDirectory = packagingDirectory;
-        this.ttxType = ttxType;
     }
 
     @Override
     protected OperationWorker getWorker() {
+        //Check for .ttx file
+        File ttxFile = null;
+        File[] files = packagingDirectory.listFiles();
+        if (files == null)
+            return null;
+
+        for (File file : files) {
+            if (file.getName().endsWith(".ttx")) {
+                ttxFile = file;
+                break;
+            }
+        }
+
+        if (ttxFile == null) {
+            return null;
+        }
+
+        ExtractionOperation.TTXType ttxType = null;
+        for (ExtractionOperation.TTXType type : ExtractionOperation.TTXType.values()) {
+            if (type.getFileName().equals(ttxFile.getName())) {
+                ttxType = type;
+                break;
+            }
+        }
+
+        if (ttxType == null)
+            return null;
+
         switch (ttxType) {
             case ANDROID:
                 return new AndroidPackagingWorker(this, new OperationProgressDialog("Packaging to NotoColorEmoji.ttf..."), packagingDirectory);
