@@ -18,11 +18,27 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools;
+package net.liveforcode.emojitools.operations.renaming;
 
-public abstract class OperationManager {
+import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.operations.Operation;
+import net.liveforcode.emojitools.operations.OperationWorker;
 
-    public abstract void start();
+import java.io.File;
 
-    public abstract void stop();
+public class RenamingOperation extends Operation {
+
+    private final File renamingDirectory;
+    private RenamingInfo renamingInfo;
+
+    public RenamingOperation(File renamingDirectory, RenamingInfo renamingInfo) {
+
+        this.renamingDirectory = renamingDirectory;
+        this.renamingInfo = renamingInfo;
+    }
+
+    @Override
+    protected OperationWorker getWorker() {
+        return new RenamingWorker(this, new ProgressDialog("Renaming Emojis..."), renamingDirectory, renamingInfo);
+    }
 }

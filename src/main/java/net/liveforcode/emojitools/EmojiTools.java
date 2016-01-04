@@ -21,13 +21,19 @@
 package net.liveforcode.emojitools;
 
 import com.aptitekk.aptiapi.AptiAPI;
-import com.aptitekk.aptiapi.ErrorHandler;
+import com.aptitekk.aptiapi.UncaughtExceptionHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
+import net.liveforcode.emojitools.operations.conversion.ConversionOperation;
+import net.liveforcode.emojitools.operations.deletion.DeletionOperation;
+import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
+import net.liveforcode.emojitools.operations.renaming.RenamingInfo;
+import net.liveforcode.emojitools.operations.renaming.RenamingOperation;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
@@ -44,7 +50,7 @@ public class EmojiTools extends Application {
 
     private static final Image logoImage = new Image(EmojiTools.class.getResourceAsStream("/Images/EmojiToolsLogo.png"));
     private static final AptiAPI aptiAPI = new AptiAPI(new Versioning(), logoImage);
-    private static final ErrorHandler errorHandler = aptiAPI.getErrorHandler();
+    private static final UncaughtExceptionHandler uncaughtExceptionHandler = aptiAPI.getUncaughtExceptionHandler();
 
     private static final ArrayList<JythonListener> jythonListenerList = new ArrayList<>();
     private static JythonHandler jythonHandler;
@@ -53,13 +59,7 @@ public class EmojiTools extends Application {
         System.setProperty("python.cachedir.skip", "false");
         System.setProperty("python.console.encoding", "UTF-8");
 
-        Thread.setDefaultUncaughtExceptionHandler(errorHandler);
-
-        String fontName = null;
-        if (args.length > 0)
-            fontName = args[0];
-
-        final File font = new File(getRootDirectory() + "/" + fontName);
+        Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
 
         new JythonLoader().execute();
 
@@ -68,18 +68,31 @@ public class EmojiTools extends Application {
         aptiAPI.checkForUpdates();
     }
 
-    public static void shutdown() {
-
-    }
-
+    /**
+     * Gets the logo image used for icons in the GUI.
+     *
+     * @return The Image object containing the logo.
+     */
     public static Image getLogoImage() {
         return logoImage;
     }
 
+    /**
+     * Creates an error report and notifies the user, asking them if they want to send or not, then
+     * immediately closes the program.
+     *
+     * @param thread    The thread that threw the exception.
+     * @param throwable The exception thrown.
+     */
     public static void submitError(Thread thread, Throwable throwable) {
-        errorHandler.uncaughtException(thread, throwable);
+        uncaughtExceptionHandler.uncaughtException(thread, throwable);
     }
 
+    /**
+     * The root directory refers to the directory immediately next to the running jar or exe file.
+     *
+     * @return The root directory file.
+     */
     public static File getRootDirectory() {
         try {
             return new File(EmojiTools.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getAbsoluteFile();
@@ -89,6 +102,11 @@ public class EmojiTools extends Application {
         }
     }
 
+    /**
+     * Adds a JythonListener, to be notified when Jython is ready to be used.
+     *
+     * @param listener The listener to notify.
+     */
     public static void addJythonListener(JythonListener listener) {
         if (!jythonListenerList.contains(listener))
             jythonListenerList.add(listener);
@@ -109,6 +127,58 @@ public class EmojiTools extends Application {
             else
                 iterator.remove();
         }
+    }
+
+    /**
+     * Gets the UncaughtExceptionHandler that creates error reports from uncaught exceptions.
+     *
+     * @return the UncaughtExceptionHandler object.
+     */
+    public static Thread.UncaughtExceptionHandler getUncaughtExceptionHandler() {
+        return uncaughtExceptionHandler;
+    }
+
+    /**
+     * Starts an Operation to delete all files within the specified directory with a ProgressDialog.
+     *
+     * @param deletionDirectory The directory to delete files from.
+     * @return True if operation completed successfully, False if unsuccessful or cancelled.
+     */
+    public static boolean performDeletionOperation(File deletionDirectory) {
+        return new DeletionOperation(deletionDirectory).runOperation();
+    }
+
+    /**
+     * Starts an Operation to extract all emojis within the specified emoji font file with a ProgressDialog.
+     *
+     * @param fontFile            The emoji font file to extract emojis from.
+     * @param extractionDirectory The directory to extract emojis into.
+     * @return True if operation completed successfully, False if unsuccessful or cancelled.
+     */
+    public static boolean performExtractionOperation(File fontFile, File extractionDirectory) {
+        return new ExtractionOperation(fontFile, extractionDirectory).runOperation();
+    }
+
+    /**
+     * Starts an Operation to rename all files within the specified directory with a ProgressDialog.
+     *
+     * @param renamingDirectory The directory containing emojis to rename.
+     * @param renamingInfo      The RenamingInfo object that specifies how renaming should be performed.
+     * @return True if operation completed successfully, False if unsuccessful or cancelled.
+     */
+    public static boolean performRenamingOperation(File renamingDirectory, RenamingInfo renamingInfo) {
+        return new RenamingOperation(renamingDirectory, renamingInfo).runOperation();
+    }
+
+    /**
+     * Starts an Operation to convert all files within the specified directory with a ProgressDialog.
+     *
+     * @param conversionDirectory The directory containing emojis to convert.
+     * @param conversionInfo      The ConversionInfo object that specifies how conversion should be performed.
+     * @return True if operation completed successfully, False if unsuccessful or cancelled.
+     */
+    public static boolean performConversionOperation(File conversionDirectory, ConversionInfo conversionInfo) {
+        return new ConversionOperation(conversionDirectory, conversionInfo).runOperation();
     }
 
     @Override

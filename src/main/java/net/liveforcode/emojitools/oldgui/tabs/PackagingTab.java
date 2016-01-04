@@ -20,12 +20,12 @@
 
 package net.liveforcode.emojitools.oldgui.tabs;
 
-import net.liveforcode.emojitools.conversion.ConversionManager;
+import net.liveforcode.emojitools.operations.conversion.ConversionOperation;
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.extraction.ExtractionManager;
+import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
 import net.liveforcode.emojitools.oldgui.*;
-import net.liveforcode.emojitools.packaging.PackagingManager;
-import net.liveforcode.emojitools.renaming.RenamingManager;
+import net.liveforcode.emojitools.operations.packaging.PackagingOperation;
+import net.liveforcode.emojitools.operations.renaming.RenamingOperation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -81,8 +81,8 @@ public class PackagingTab extends OperationTab implements ActionListener {
             return;
         }
 
-        ExtractionManager.TTXType ttxType = null;
-        for (ExtractionManager.TTXType type : ExtractionManager.TTXType.values()) {
+        ExtractionOperation.TTXType ttxType = null;
+        for (ExtractionOperation.TTXType type : ExtractionOperation.TTXType.values()) {
             if (type.getFileName().equals(ttxFile.getName())) {
                 ttxType = type;
                 break;
@@ -102,21 +102,21 @@ public class PackagingTab extends OperationTab implements ActionListener {
         }
 
         RenamingDialog renamingDialog = new RenamingDialog(this);
-        this.currentOperationManager = new RenamingManager(this.packagingFile, this.gui, renamingDialog, new boolean[]{false, false, true, false}, new boolean[]{false, false, true, true});
-        currentOperationManager.start();
+        //this.currentOperation = new RenamingOperation(this.packagingFile, this.gui, renamingDialog, new boolean[]{false, false, true, false}, new boolean[]{false, false, true, true});
+        //currentOperation.start();
         renamingDialog.setVisible(true);
 
         if (!cancelled) {
             ConversionDialog conversionDialog = new ConversionDialog(this);
-            this.currentOperationManager = new ConversionManager(this.packagingFile, this.gui, conversionDialog, true);
-            currentOperationManager.start();
+            //this.currentOperation = new ConversionOperation(this.packagingFile, this.gui, conversionDialog, true);
+         //   currentOperation.start();
             conversionDialog.setVisible(true);
         }
 
         if (!cancelled) {
             PackagingDialog packagingDialog = new PackagingDialog(this);
-            this.currentOperationManager = new PackagingManager(this.gui, this.packagingFile, packagingDialog, ttxType);
-            currentOperationManager.start();
+            //this.currentOperation = new PackagingOperation(this.gui, this.packagingFile, packagingDialog, ttxType);
+        //    currentOperation.start();
             packagingDialog.setVisible(true);
         }
 
@@ -125,8 +125,8 @@ public class PackagingTab extends OperationTab implements ActionListener {
 
     @Override
     public void stopOperations() {
-        if (this.currentOperationManager != null)
-            this.currentOperationManager.stop();
+      //  if (this.currentOperation != null)
+      //      this.currentOperation.stop();
         this.cancelled = true;
     }
 

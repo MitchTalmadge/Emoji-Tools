@@ -18,15 +18,16 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.extraction.extractors;
+package net.liveforcode.emojitools.operations.extraction.extractors;
 
-import net.liveforcode.emojitools.ConsoleManager;
-import net.liveforcode.emojitools.oldgui.ExtractionDialog;
-import net.liveforcode.emojitools.JythonHandler;
+import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.operations.Operation;
+import net.liveforcode.emojitools.operations.OperationWorker;
 
 import java.io.File;
+import java.util.List;
 
-public class ExtractionThread extends Thread implements ConsoleManager.ConsoleListener {
+public abstract class ExtractionWorker extends OperationWorker {
     final static String[] standardOrderNames = {
             ".notdef", //0
             ".null",
@@ -287,26 +288,21 @@ public class ExtractionThread extends Thread implements ConsoleManager.ConsoleLi
             "ccaron",
             "dcroat" //257
     };
-    final File font;
+    final File fontFile;
     final File extractionDirectory;
-    final JythonHandler jythonHandler;
-    ExtractionDialog extractionDialog;
-    boolean running = true;
+    final List<String> tableNames;
+    final List<Integer> tableOffsets;
+    final List<Integer> tableLengths;
 
-    ExtractionThread(String threadName, File font, File extractionDirectory, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
-        super(threadName);
-        this.font = font;
+    public ExtractionWorker(Operation operation, ProgressDialog progressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, boolean requireJython) {
+        super(operation, progressDialog, requireJython);
+        this.fontFile = fontFile;
         this.extractionDirectory = extractionDirectory;
-        this.extractionDialog = extractionDialog;
-        this.jythonHandler = jythonHandler;
-    }
-
-    public void endExtraction() {
-        running = false;
+        this.tableNames = tableNames;
+        this.tableOffsets = tableOffsets;
+        this.tableLengths = tableLengths;
     }
 
     @Override
-    public void write(String message) {
-        extractionDialog.writeToStatus(message);
-    }
+    protected abstract Boolean doWork() throws Exception;
 }

@@ -29,7 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.OperationManager;
+import net.liveforcode.emojitools.operations.Operation;
 
 import java.awt.*;
 import java.io.File;
@@ -54,7 +54,7 @@ public abstract class TabController implements Initializable {
     @FXML
     Button startButton;
 
-    OperationManager currentOperationManager;
+    Operation currentOperation;
     boolean operationsCancelled;
     File selectedFile;
 
@@ -122,10 +122,4 @@ public abstract class TabController implements Initializable {
     }
 
     abstract void startOperations();
-
-    public void stopOperations() {
-        if (this.currentOperationManager != null)
-            this.currentOperationManager.stop();
-        this.operationsCancelled = true;
-    }
 }

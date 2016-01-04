@@ -18,13 +18,13 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.extraction.extractors;
+package net.liveforcode.emojitools.operations.extraction.extractors;
 
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.extraction.ExtractionManager;
-import net.liveforcode.emojitools.extraction.ExtractionUtilites;
-import net.liveforcode.emojitools.oldgui.ExtractionDialog;
-import net.liveforcode.emojitools.JythonHandler;
+import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.operations.Operation;
+import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
+import net.liveforcode.emojitools.operations.extraction.ExtractionUtilites;
 import org.python.core.PyList;
 import org.python.core.PyType;
 
@@ -33,57 +33,39 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class GoogleExtractionThread extends ExtractionThread {
+public class GoogleExtractionWorker extends ExtractionWorker {
 
-    private final List<String> tableNames;
-    private final List<Integer> tableOffsets;
-    private final List<Integer> tableLengths;
-
-    private final ExtractionManager extractionManager;
-
-    public GoogleExtractionThread(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
-        super("GoogleExtractionThread", font, extractionDirectory, extractionDialog, jythonHandler);
-
-        this.tableNames = tableNames;
-        this.tableOffsets = tableOffsets;
-        this.tableLengths = tableLengths;
-
-        this.extractionManager = extractionManager;
+    public GoogleExtractionWorker(Operation operation, ProgressDialog progressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths) {
+        super(operation, progressDialog, fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths, true);
     }
 
     @Override
-    public void run() {
-        if (!extractionDirectory.exists()) {
-            extractionDirectory.mkdir();
-        }
-
+    protected Boolean doWork() throws Exception {
         //---- ttx.py ----//
-        extractionDialog.setIndeterminate(true);
-        extractionDialog.appendToStatus("Converting Emoji Font... Please wait...");
+        setProgressIndeterminate();
+        appendMessageToDialog("Converting Emoji Font... Please wait...");
 
         //Set sys.argv
         ArrayList<String> argvList = new ArrayList<>();
         argvList.add("package.py");                                         //Python Script Name
         argvList.add("-o");                                                 //Output flag
         argvList.add(extractionDirectory.getAbsolutePath()
-                + "/" + ExtractionManager.TTXType.ANDROID.getFileName());   //Output ttx path
-        argvList.add(font.getAbsolutePath());                               //Input ttf path
+                + "/" + ExtractionOperation.TTXType.ANDROID.getFileName());   //Output ttx path
+        argvList.add(fontFile.getAbsolutePath());                               //Input ttf path
 
-        jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
+        getJythonHandler().getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
 
-        if (!running)
-            return;
+        if (isCancelled())
+            return false;
 
         //Execute
-        jythonHandler.getPythonInterpreter().execfile(jythonHandler.getTempDirectory().getAbsolutePath()
+        getJythonHandler().getPythonInterpreter().execfile(getJythonHandler().getTempDirectory().getAbsolutePath()
                 + "/PythonScripts/package.py");
 
-        extractionDialog.setIndeterminate(false);
-
         try {
-            RandomAccessFile inputStream = new RandomAccessFile(font, "r");
+            RandomAccessFile inputStream = new RandomAccessFile(fontFile, "r");
 
-            appendToStatus("Searching for Emojis - Please wait until complete!");
+            appendMessageToDialog("Searching for Emojis - Please wait until complete!");
 
             //Get numGlyphs, ordinal numbers, and glyphNames from post table
             int cmapIndex = tableNames.indexOf("cmap");
@@ -94,10 +76,9 @@ public class GoogleExtractionThread extends ExtractionThread {
                 inputStream.seek(cmapOffset);
 
                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x00)) {
-                    extractionManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 1)");
+                    //extractionOperationManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 1)");
                     inputStream.close();
-                    extractionDialog.dispose();
-                    return;
+                    return false;
                 }
 
                 short numSubTables = inputStream.readShort();
@@ -123,10 +104,9 @@ public class GoogleExtractionThread extends ExtractionThread {
                         //Platform ID = Microsoft, Platform Specific ID = Unicode UCS-4
 
                         if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x0C)) {
-                            extractionManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 3:1)");
+                            //extractionOperationManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 3:1)");
                             inputStream.close();
-                            extractionDialog.dispose();
-                            return;
+                            return false;
                         }
 
                         inputStream.skipBytes(10); //Skip Reserved, Length, and Language
@@ -146,7 +126,7 @@ public class GoogleExtractionThread extends ExtractionThread {
                                 if (unicode.length() == 6 && unicode.startsWith("0"))
                                     unicode = unicode.substring(1);
                                 unicode = "uni" + unicode;
-                                appendToStatus("Added glyph name " + unicode + " for glyphID " + (startGlyphID + j));
+                                appendMessageToDialog("Added glyph name " + unicode + " for glyphID " + (startGlyphID + j));
                                 unicodeNameMap.put(startGlyphID + j, unicode);
                             }
                         }
@@ -159,9 +139,9 @@ public class GoogleExtractionThread extends ExtractionThread {
                             inputStream.seek(CBLCOffset);
 
                             if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                                extractionManager.showMessageDialog("Invalid 'CBLC' table! Contact developer for help.");
+                                //extractionOperationManager.showMessageDialog("Invalid 'CBLC' table! Contact developer for help.");
                                 inputStream.close();
-                                return;
+                                return false;
                             }
 
                             inputStream.skipBytes(44);
@@ -178,9 +158,9 @@ public class GoogleExtractionThread extends ExtractionThread {
                                 inputStream.seek(GSUBOffset);
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
-                                    extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 1)");
+                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 1)");
                                     inputStream.close();
-                                    return;
+                                    return false;
                                 }
 
                                 inputStream.skipBytes(4); //Skip ScriptList and FeatureList offsets
@@ -188,31 +168,28 @@ public class GoogleExtractionThread extends ExtractionThread {
                                 int lookupListOffset = GSUBOffset + inputStream.readShort(); //Get offset of LookupList
                                 inputStream.seek(lookupListOffset); //Navigate to LookupList
 
-                                System.out.println(GSUBOffset);
-                                System.out.println(lookupListOffset);
-
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01)) { //Get LookupCount
-                                    extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 2)");
+                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 2)");
                                     inputStream.close();
-                                    return;
+                                    return false;
                                 }
 
                                 int lookupTableOffset = lookupListOffset + inputStream.readShort(); //Get first LookupTable Offset
                                 inputStream.seek(lookupTableOffset); //Navigate to first LookupTable
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01)) { //Get LookupType, LookupFlag, and SubTableCount.
-                                    extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 3)");
+                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 3)");
                                     inputStream.close();
-                                    return;
+                                    return false;
                                 }
 
                                 int ligatureTableOffset = lookupTableOffset + inputStream.readShort(); //Get offset of Ligature Substitution Subtable
                                 inputStream.seek(ligatureTableOffset); //Navigate to Ligature Substitution Subtable
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01)) { //Get SubstFormat
-                                    extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 4)");
+                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 4)");
                                     inputStream.close();
-                                    return;
+                                    return false;
                                 }
 
                                 int coverageOffset = ligatureTableOffset + inputStream.readShort(); //Get Coverage Offset
@@ -228,9 +205,9 @@ public class GoogleExtractionThread extends ExtractionThread {
                                 /* Coverage Table */
                                 inputStream.seek(coverageOffset);
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02)) {
-                                    extractionManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 5)");
+                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 5)");
                                     inputStream.close();
-                                    return;
+                                    return false;
                                 }
 
                                 short rangeCount = inputStream.readShort();
@@ -264,12 +241,12 @@ public class GoogleExtractionThread extends ExtractionThread {
                                                 stringBuilder.append("_").append(unicodeNameMap.get((int) inputStream.readShort()));
                                             }
                                         }
-                                        appendToStatus("Added substituted glyph name " + stringBuilder.toString() + " for glyphID " + ligGlyph);
+                                        appendMessageToDialog("Added substituted glyph name " + stringBuilder.toString() + " for glyphID " + ligGlyph);
                                         unicodeNameMap.put((int) ligGlyph, stringBuilder.toString());
                                     }
                                 }
                             } else {
-                                appendToStatus("Could not find 'GSUB' table! Continuing...");
+                                appendMessageToDialog("Could not find 'GSUB' table! Continuing...");
                             }
 
                             //Get number of strikes, and scan for PNG files.
@@ -281,19 +258,18 @@ public class GoogleExtractionThread extends ExtractionThread {
                                 inputStream.seek(CBDTOffset);
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                                    extractionManager.showMessageDialog("Invalid 'CBDT' table! Contact developer for help.");
+                                    //extractionOperationManager.showMessageDialog("Invalid 'CBDT' table! Contact developer for help.");
                                     inputStream.close();
-                                    return;
+                                    return false;
                                 }
 
                                 System.out.println("# Emojis to Extract: " + (endGlyphID - beginGlyphID));
                                 System.out.println("Begin: " + beginGlyphID + " - End: " + endGlyphID);
 
                                 for (int i = beginGlyphID; i <= endGlyphID; i++) {
-                                    if (!running) {
+                                    if (isCancelled()) {
                                         inputStream.close();
-                                        extractionDialog.dispose();
-                                        return;
+                                        return false;
                                     }
                                     inputStream.skipBytes(5);
 
@@ -302,71 +278,56 @@ public class GoogleExtractionThread extends ExtractionThread {
                                         byte[] b = new byte[glyphLength];
                                         if (unicodeNameMap.get(i) != null) {
                                             System.out.println("Extracting Emoji #" + i + " to '" + unicodeNameMap.get(i) + ".png'");
-                                            appendToStatus("Extracting Emoji #" + i + " to '" + unicodeNameMap.get(i) + ".png'");
+                                            appendMessageToDialog("Extracting Emoji #" + i + " to '" + unicodeNameMap.get(i) + ".png'");
                                             FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, unicodeNameMap.get(i) + ".png"));
                                             inputStream.readFully(b);
                                             outputStream.write(b);
                                             outputStream.close();
                                         } else
                                             inputStream.skipBytes(glyphLength);
-                                        updateProgress((int) ((i - beginGlyphID) / (float) (endGlyphID - beginGlyphID) * 100));
+                                        updateProgress(i - beginGlyphID, endGlyphID - beginGlyphID);
                                     }
                                 }
 
                             } else {
-                                extractionManager.showMessageDialog("Could not find 'CBDT' table! Contact developer for help.");
+                                //extractionOperationManager.showMessageDialog("Could not find 'CBDT' table! Contact developer for help.");
                                 inputStream.close();
-                                extractionDialog.dispose();
-                                return;
+                                return false;
                             }
                         } else {
-                            extractionManager.showMessageDialog("Could not find 'CBLC' table! Contact developer for help.");
+                            //extractionOperationManager.showMessageDialog("Could not find 'CBLC' table! Contact developer for help.");
                             inputStream.close();
-                            extractionDialog.dispose();
-                            return;
+                            return false;
                         }
                     } else if (platformIDs[subTableId] == 0 && platformSpecificIDs[subTableId] == 5) {
                         //Platform ID = Unicode, //Platform Specific ID = Unicode Variation Sequences
 
                         if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x0E)) {
-                            extractionManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 3:2)");
+                            //extractionOperationManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 3:2)");
                             inputStream.close();
-                            extractionDialog.dispose();
-                            return;
+                            return false;
                         }
 
                         //TODO: Format 14
                     } else {
-                        extractionManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 2:" + subTableId + ")");
+                        //extractionOperationManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 2:" + subTableId + ")");
                         inputStream.close();
-                        extractionDialog.dispose();
-                        return;
+                        return false;
                     }
                 }
             } else {
-                extractionManager.showMessageDialog("Could not find 'cmap' table! Contact developer for help.");
+                //extractionOperationManager.showMessageDialog("Could not find 'cmap' table! Contact developer for help.");
                 inputStream.close();
-                extractionDialog.dispose();
-                return;
+                return false;
             }
 
             inputStream.close();
-
-            extractionDialog.dispose();
         } catch (FileNotFoundException e) {
-            System.out.println(this.font.getName() + " not found!");
-            extractionManager.showMessageDialog(this.font.getName() + " not found!");
+            System.out.println(this.fontFile.getName() + " not found!");
+            //extractionOperationManager.showMessageDialog(this.fontFile.getName() + " not found!");
         } catch (IOException e) {
-            EmojiTools.submitError(currentThread(), e);
+            EmojiTools.submitError(Thread.currentThread(), e);
         }
+        return true;
     }
-
-    private void updateProgress(int progress) {
-        extractionDialog.setProgress(progress);
-    }
-
-    private void appendToStatus(String message) {
-        extractionDialog.appendToStatus(message);
-    }
-
 }

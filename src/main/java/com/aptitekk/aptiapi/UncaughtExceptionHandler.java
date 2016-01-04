@@ -18,21 +18,27 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.oldgui.tabs;
+package com.aptitekk.aptiapi;
 
-import net.liveforcode.emojitools.operations.Operation;
+import com.aptitekk.aptiapi.gui.ErrorReportDialog;
 
-import javax.swing.*;
+public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-public class OperationTab extends JPanel {
+    private final AptiAPI aptiAPI;
 
-    Operation currentOperation;
-    boolean cancelled;
-
-    public void stopOperations() {
-        /*if (this.currentOperation != null)
-            this.currentOperation.stop();
-        this.cancelled = true;*/
+    public UncaughtExceptionHandler(AptiAPI aptiAPI) {
+        this.aptiAPI = aptiAPI;
     }
 
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+        ErrorReport errorReport = new ErrorReport(t, e);
+        errorReport.setVersion(aptiAPI.getVersioningDetails().getVersionString());
+
+        System.out.println("ERROR OCCURRED!");
+        System.out.println("Thread Name: " + t.getName());
+        System.out.println("Exception:\n" + errorReport.getStackTrace());
+
+        new ErrorReportDialog(aptiAPI, errorReport).setVisible(true);
+    }
 }

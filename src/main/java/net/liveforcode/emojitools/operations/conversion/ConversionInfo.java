@@ -18,32 +18,23 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.extraction;
+package net.liveforcode.emojitools.operations.conversion;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.Arrays;
+public class ConversionInfo {
 
-public class ExtractionUtilites {
+    public static final int DIRECTION_CGBI_RGBA = 0;
+    public static final int DIRECTION_RGBA_CGBI = 1;
 
-    public static String getByteString(RandomAccessFile inputStream, int numBytesToRead) {
-        byte[] bytes = new byte[numBytesToRead];
-        try {
-            inputStream.readFully(bytes);
-        } catch (IOException e) {
-            e.printStackTrace();
+    private int direction;
+
+    public ConversionInfo(int direction) {
+        if (direction < 0 || direction > 1) {
+            direction = 0;
         }
-        return new String(bytes);
+        this.direction = direction;
     }
 
-    public static boolean compareBytes(RandomAccessFile inputStream, byte... compare) {
-        byte[] bytes = new byte[compare.length];
-        try {
-            inputStream.readFully(bytes);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Arrays.equals(bytes, compare);
+    public int getDirection() {
+        return direction;
     }
-
 }

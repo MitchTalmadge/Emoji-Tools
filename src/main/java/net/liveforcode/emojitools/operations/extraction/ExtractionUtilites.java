@@ -18,21 +18,32 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.oldgui.tabs;
+package net.liveforcode.emojitools.operations.extraction;
 
-import net.liveforcode.emojitools.operations.Operation;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Arrays;
 
-import javax.swing.*;
+public class ExtractionUtilites {
 
-public class OperationTab extends JPanel {
+    public static String getByteString(RandomAccessFile inputStream, int numBytesToRead) {
+        byte[] bytes = new byte[numBytesToRead];
+        try {
+            inputStream.readFully(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new String(bytes);
+    }
 
-    Operation currentOperation;
-    boolean cancelled;
-
-    public void stopOperations() {
-        /*if (this.currentOperation != null)
-            this.currentOperation.stop();
-        this.cancelled = true;*/
+    public static boolean compareBytes(RandomAccessFile inputStream, byte... compare) {
+        byte[] bytes = new byte[compare.length];
+        try {
+            inputStream.readFully(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Arrays.equals(bytes, compare);
     }
 
 }

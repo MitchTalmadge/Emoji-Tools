@@ -18,13 +18,13 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.packaging.packagingthreads;
+package net.liveforcode.emojitools.operations.packaging.packagingthreads;
 
 import net.liveforcode.emojitools.ConsoleManager;
 import net.liveforcode.emojitools.oldgui.EmojiToolsGUI;
 import net.liveforcode.emojitools.oldgui.PackagingDialog;
 import net.liveforcode.emojitools.JythonHandler;
-import net.liveforcode.emojitools.packaging.PackagingManager;
+import net.liveforcode.emojitools.operations.packaging.PackagingOperation;
 
 import java.io.File;
 
@@ -32,17 +32,17 @@ public class PackagingThread extends Thread implements ConsoleManager.ConsoleLis
 
     final EmojiToolsGUI gui;
     final File pngDirectory;
-    final PackagingManager packagingManager;
+    final PackagingOperation packagingOperationManager;
     final PackagingDialog packagingDialog;
     final JythonHandler jythonHandler;
 
     boolean running = true;
 
-    public PackagingThread(String threadName, EmojiToolsGUI gui, File pngDirectory, PackagingManager packagingManager, PackagingDialog packagingDialog, JythonHandler jythonHandler) {
+    public PackagingThread(String threadName, EmojiToolsGUI gui, File pngDirectory, PackagingOperation packagingOperationManager, PackagingDialog packagingDialog, JythonHandler jythonHandler) {
         super(threadName);
         this.gui = gui;
         this.pngDirectory = pngDirectory;
-        this.packagingManager = packagingManager;
+        this.packagingOperationManager = packagingOperationManager;
         this.packagingDialog = packagingDialog;
         this.jythonHandler = jythonHandler;
     }

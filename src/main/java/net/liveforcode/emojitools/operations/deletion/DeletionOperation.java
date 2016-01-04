@@ -18,40 +18,26 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.deletion;
+package net.liveforcode.emojitools.operations.deletion;
 
-import net.liveforcode.emojitools.oldgui.DeletionDialog;
-import net.liveforcode.emojitools.oldgui.EmojiToolsGUI;
-import net.liveforcode.emojitools.OperationManager;
+import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.operations.Operation;
+import net.liveforcode.emojitools.operations.OperationWorker;
 
+import javax.swing.*;
 import java.io.File;
+import java.util.ResourceBundle;
 
-public class DeletionManager extends OperationManager {
+public class DeletionOperation extends Operation {
 
-    private final EmojiToolsGUI gui;
+    private File deletionDirectory;
 
-    private final DeletionThread deletionThread;
-
-
-    public DeletionManager(File extractionDirectory, EmojiToolsGUI gui, DeletionDialog deletionDialog) {
-        this.gui = gui;
-
-        this.deletionThread = new DeletionThread(extractionDirectory, this, deletionDialog);
-    }
-
-    public void showMessageDialog(String message) {
-        this.gui.showMessageDialog(message);
+    public DeletionOperation(File deletionDirectory) {
+        this.deletionDirectory = deletionDirectory;
     }
 
     @Override
-    public void start() {
-        deletionThread.start();
-    }
-
-    @Override
-    public void stop() {
-        if (deletionThread != null && deletionThread.isAlive()) {
-            deletionThread.endDeletion();
-        }
+    protected OperationWorker getWorker() {
+        return new DeletionWorker(this, new ProgressDialog("Deleting Directory Contents..."), deletionDirectory);
     }
 }

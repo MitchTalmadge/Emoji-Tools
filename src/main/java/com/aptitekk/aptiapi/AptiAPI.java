@@ -42,7 +42,7 @@ public class AptiAPI {
     private static final String ERROR_REPORTER = "ErrorReporter.php";
     private static final String UPDATE_CHECKER = "UpdateChecker.php";
     protected final ArrayList<AptiAPIListener> APIListeners = new ArrayList<>();
-    private final ErrorHandler errorHandler;
+    private final UncaughtExceptionHandler uncaughtExceptionHandler;
     private AptiCrypto aptiCrypto;
     private AptiAPIVersioningDetails versioningDetails;
     private Image icon;
@@ -50,7 +50,7 @@ public class AptiAPI {
     public AptiAPI(AptiAPIVersioningDetails versioningDetails, Image icon) {
         this.versioningDetails = versioningDetails;
         this.icon = icon;
-        this.errorHandler = new ErrorHandler(this);
+        this.uncaughtExceptionHandler = new UncaughtExceptionHandler(this);
     }
 
     public void addAPIListener(AptiAPIListener listener) {
@@ -232,8 +232,8 @@ public class AptiAPI {
         return true;
     }
 
-    public ErrorHandler getErrorHandler() {
-        return errorHandler;
+    public UncaughtExceptionHandler getUncaughtExceptionHandler() {
+        return uncaughtExceptionHandler;
     }
 
     public AptiAPIVersioningDetails getVersioningDetails() {

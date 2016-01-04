@@ -1,4 +1,4 @@
-package net.liveforcode.emojitools.packaging;
+package net.liveforcode.emojitools.operations.packaging;
 
 import java.util.HashMap;
 import java.util.List;

@@ -18,51 +18,44 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.deletion;
+package net.liveforcode.emojitools.operations.deletion;
 
-import net.liveforcode.emojitools.oldgui.DeletionDialog;
+import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.operations.Operation;
+import net.liveforcode.emojitools.operations.OperationWorker;
 
 import java.io.File;
 
-class DeletionThread extends Thread {
-
-    private final File extractionDirectory;
-    private final DeletionManager deletionManager;
-    private final DeletionDialog deletionDialog;
-    private boolean running = true;
-
+public class DeletionWorker extends OperationWorker {
 
     private int totalFileNum = 0;
     private int currentFileNum = 0;
+    private File deletionDirectory;
 
-    public DeletionThread(File extractionDirectory, DeletionManager deletionManager, DeletionDialog deletionDialog) {
-        super("DeletionThread");
-        this.extractionDirectory = extractionDirectory;
-        this.deletionManager = deletionManager;
-        this.deletionDialog = deletionDialog;
+    public DeletionWorker(Operation operation, ProgressDialog progressDialog, File deletionDirectory) {
+        super(operation, progressDialog, false);
+        this.deletionDirectory = deletionDirectory;
     }
 
     @Override
-    public void run() {
+    protected Boolean doWork() throws Exception {
+        totalFileNum = countFilesRecursive(totalFileNum, deletionDirectory);
 
-        totalFileNum = countFilesRecursive(totalFileNum, extractionDirectory);
+        System.out.println("# of Files to Delete: " + totalFileNum);
 
-        System.out.println(totalFileNum);
-
-        if (!running) {
-            this.deletionDialog.dispose();
-            return;
+        if (isCancelled()) {
+            return false;
         }
 
-        deleteFilesRecursive(extractionDirectory);
+        deleteFilesRecursive(deletionDirectory);
 
-        deletionDialog.dispose();
+        return true;
     }
 
     private int countFilesRecursive(int fileCount, File dir) {
         fileCount += dir.listFiles().length;
         for (File file : dir.listFiles()) {
-            if (!running)
+            if (isCancelled())
                 return 0;
             if (file.isDirectory())
                 fileCount = countFilesRecursive(fileCount, file);
@@ -72,7 +65,7 @@ class DeletionThread extends Thread {
 
     private void deleteFilesRecursive(File dir) {
         for (File file : dir.listFiles()) {
-            if (!running) {
+            if (isCancelled()) {
                 return;
             }
             this.currentFileNum++;
@@ -80,21 +73,13 @@ class DeletionThread extends Thread {
             if (file.isDirectory())
                 deleteFilesRecursive(file);
 
-            if (!file.equals(extractionDirectory))
+            if (!file.equals(deletionDirectory))
                 file.delete();
 
-            System.out.println("Deleting " + file.getName());
-            deletionDialog.appendToStatus("Deleting " + file.getName());
-            updateProgress();
+            appendMessageToDialog("Deleting " + file.getName());
+            updateProgress(currentFileNum, totalFileNum);
         }
-        updateProgress();
+        updateProgress(currentFileNum, totalFileNum);
     }
 
-    private void updateProgress() {
-        deletionDialog.setProgress((int) (((double) currentFileNum / totalFileNum) * 100));
-    }
-
-    public void endDeletion() {
-        running = false;
-    }
 }

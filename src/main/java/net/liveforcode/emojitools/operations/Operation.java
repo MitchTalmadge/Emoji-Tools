@@ -18,21 +18,31 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.oldgui.tabs;
+package net.liveforcode.emojitools.operations;
 
-import net.liveforcode.emojitools.operations.Operation;
+public abstract class Operation {
 
-import javax.swing.*;
+    boolean successfullyCompleted = false;
 
-public class OperationTab extends JPanel {
+    protected abstract OperationWorker getWorker();
 
-    Operation currentOperation;
-    boolean cancelled;
+    /**
+     * Runs the operation.
+     *
+     * @return True if operation is completed successfully, False if unsuccessful or cancelled.
+     */
+    public boolean runOperation() {
 
-    public void stopOperations() {
-        /*if (this.currentOperation != null)
-            this.currentOperation.stop();
-        this.cancelled = true;*/
+        OperationWorker worker = getWorker();
+
+        if (worker == null)
+            return false;
+
+        worker.executeWorker();
+        return successfullyCompleted;
     }
 
+    public void done(boolean successfullyCompleted) {
+        this.successfullyCompleted = successfullyCompleted;
+    }
 }

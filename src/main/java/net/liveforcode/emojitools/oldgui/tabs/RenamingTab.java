@@ -24,7 +24,7 @@ import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.oldgui.EmojiToolsGUI;
 import net.liveforcode.emojitools.oldgui.FinishedDialog;
 import net.liveforcode.emojitools.oldgui.RenamingDialog;
-import net.liveforcode.emojitools.renaming.RenamingManager;
+import net.liveforcode.emojitools.operations.renaming.RenamingOperation;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -90,8 +90,8 @@ public class RenamingTab extends OperationTab implements ActionListener {
         RenamingDialog renamingDialog = new RenamingDialog(this);
         boolean[] prefixButtons = new boolean[]{this.prefixesRadioButton1.isSelected(), this.prefixesRadioButton2.isSelected(), this.prefixesRadioButton3.isSelected(), this.prefixesRadioButton4.isSelected()};
         boolean[] capitalizationButtons = new boolean[]{this.captializationRadioButton1.isSelected(), this.captializationRadioButton2.isSelected(), this.captializationRadioButton3.isSelected(), this.capitalizationCheckBox1.isSelected()};
-        this.currentOperationManager = new RenamingManager(renameFile, this.gui, renamingDialog, prefixButtons, capitalizationButtons);
-        currentOperationManager.start();
+        //this.currentOperation = new RenamingOperation(renameFile, this.gui, renamingDialog, prefixButtons, capitalizationButtons);
+        //currentOperation.start();
         renamingDialog.setVisible(true);
 
         new FinishedDialog(this.gui, "Emoji Renaming Complete!", "Your Renamed Emojis can be found in:", renameFile).setVisible(true);
@@ -99,8 +99,8 @@ public class RenamingTab extends OperationTab implements ActionListener {
 
     @Override
     public void stopOperations() {
-        if (this.currentOperationManager != null)
-            this.currentOperationManager.stop();
+        if (this.currentOperation != null)
+       //     this.currentOperation.stop();
         this.cancelled = true;
     }
 

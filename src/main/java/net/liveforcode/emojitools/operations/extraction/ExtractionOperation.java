@@ -18,16 +18,14 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.extraction;
+package net.liveforcode.emojitools.operations.extraction;
 
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.extraction.extractors.AppleExtractionThread;
-import net.liveforcode.emojitools.extraction.extractors.ExtractionThread;
-import net.liveforcode.emojitools.extraction.extractors.GoogleExtractionThread;
-import net.liveforcode.emojitools.oldgui.EmojiToolsGUI;
-import net.liveforcode.emojitools.oldgui.ExtractionDialog;
-import net.liveforcode.emojitools.JythonHandler;
-import net.liveforcode.emojitools.OperationManager;
+import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.operations.Operation;
+import net.liveforcode.emojitools.operations.OperationWorker;
+import net.liveforcode.emojitools.operations.extraction.extractors.AppleExtractionWorker;
+import net.liveforcode.emojitools.operations.extraction.extractors.GoogleExtractionWorker;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,29 +33,24 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.List;
 
-public class ExtractionManager extends OperationManager implements EmojiTools.JythonListener {
+public class ExtractionOperation extends Operation {
 
-    private final File font;
+    private final File fontFile;
     private final File extractionDirectory;
-    private final EmojiToolsGUI gui;
-    private final ExtractionDialog extractionDialog;
     private List<String> tableNames;
     private List<Integer> tableOffsets;
     private List<Integer> tableLengths;
-    private ExtractionThread extractionThread;
 
-    public ExtractionManager(File font, File extractionDirectory, EmojiToolsGUI gui, ExtractionDialog extractionDialog) {
-        this.font = font;
+    public ExtractionOperation(File fontFile, File extractionDirectory) {
+        this.fontFile = fontFile;
         this.extractionDirectory = extractionDirectory;
-        this.gui = gui;
-        this.extractionDialog = extractionDialog;
 
         //Determine which Extraction Method to use
         try {
-            RandomAccessFile inputStream = new RandomAccessFile(font, "r");
+            RandomAccessFile inputStream = new RandomAccessFile(fontFile, "r");
 
             if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
-                showMessageDialog("Selected Font is not a valid True Type Font! (*.ttf)");
+                //showMessageDialog("Selected Font is not a valid True Type Font! (*.ttf)");
                 inputStream.close();
                 return;
             }
@@ -81,33 +74,15 @@ public class ExtractionManager extends OperationManager implements EmojiTools.Jy
         }
     }
 
-    public void showMessageDialog(String message) {
-        this.gui.showMessageDialog(message);
-    }
-
     @Override
-    public void start() {
-        EmojiTools.addJythonListener(this);
-    }
-
-    @Override
-    public void onJythonReady(JythonHandler jythonHandler) {
+    protected OperationWorker getWorker() {
         if (tableNames.contains("sbix"))
-            extractionThread = new AppleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog, jythonHandler);
+            return new AppleExtractionWorker(this, new ProgressDialog("Extracting Apple Emojis..."), fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths);
         else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
-            extractionThread = new GoogleExtractionThread(font, extractionDirectory, tableNames, tableOffsets, tableLengths, this, extractionDialog, jythonHandler);
+            return new GoogleExtractionWorker(this, new ProgressDialog("Extracting Android Emojis..."), fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths);
         else {
-            gui.showMessageDialog("The selected font cannot be extracted. Contact developer for help.");
-            return;
-        }
-        this.gui.getConsoleManager().addConsoleListener(extractionThread);
-        extractionThread.start();
-    }
-
-    @Override
-    public void stop() {
-        if (extractionThread != null && extractionThread.isAlive()) {
-            extractionThread.endExtraction();
+            //gui.showMessageDialog("The selected font cannot be extracted. Contact developer for help.");
+            return null;
         }
     }
 

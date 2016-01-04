@@ -20,12 +20,12 @@
 
 package net.liveforcode.emojitools.oldgui.tabs;
 
-import net.liveforcode.emojitools.conversion.ConversionManager;
-import net.liveforcode.emojitools.deletion.DeletionManager;
+import net.liveforcode.emojitools.operations.conversion.ConversionOperation;
+import net.liveforcode.emojitools.operations.deletion.DeletionOperation;
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.extraction.ExtractionManager;
+import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
 import net.liveforcode.emojitools.oldgui.*;
-import net.liveforcode.emojitools.renaming.RenamingManager;
+import net.liveforcode.emojitools.operations.renaming.RenamingOperation;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -78,61 +78,12 @@ public class ExtractionTab extends OperationTab implements ActionListener, TextF
     }
 
     private void startExtraction() {
-        this.cancelled = false;
-
-        if (!this.fontFile.exists()) {
-            this.fontFile = null;
-            this.fileNameField.setText(defaultFileNameFieldText);
-            this.updateStartButton();
-            return;
-        }
-
-        File extractionDirectory = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryField.getText());
-        if (extractionDirectory.exists()) {
-            OverwriteWarningDialog overwriteWarningDialog = new OverwriteWarningDialog(this, extractionDirectory);
-            overwriteWarningDialog.setVisible(true);
-            if (cancelled) {
-                this.cancelled = false;
-                return;
-            } else {
-                DeletionDialog deletionDialog = new DeletionDialog(this);
-                this.currentOperationManager = new DeletionManager(extractionDirectory, this.gui, deletionDialog);
-                currentOperationManager.start();
-                deletionDialog.setVisible(true);
-            }
-        }
-
-        if (!cancelled) {
-            ExtractionDialog extractionDialog = new ExtractionDialog(this);
-            this.currentOperationManager = new ExtractionManager(this.fontFile, extractionDirectory, this.gui, extractionDialog);
-            currentOperationManager.start();
-            extractionDialog.setVisible(true);
-        } else {
-            this.cancelled = false;
-            return;
-        }
-
-        if (this.renameRadioButton2.isSelected() && !cancelled) {
-            RenamingDialog renamingDialog = new RenamingDialog(this);
-            this.currentOperationManager = new RenamingManager(extractionDirectory, this.gui, renamingDialog, new boolean[]{false, true, false, false}, new boolean[]{true, false, false, false});
-            currentOperationManager.start();
-            renamingDialog.setVisible(true);
-        }
-
-        if (this.convertRadioButton2.isSelected() && !cancelled) {
-            ConversionDialog conversionDialog = new ConversionDialog(this);
-            this.currentOperationManager = new ConversionManager(extractionDirectory, this.gui, conversionDialog, true);
-            currentOperationManager.start();
-            conversionDialog.setVisible(true);
-        }
-
-        new FinishedDialog(this.gui, "Emoji Extraction Complete!", "Your Extracted Emojis can be found in:", extractionDirectory).setVisible(true);
     }
 
     @Override
     public void stopOperations() {
-        if (this.currentOperationManager != null)
-            this.currentOperationManager.stop();
+        //if (this.currentOperation != null)
+        //    this.currentOperation.stop();
         this.cancelled = true;
     }
 

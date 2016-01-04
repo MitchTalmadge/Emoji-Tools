@@ -18,7 +18,7 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.conversion.converter;
+package net.liveforcode.emojitools.operations.conversion.converter;
 
 import java.io.DataInputStream;
 import java.io.FileOutputStream;

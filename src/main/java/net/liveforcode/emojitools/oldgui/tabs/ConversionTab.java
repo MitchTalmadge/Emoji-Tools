@@ -20,7 +20,7 @@
 
 package net.liveforcode.emojitools.oldgui.tabs;
 
-import net.liveforcode.emojitools.conversion.ConversionManager;
+import net.liveforcode.emojitools.operations.conversion.ConversionOperation;
 import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.oldgui.ConversionDialog;
 import net.liveforcode.emojitools.oldgui.EmojiToolsGUI;
@@ -72,8 +72,8 @@ public class ConversionTab extends OperationTab implements ActionListener {
         }
 
         ConversionDialog conversionDialog = new ConversionDialog(this);
-        this.currentOperationManager = new ConversionManager(this.conversionFile, this.gui, conversionDialog, this.conversionRadioButton1.isSelected());
-        currentOperationManager.start();
+        //this.currentOperation = new ConversionOperation(this.conversionFile, this.gui, conversionDialog, this.conversionRadioButton1.isSelected());
+        //currentOperation.start();
         conversionDialog.setVisible(true);
 
         new FinishedDialog(this.gui, "Emoji Conversion Complete!", "Your Converted Emojis can be found in:", conversionFile).setVisible(true);
@@ -81,8 +81,8 @@ public class ConversionTab extends OperationTab implements ActionListener {
 
     @Override
     public void stopOperations() {
-        if (this.currentOperationManager != null)
-            this.currentOperationManager.stop();
+        //if (this.currentOperation != null)
+        //    this.currentOperation.stop();
         this.cancelled = true;
     }
 

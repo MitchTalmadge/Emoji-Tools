@@ -18,27 +18,26 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.aptitekk.aptiapi;
+package net.liveforcode.emojitools.operations.conversion;
 
-import com.aptitekk.aptiapi.gui.ErrorReportDialog;
+import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.operations.Operation;
+import net.liveforcode.emojitools.operations.OperationWorker;
 
-public class ErrorHandler implements Thread.UncaughtExceptionHandler {
+import java.io.File;
 
-    private final AptiAPI aptiAPI;
+public class ConversionOperation extends Operation {
 
-    public ErrorHandler(AptiAPI aptiAPI) {
-        this.aptiAPI = aptiAPI;
+    private final File conversionDirectory;
+    private final ConversionInfo conversionInfo;
+
+    public ConversionOperation(File conversionDirectory, ConversionInfo conversionInfo) {
+        this.conversionDirectory = conversionDirectory;
+        this.conversionInfo = conversionInfo;
     }
 
     @Override
-    public void uncaughtException(Thread t, Throwable e) {
-        ErrorReport errorReport = new ErrorReport(t, e);
-        errorReport.setVersion(aptiAPI.getVersioningDetails().getVersionString());
-
-        System.out.println("ERROR OCCURRED!");
-        System.out.println("Thread Name: " + t.getName());
-        System.out.println("Exception:\n" + errorReport.getStackTrace());
-
-        new ErrorReportDialog(aptiAPI, errorReport).setVisible(true);
+    protected OperationWorker getWorker() {
+        return new ConversionWorker(this, new ProgressDialog("Converting Emojis..."), conversionDirectory, conversionInfo);
     }
 }

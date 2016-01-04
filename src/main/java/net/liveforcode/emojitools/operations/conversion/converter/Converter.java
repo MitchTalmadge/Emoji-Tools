@@ -18,13 +18,14 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.conversion.converter;
+package net.liveforcode.emojitools.operations.conversion.converter;
 
 import com.jcraft.jzlib.Deflater;
 import com.jcraft.jzlib.GZIPException;
 import com.jcraft.jzlib.Inflater;
 import com.jcraft.jzlib.JZlib;
 import net.liveforcode.emojitools.EmojiTools;
+import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -42,7 +43,7 @@ public class Converter {
     private static final byte COLOR_GREYALPHA = 4;
     private static final byte COLOR_TRUEALPHA = 6;
     private File sourceFile;
-    private boolean CgBItoRGBA;
+    private ConversionInfo conversionInfo;
     private ArrayList<PNGChunk> chunks;
 
     public static String bytesToHex(byte[] bytes) {
@@ -70,38 +71,42 @@ public class Converter {
         return image;
     }
 
-    public void convertFile(File source, boolean CgBItoRGBA) {
-        this.sourceFile = source;
-        this.CgBItoRGBA = CgBItoRGBA;
+    public void convertDirectory(File directory, ConversionInfo conversionInfo) {
+        this.sourceFile = directory;
+        this.conversionInfo = conversionInfo;
 
         this.chunks = new ArrayList<>();
 
-        if (source.isDirectory()) {
-            for (File file : source.listFiles())
-                convertFile(file, CgBItoRGBA);
-        } else if (source.getName().toLowerCase().endsWith(".png")) {
-            try {
-                readChunks();
+        if (directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if(files == null)
+                return;
+            for (File file : files) {
+                if (file.getName().toLowerCase().endsWith(".png")) {
+                    try {
+                        readChunks();
 
-                if ((CgBItoRGBA && getChunkByName("CgBI") != null) || (!CgBItoRGBA && getChunkByName("CgBI") == null)) {
+                        if ((conversionInfo.getDirection() == ConversionInfo.DIRECTION_CGBI_RGBA && getChunkByName("CgBI") != null) || (conversionInfo.getDirection() == ConversionInfo.DIRECTION_RGBA_CGBI && getChunkByName("CgBI") == null)) {
 
-                    if (!CgBItoRGBA) {
-                        PNGChunk chunk = new PNGChunk(4, "CgBI", new byte[]{0x50, 0x00, 0x20, 0x02}, new byte[]{0x2B, (byte) 0xD5, (byte) 0xB3, 0x7F});
-                        chunks.add(0, chunk);
-                    }
+                            if (conversionInfo.getDirection() == ConversionInfo.DIRECTION_RGBA_CGBI) {
+                                PNGChunk chunk = new PNGChunk(4, "CgBI", new byte[]{0x50, 0x00, 0x20, 0x02}, new byte[]{0x2B, (byte) 0xD5, (byte) 0xB3, 0x7F});
+                                chunks.add(0, chunk);
+                            }
 
-                    PNGIHDRChunk IHDRChunk = (PNGIHDRChunk) getChunkByName("IHDR");
-                    if (IHDRChunk != null) {
-                        int maxInflateBuffer = (((IHDRChunk.getColorType() == COLOR_TRUECOLOR) ? 3 : 4) * (IHDRChunk.getWidth()) + 1) * IHDRChunk.getHeight();
-                        byte[] outputBuffer = new byte[maxInflateBuffer];
+                            PNGIHDRChunk IHDRChunk = (PNGIHDRChunk) getChunkByName("IHDR");
+                            if (IHDRChunk != null) {
+                                int maxInflateBuffer = (((IHDRChunk.getColorType() == COLOR_TRUECOLOR) ? 3 : 4) * (IHDRChunk.getWidth()) + 1) * IHDRChunk.getHeight();
+                                byte[] outputBuffer = new byte[maxInflateBuffer];
 
-                        convertDataChunk(IHDRChunk, outputBuffer, maxInflateBuffer);
+                                convertDataChunk(IHDRChunk, outputBuffer, maxInflateBuffer);
 
-                        writePng();
+                                writePng();
+                            }
+                        }
+                    } catch (IOException e) {
+                        EmojiTools.submitError(Thread.currentThread(), e);
                     }
                 }
-            } catch (IOException e) {
-                EmojiTools.submitError(Thread.currentThread(), e);
             }
         }
     }
@@ -164,7 +169,7 @@ public class Converter {
         }
 
         // Switch the color
-        if (CgBItoRGBA) {
+        if (conversionInfo.getDirection() == ConversionInfo.DIRECTION_CGBI_RGBA) {
             int index = 0;
             int r, g, b, a;
 
@@ -235,7 +240,7 @@ public class Converter {
     }
 
     private long inflate(byte[] conversionBuffer, int maxInflateBuffer) throws GZIPException {
-        Inflater inflater = new Inflater(this.CgBItoRGBA ? -15 : 15);
+        Inflater inflater = new Inflater(conversionInfo.getDirection() == ConversionInfo.DIRECTION_CGBI_RGBA ? -15 : 15);
 
         for (PNGChunk chunk : chunks) {
             if (!chunk.getName().equalsIgnoreCase("IDAT"))
@@ -257,7 +262,7 @@ public class Converter {
     }
 
     private Deflater deflate(byte[] buffer, int length, int maxInflateBuffer) throws GZIPException {
-        Deflater deflater = new Deflater(JZlib.Z_BEST_COMPRESSION, this.CgBItoRGBA ? 15 : -15);
+        Deflater deflater = new Deflater(JZlib.Z_BEST_COMPRESSION, conversionInfo.getDirection() == ConversionInfo.DIRECTION_CGBI_RGBA ? 15 : -15);
         deflater.setInput(buffer, 0, length, false);
 
         int maxDeflateBuffer = maxInflateBuffer + 1024;
@@ -298,7 +303,7 @@ public class Converter {
             boolean dataWritten = false;
             for (PNGChunk chunk : chunks) {
                 // Skip Apple specific and misplaced CgBI chunk
-                if (chunk.getName().equalsIgnoreCase("CgBI") && this.CgBItoRGBA) {
+                if (chunk.getName().equalsIgnoreCase("CgBI") && conversionInfo.getDirection() == ConversionInfo.DIRECTION_CGBI_RGBA) {
                     continue;
                 }
 

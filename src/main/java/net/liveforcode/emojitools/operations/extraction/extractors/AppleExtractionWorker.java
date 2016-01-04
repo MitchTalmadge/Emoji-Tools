@@ -18,68 +18,28 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.extraction.extractors;
+package net.liveforcode.emojitools.operations.extraction.extractors;
 
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.extraction.ExtractionManager;
-import net.liveforcode.emojitools.extraction.ExtractionUtilites;
-import net.liveforcode.emojitools.oldgui.ExtractionDialog;
-import net.liveforcode.emojitools.JythonHandler;
+import net.liveforcode.emojitools.gui.dialogs.ProgressDialog;
+import net.liveforcode.emojitools.operations.Operation;
+import net.liveforcode.emojitools.operations.extraction.ExtractionUtilites;
 
 import java.io.*;
 import java.util.List;
 
-public class AppleExtractionThread extends ExtractionThread {
+public class AppleExtractionWorker extends ExtractionWorker {
 
-    private final List<String> tableNames;
-    private final List<Integer> tableOffsets;
-    private final List<Integer> tableLengths;
-
-    private final ExtractionManager extractionManager;
-
-    public AppleExtractionThread(File font, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths, ExtractionManager extractionManager, ExtractionDialog extractionDialog, JythonHandler jythonHandler) {
-        super("AppleExtractionThread", font, extractionDirectory, extractionDialog, jythonHandler);
-
-        this.tableNames = tableNames;
-        this.tableOffsets = tableOffsets;
-        this.tableLengths = tableLengths;
-
-        this.extractionManager = extractionManager;
+    public AppleExtractionWorker(Operation operation, ProgressDialog progressDialog, File fontFile, File extractionDirectory, List<String> tableNames, List<Integer> tableOffsets, List<Integer> tableLengths) {
+        super(operation, progressDialog, fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths, false);
     }
 
     @Override
-    public void run() {
+    protected Boolean doWork() throws Exception {
         try {
-            RandomAccessFile inputStream = new RandomAccessFile(font, "r");
+            RandomAccessFile inputStream = new RandomAccessFile(fontFile, "r");
 
-            if (!extractionDirectory.exists()) {
-                extractionDirectory.mkdir();
-            }
-
-            /*//---- ttx.py ----//
-            extractionDialog.setIndeterminate(true);
-            extractionDialog.appendToStatus("Converting Emoji Font... Please wait...");
-
-            //Set sys.argv
-            ArrayList<String> argvList = new ArrayList<>();
-            argvList.add("package.py");                                         //Python Script Name
-            argvList.add("-o");                                                 //Output flag
-            argvList.add(extractionDirectory.getAbsolutePath()
-                    + "/" + ExtractionManager.TTXType.IOS.getFileName());       //Output ttx path
-            argvList.add(font.getAbsolutePath());                               //Input ttf path
-
-            jythonHandler.getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
-
-            if (!running)
-                return;
-
-            //Execute
-            jythonHandler.getPythonInterpreter().execfile(jythonHandler.getTempDirectory().getAbsolutePath()
-                    + "/PythonScripts/package.py");*/
-
-            extractionDialog.setIndeterminate(false);
-
-            appendToStatus("Searching for Emojis - Please wait until complete!");
+            appendMessageToDialog("Searching for Emojis - Please wait until complete!");
 
             //Get numGlyphs, ordinal numbers, and glyphNames from post table
             int postIndex = tableNames.indexOf("post");
@@ -91,10 +51,9 @@ public class AppleExtractionThread extends ExtractionThread {
 
 
                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                    extractionManager.showMessageDialog("Invalid 'post' table format! Contact developer for help.");
+                    //extractionOperationManager.showMessageDialog("Invalid 'post' table format! Contact developer for help.");
                     inputStream.close();
-                    extractionDialog.dispose();
-                    return;
+                    return false;
                 }
 
                 inputStream.skipBytes(28);
@@ -166,18 +125,16 @@ public class AppleExtractionThread extends ExtractionThread {
                     inputStream.skipBytes(glyphOffsets[0]);
 
                     for (int i = 0; i < numGlyphs; i++) {
-                        if (!running) {
+                        if (isCancelled()) {
                             inputStream.close();
-                            extractionDialog.dispose();
-                            return;
+                            return false;
                         }
-                        updateProgress((int) ((i / (float) (numGlyphs)) * 100));
+                        updateProgress(i, numGlyphs);
 
                         if (glyphLengths[i] > 0) {
                             inputStream.skipBytes(4);
                             if (ExtractionUtilites.getByteString(inputStream, 4).equals("png ")) {
-                                System.out.println("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
-                                appendToStatus("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
+                                appendMessageToDialog("Extracting Emoji #" + i + " to '" + glyphNames[i] + ".png'");
                                 FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, glyphNames[i] + ".png"));
                                 byte[] b = new byte[glyphLengths[i] - 8];
                                 inputStream.readFully(b);
@@ -187,35 +144,24 @@ public class AppleExtractionThread extends ExtractionThread {
                         }
                     }
                 } else {
-                    extractionManager.showMessageDialog("Could not find 'sbix' table! Contact developer for help.");
+                    //extractionOperationManager.showMessageDialog("Could not find 'sbix' table! Contact developer for help.");
                     inputStream.close();
-                    extractionDialog.dispose();
-                    return;
+                    return false;
                 }
             } else {
-                extractionManager.showMessageDialog("Could not find 'post' table! Contact developer for help.");
+                //extractionOperationManager.showMessageDialog("Could not find 'post' table! Contact developer for help.");
                 inputStream.close();
-                extractionDialog.dispose();
-                return;
+                return false;
             }
 
             inputStream.close();
-
-            extractionDialog.dispose();
         } catch (FileNotFoundException e) {
-            System.out.println(this.font.getName() + " not found!");
-            extractionManager.showMessageDialog(this.font.getName() + " not found!");
+            System.out.println(this.fontFile.getName() + " not found!");
+            //extractionOperationManager.showMessageDialog(this.font.getName() + " not found!");
         } catch (IOException e) {
             EmojiTools.submitError(Thread.currentThread(), e);
         }
-    }
-
-    private void updateProgress(int progress) {
-        extractionDialog.setProgress(progress);
-    }
-
-    private void appendToStatus(String message) {
-        extractionDialog.appendToStatus(message);
+        return true;
     }
 
 }

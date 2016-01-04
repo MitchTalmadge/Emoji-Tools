@@ -25,12 +25,10 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.FileChooser;
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.conversion.ConversionManager;
-import net.liveforcode.emojitools.deletion.DeletionManager;
-import net.liveforcode.emojitools.extraction.ExtractionManager;
 import net.liveforcode.emojitools.gui.LimitingTextField;
 import net.liveforcode.emojitools.gui.dialogs.OverwriteWarningDialog;
-import net.liveforcode.emojitools.renaming.RenamingManager;
+import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
+import net.liveforcode.emojitools.operations.renaming.RenamingInfo;
 
 import java.io.File;
 
@@ -65,18 +63,13 @@ public class ExtractorTabController extends TabController {
     }
 
     @Override
-    protected void validateStartButton()
-    {
-        if(extractionDirectoryNameField.getText().matches("(\\w|[_-])+"))
-        {
-            if(selectedFile != null)
-            {
+    protected void validateStartButton() {
+        if (extractionDirectoryNameField.getText().matches("(\\w|[_-])+")) {
+            if (selectedFile != null) {
                 startButton.setDisable(false);
-            }
-            else
+            } else
                 startButton.setDisable(true);
-        }
-        else
+        } else
             startButton.setDisable(true);
     }
 
@@ -92,41 +85,50 @@ public class ExtractorTabController extends TabController {
 
     @Override
     void startOperations() {
-        this.operationsCancelled = false;
+        boolean shouldContinue = true;
 
-        File extractionDirectoryFile = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryNameField.getText());
-        if (extractionDirectoryFile.exists()) {
-            if(new OverwriteWarningDialog(extractionDirectoryFile).getResult())
-            {
-                /*DeletionDialog deletionDialog = new DeletionDialog(this);
-                this.currentOperationManager = new DeletionManager(extractionDirectoryFile, this.gui, deletionDialog);
-                currentOperationManager.start();
-                deletionDialog.setVisible(true);*/
+        File extractionDirectory = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryNameField.getText());
+        if (extractionDirectory.exists()) {
+            File[] files = extractionDirectory.listFiles();
+            if (files != null) {
+                if (files.length > 0) {
+                    System.out.println("Files will be overwritten. Asking user for confirmation.");
+                    if (new OverwriteWarningDialog(extractionDirectory).getResult()) {
+                        shouldContinue = EmojiTools.performDeletionOperation(extractionDirectory);
+                    }
+                } else {
+                    System.out.println("No files will be overwritten. Continuing.");
+                }
+            } else {
+                boolean dirCreated = extractionDirectory.mkdir();
+                if (!dirCreated) {
+                    System.out.println("Could not create extraction directory.");
+                    shouldContinue = false;
+                }
+            }
+        } else {
+            boolean dirCreated = extractionDirectory.mkdir();
+            if (!dirCreated) {
+                System.out.println("Could not create extraction directory.");
+                shouldContinue = false;
             }
         }
 
-        if (!operationsCancelled) {
-            /*ExtractionDialog extractionDialog = new ExtractionDialog(this);
-            this.currentOperationManager = new ExtractionManager(this.selectedFile, extractionDirectoryFile, this.gui, extractionDialog);
-            currentOperationManager.start();
-            extractionDialog.setVisible(true);*/
+        if (shouldContinue) {
+            shouldContinue = EmojiTools.performExtractionOperation(selectedFile, extractionDirectory);
         } else {
             return;
         }
 
-        if (this.renameTrueToggle.isSelected() && !operationsCancelled) {
-            /*RenamingDialog renamingDialog = new RenamingDialog(this);
-            this.currentOperationManager = new RenamingManager(extractionDirectoryFile, this.gui, renamingDialog, new boolean[]{false, true, false, false}, new boolean[]{true, false, false, false});
-            currentOperationManager.start();
-            renamingDialog.setVisible(true);*/
+        if (this.renameTrueToggle.isSelected() && shouldContinue) {
+            shouldContinue = EmojiTools.performRenamingOperation(extractionDirectory, new RenamingInfo(RenamingInfo.PREFIX_REMOVE_ALL, RenamingInfo.CASE_DONT_CHANGE, false));
         }
 
-        if (this.convertTrueToggle.isSelected() && !operationsCancelled) {
-            /*ConversionDialog conversionDialog = new ConversionDialog(this);
-            this.currentOperationManager = new ConversionManager(extractionDirectoryFile, this.gui, conversionDialog, true);
-            currentOperationManager.start();
-            conversionDialog.setVisible(true);*/
+        if (this.convertTrueToggle.isSelected() && shouldContinue) {
+            shouldContinue = EmojiTools.performConversionOperation(extractionDirectory, new ConversionInfo(ConversionInfo.DIRECTION_CGBI_RGBA));
         }
+
+        //TODO: Show completion dialog, or tell user that it did not complete successfully based on shouldContinue value.
 
         //new FinishedDialog(this.gui, "Emoji Extraction Complete!", "Your Extracted Emojis can be found in:", extractionDirectoryFile).setVisible(true);
     }
