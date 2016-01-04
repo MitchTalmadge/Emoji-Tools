@@ -69,14 +69,14 @@
                                       <Font name="System Bold" size="12.0" />
                                   </font>
                               </Label>
-                              <RadioButton fx:id="capitalizationNoChangeToggle" mnemonicParsing="false" selected="true" text="Don't Change Case">
+                              <RadioButton fx:id="caseNoChangeToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" selected="true" text="Don't Change Case">
                            <toggleGroup>
                               <ToggleGroup fx:id="capitalization" />
                            </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="capitalizationUpperToggle" mnemonicParsing="false" text="Capitalize" toggleGroup="$capitalization" />
-                        <RadioButton fx:id="capitalizationLowerToggle" mnemonicParsing="false" text="Lowercase" toggleGroup="$capitalization" />
-                        <CheckBox fx:id="capitalizationPrefixOppositeCheckBox" disable="true" mnemonicParsing="false" text="Make Prefix Case Opposite" />
+                              <RadioButton fx:id="caseUpperToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Capitalize" toggleGroup="$capitalization" />
+                        <RadioButton fx:id="caseLowerToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Lowercase" toggleGroup="$capitalization" />
+                        <CheckBox fx:id="casePrefixOppositeCheckBox" disable="true" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Make Prefix Case Opposite" />
                           </children>
                       </VBox>
                       <VBox spacing="5.0">
@@ -86,14 +86,14 @@
                                       <Font name="System Bold" size="12.0" />
                                   </font>
                               </Label>
-                              <RadioButton fx:id="prefixesNoChangeToggle" mnemonicParsing="false" selected="true" text="Don't Change Prefixes">
+                              <RadioButton fx:id="prefixesNoChangeToggle" mnemonicParsing="false" onAction="#onPrefixTogglesChanged" selected="true" text="Don't Change Prefixes">
                            <toggleGroup>
                               <ToggleGroup fx:id="prefixes" />
                            </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="prefixesRemoveAllToggle" mnemonicParsing="false" text="Remove &quot;uni&quot; &amp; &quot;u&quot; Prefixes" toggleGroup="$prefixes" />
-                        <RadioButton fx:id="prefixesSetUniToggle" mnemonicParsing="false" text="Set Prefix to &quot;uni&quot;" toggleGroup="$prefixes" />
-                        <RadioButton fx:id="prefixesSetUToggle" mnemonicParsing="false" text="Set Prefix to &quot;u&quot;" toggleGroup="$prefixes" />
+                              <RadioButton fx:id="prefixesRemoveAllToggle" mnemonicParsing="false" onAction="#onPrefixTogglesChanged" text="Remove &quot;uni&quot; &amp; &quot;u&quot; Prefixes" toggleGroup="$prefixes" />
+                        <RadioButton fx:id="prefixesSetUniToggle" mnemonicParsing="false" onAction="#onPrefixTogglesChanged" text="Set Prefix to &quot;uni&quot;" toggleGroup="$prefixes" />
+                        <RadioButton fx:id="prefixesSetUToggle" mnemonicParsing="false" onAction="#onPrefixTogglesChanged" text="Set Prefix to &quot;u&quot;" toggleGroup="$prefixes" />
                           </children>
                       </VBox>
                </children>

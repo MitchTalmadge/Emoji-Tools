@@ -196,8 +196,6 @@ public class EmojiTools extends Application {
 
     @Override
     public void stop() throws Exception {
-        //TODO: Stop tab operations
-
         if (jythonHandler != null) {
             jythonHandler.getPythonInterpreter().close();
 
