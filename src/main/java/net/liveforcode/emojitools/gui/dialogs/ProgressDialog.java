@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.ProgressDialogController;
 
 import java.io.IOException;
@@ -22,6 +23,8 @@ public class ProgressDialog implements ProgressDialogController.ProgressDialogLi
 
     public ProgressDialog(String headerText) {
         this.stage = new Stage();
+        stage.setTitle(headerText);
+        stage.getIcons().add(EmojiTools.getLogoImage());
         stage.setOnCloseRequest(e -> {
             onCancelButtonFired();
             e.consume();

@@ -25,6 +25,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OverwriteWarningDialogController;
 
 import java.io.File;
@@ -43,6 +44,8 @@ public class OverwriteWarningDialog implements OverwriteWarningDialogController.
 
     public boolean getResult() {
         this.stage = new Stage();
+        stage.setTitle("Overwrite Warning");
+        stage.getIcons().add(EmojiTools.getLogoImage());
 
         try {
             FXMLLoader loader = new FXMLLoader();

@@ -277,7 +277,6 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                     if (glyphLength > 0) {
                                         byte[] b = new byte[glyphLength];
                                         if (unicodeNameMap.get(i) != null) {
-                                            System.out.println("Extracting Emoji #" + i + " to '" + unicodeNameMap.get(i) + ".png'");
                                             appendMessageToDialog("Extracting Emoji #" + i + " to '" + unicodeNameMap.get(i) + ".png'");
                                             FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, unicodeNameMap.get(i) + ".png"));
                                             inputStream.readFully(b);

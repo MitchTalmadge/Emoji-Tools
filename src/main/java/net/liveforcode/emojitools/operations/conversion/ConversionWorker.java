@@ -56,7 +56,6 @@ public class ConversionWorker extends OperationWorker {
 
             File file = files[i];
             if (file.getName().endsWith(".png")) {
-                System.out.println("Converting " + file.getName());
                 appendMessageToDialog("Converting " + file.getName());
 
                 converter.convertFile(file, conversionInfo);
