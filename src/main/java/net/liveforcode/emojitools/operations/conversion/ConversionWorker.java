@@ -20,6 +20,7 @@
 
 package net.liveforcode.emojitools.operations.conversion;
 
+import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
@@ -43,7 +44,10 @@ public class ConversionWorker extends OperationWorker {
         File[] files = conversionDirectory.listFiles();
 
         if (files == null)
+        {
+            EmojiTools.showErrorDialog("Conversion Failed (Error Code 1)", "An internal error occurred. Please contact the developer for help.");
             return false;
+        }
 
         Converter converter = new Converter();
 

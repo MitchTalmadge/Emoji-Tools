@@ -61,18 +61,29 @@ public class ConverterTabController extends TabController {
 
     @Override
     protected boolean validateSelectedFile(File chooserFile) {
-        if (!chooserFile.isDirectory()) //TODO: Tell user to pick a directory (this shouldn't happen anyway)
+        if (!chooserFile.isDirectory())
+        {
+            EmojiTools.showErrorDialog("Invalid Directory", "Please choose a directory, not a file.");
             return false;
+        }
         File[] files = chooserFile.listFiles();
-        if (files == null) //TODO: Tell user to pick a directory (this shouldn't happen anyway)
+        if (files == null)
+        {
+            EmojiTools.showErrorDialog("Invalid Directory", "Please choose a directory, not a file.");
             return false;
-        if (files.length == 0) //TODO: Say directory is empty
+        }
+        if (files.length == 0)
+        {
+            EmojiTools.showWarningDialog("Empty Directory", "The chosen directory is empty. There is nothing to convert.");
             return false;
+        }
         for (File file : files)
             if (file.getName().endsWith(".png"))
                 return true; //We found a png file, good enough.
-        //TODO: Say directory contains no emojis.
-        return false; //No png files found
+        {
+            EmojiTools.showErrorDialog("Directory Contains No Emojis", "The chosen directory contains no emojis. Please pick a directory containing emojis.");
+            return false;
+        }
     }
 
     @Override
@@ -89,6 +100,7 @@ public class ConverterTabController extends TabController {
 
         if (shouldContinue)
             new OperationFinishedDialog("Conversion Complete!", "Your converted emojis can be found in:", selectedFile).display();
-        //TODO: Show unsuccessful dialog
+        else
+            EmojiTools.showErrorDialog("Conversion Unsuccessful.", "Conversion was cancelled or unsuccessful.");
     }
 }

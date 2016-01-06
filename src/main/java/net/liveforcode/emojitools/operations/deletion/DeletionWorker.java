@@ -56,7 +56,7 @@ public class DeletionWorker extends OperationWorker {
         fileCount += dir.listFiles().length;
         for (File file : dir.listFiles()) {
             if (isCancelled())
-                return 0;
+                break;
             if (file.isDirectory())
                 fileCount = countFilesRecursive(fileCount, file);
         }

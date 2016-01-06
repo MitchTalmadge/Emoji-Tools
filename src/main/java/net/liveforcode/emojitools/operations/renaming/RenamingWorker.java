@@ -20,6 +20,7 @@
 
 package net.liveforcode.emojitools.operations.renaming;
 
+import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
@@ -45,17 +46,20 @@ public class RenamingWorker extends OperationWorker {
     protected Boolean doWork() throws Exception {
         File[] files = renamingDirectory.listFiles();
 
-        if (files == null)
+        if (files == null) {
+            EmojiTools.showErrorDialog("Renaming Failed (Error Code 1)", "An internal error occurred. Please contact the developer for help.");
             return false;
+        }
 
         for (File file : files) {
+            if (isCancelled())
+                return false;
+
             if (file.isDirectory())
                 continue;
+
             if (!file.getName().toLowerCase().endsWith(".png"))
                 continue;
-            if (isCancelled()) {
-                return false;
-            }
 
             this.currentFileNum++;
             String newFileName = file.getName();
@@ -88,7 +92,10 @@ public class RenamingWorker extends OperationWorker {
 
             boolean renamed = file.renameTo(new File(file.getParent(), newFileName));
             if (!renamed)
+            {
+                EmojiTools.showErrorDialog("Unable To Rename File", "Emoji Tools was unable to rename a file. Does it have permission?");
                 return false;
+            }
         }
 
         updateProgress(currentFileNum, files.length);
@@ -98,7 +105,8 @@ public class RenamingWorker extends OperationWorker {
 
     /**
      * Changes the prefix of the unicode file name.
-     * @param fileName The file name to modify.
+     *
+     * @param fileName  The file name to modify.
      * @param newPrefix The new prefix for the file name. ("uni" or "u")
      * @return The modified file name.
      */
@@ -124,8 +132,9 @@ public class RenamingWorker extends OperationWorker {
 
     /**
      * Changes the case of the unicode file name.
-     * @param fileName The file name to modify.
-     * @param upperCase Setting to true will result in uppercase; false will result in lowercase.
+     *
+     * @param fileName           The file name to modify.
+     * @param upperCase          Setting to true will result in uppercase; false will result in lowercase.
      * @param oppositePrefixCase Setting to true will result in a prefix with the opposite case of that specified in upperCase parameter.
      * @return The modified file name.
      */

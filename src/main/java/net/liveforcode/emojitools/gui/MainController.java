@@ -40,16 +40,16 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     @FXML
-    private Label donationLabel;
+    protected Label donationLabel;
 
     @FXML
-    private Label copyrightLabel;
+    protected Label copyrightLabel;
 
     @FXML
-    private Label headerLabel;
+    protected Label headerLabel;
 
     @FXML
-    private TabPane tabPane;
+    protected TabPane tabPane;
 
 
     @Override
@@ -62,17 +62,17 @@ public class MainController implements Initializable {
     private void addTabs() {
         try {
             tabPane.getTabs().addAll(
-                    new Tab("Extractor", (Parent) FXMLLoader.load(getClass().getResource("/GUI/Tabs/Extractor.fxml"))),
-                    new Tab("Renamer", (Parent) FXMLLoader.load(getClass().getResource("/GUI/Tabs/Renamer.fxml"))),
-                    new Tab("Converter", (Parent) FXMLLoader.load(getClass().getResource("/GUI/Tabs/Converter.fxml"))),
-                    new Tab("Packager", (Parent) FXMLLoader.load(getClass().getResource("/GUI/Tabs/Packager.fxml"))));
+                    new Tab("Extractor", FXMLLoader.load(getClass().getResource("/GUI/Tabs/Extractor.fxml"))),
+                    new Tab("Renamer", FXMLLoader.load(getClass().getResource("/GUI/Tabs/Renamer.fxml"))),
+                    new Tab("Converter", FXMLLoader.load(getClass().getResource("/GUI/Tabs/Converter.fxml"))),
+                    new Tab("Packager", FXMLLoader.load(getClass().getResource("/GUI/Tabs/Packager.fxml"))));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    void onDonateLabelFired(MouseEvent mouseEvent) {
+    protected void onDonateLabelFired(MouseEvent mouseEvent) {
         try {
             Desktop.getDesktop().browse(new URI("https://donate.liveforcode.net"));
         } catch (IOException | URISyntaxException e1) {
@@ -81,7 +81,7 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    void onCopyrightLabelFired(MouseEvent mouseEvent) {
+    protected void onCopyrightLabelFired(MouseEvent mouseEvent) {
         try {
             Desktop.getDesktop().browse(new URI("https://liveforcode.net"));
         } catch (IOException | URISyntaxException e1) {

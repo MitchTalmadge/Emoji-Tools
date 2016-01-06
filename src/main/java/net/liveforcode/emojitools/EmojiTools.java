@@ -26,7 +26,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
 import net.liveforcode.emojitools.operations.conversion.ConversionOperation;
@@ -190,6 +192,60 @@ public class EmojiTools extends Application {
      */
     public static boolean performPackagingOperation(File packagingDirectory) {
         return new PackagingOperation(packagingDirectory).runOperation();
+    }
+
+    /**
+     * Displays an information dialog with the specified header and message.
+     * @param header The header text. Can be null for no header.
+     * @param message The message.
+     */
+    public static void showInfoDialog(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        ((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(getLogoImage());
+        if (header != null) {
+            alert.setTitle(header);
+            alert.setHeaderText(header);
+        }
+        alert.setContentText(message);
+
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.showAndWait();
+    }
+
+    /**
+     * Displays a warning dialog with the specified header and message.
+     * @param header The header text. Can be null for no header.
+     * @param message The message.
+     */
+    public static void showWarningDialog(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        ((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(getLogoImage());
+        if (header != null) {
+            alert.setTitle(header);
+            alert.setHeaderText(header);
+        }
+        alert.setContentText(message);
+
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.showAndWait();
+    }
+
+    /**
+     * Displays an error dialog with the specified header and message.
+     * @param header The header text. Can be null for no header.
+     * @param message The message.
+     */
+    public static void showErrorDialog(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        ((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(getLogoImage());
+        if (header != null) {
+            alert.setTitle(header);
+            alert.setHeaderText(header);
+        }
+        alert.setContentText(message);
+
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.showAndWait();
     }
 
     @Override

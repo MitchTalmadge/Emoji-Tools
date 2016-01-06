@@ -76,7 +76,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                 inputStream.seek(cmapOffset);
 
                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x00)) {
-                    //extractionOperationManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 1)");
+                    EmojiTools.showErrorDialog("Invalid 'cmap' Table (Error Code 1)", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                     inputStream.close();
                     return false;
                 }
@@ -104,7 +104,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                         //Platform ID = Microsoft, Platform Specific ID = Unicode UCS-4
 
                         if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x0C)) {
-                            //extractionOperationManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 3:1)");
+                            EmojiTools.showErrorDialog("Invalid 'cmap' Table (Error Code 3:1)", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                             inputStream.close();
                             return false;
                         }
@@ -139,7 +139,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                             inputStream.seek(CBLCOffset);
 
                             if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                                //extractionOperationManager.showMessageDialog("Invalid 'CBLC' table! Contact developer for help.");
+                                EmojiTools.showErrorDialog("Invalid 'CBLC' Table", "The font's 'CBLC' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                 inputStream.close();
                                 return false;
                             }
@@ -158,7 +158,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                 inputStream.seek(GSUBOffset);
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
-                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 1)");
+                                    EmojiTools.showErrorDialog("Invalid 'GSUB' Table (Error Code 1)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                     inputStream.close();
                                     return false;
                                 }
@@ -169,7 +169,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                 inputStream.seek(lookupListOffset); //Navigate to LookupList
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01)) { //Get LookupCount
-                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 2)");
+                                    EmojiTools.showErrorDialog("Invalid 'GSUB' Table (Error Code 2)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                     inputStream.close();
                                     return false;
                                 }
@@ -178,7 +178,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                 inputStream.seek(lookupTableOffset); //Navigate to first LookupTable
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01)) { //Get LookupType, LookupFlag, and SubTableCount.
-                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 3)");
+                                    EmojiTools.showErrorDialog("Invalid 'GSUB' Table (Error Code 3)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                     inputStream.close();
                                     return false;
                                 }
@@ -187,7 +187,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                 inputStream.seek(ligatureTableOffset); //Navigate to Ligature Substitution Subtable
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01)) { //Get SubstFormat
-                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 4)");
+                                    EmojiTools.showErrorDialog("Invalid 'GSUB' Table (Error Code 4)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                     inputStream.close();
                                     return false;
                                 }
@@ -205,7 +205,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                 /* Coverage Table */
                                 inputStream.seek(coverageOffset);
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02)) {
-                                    //extractionOperationManager.showMessageDialog("Invalid 'GSUB' table! Contact developer for help. (Code 5)");
+                                    EmojiTools.showErrorDialog("Invalid 'GSUB' Table (Error Code 5)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                     inputStream.close();
                                     return false;
                                 }
@@ -258,7 +258,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                 inputStream.seek(CBDTOffset);
 
                                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                                    //extractionOperationManager.showMessageDialog("Invalid 'CBDT' table! Contact developer for help.");
+                                    EmojiTools.showErrorDialog("Invalid 'CBDT' Table", "The font's 'CBDT' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                     inputStream.close();
                                     return false;
                                 }
@@ -289,12 +289,12 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                 }
 
                             } else {
-                                //extractionOperationManager.showMessageDialog("Could not find 'CBDT' table! Contact developer for help.");
+                                EmojiTools.showErrorDialog("Missing 'CBDT' Table", "The font's 'CBDT' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                 inputStream.close();
                                 return false;
                             }
                         } else {
-                            //extractionOperationManager.showMessageDialog("Could not find 'CBLC' table! Contact developer for help.");
+                            EmojiTools.showErrorDialog("Missing 'CBLC' Table", "The font's 'CBLC' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                             inputStream.close();
                             return false;
                         }
@@ -302,20 +302,20 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                         //Platform ID = Unicode, //Platform Specific ID = Unicode Variation Sequences
 
                         if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x0E)) {
-                            //extractionOperationManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 3:2)");
+                            EmojiTools.showErrorDialog("Invalid 'cmap' Table (Error Code 3:2)", "The font's 'cmap' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                             inputStream.close();
                             return false;
                         }
 
                         //TODO: Format 14
                     } else {
-                        //extractionOperationManager.showMessageDialog("Invalid 'cmap' table format! Contact developer for help. (Code 2:" + subTableId + ")");
+                        EmojiTools.showErrorDialog("Invalid 'cmap' Table (Error Code 2:"+subTableId+")", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                         inputStream.close();
                         return false;
                     }
                 }
             } else {
-                //extractionOperationManager.showMessageDialog("Could not find 'cmap' table! Contact developer for help.");
+                EmojiTools.showErrorDialog("Missing 'cmap' Table", "The font's 'cmap' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                 inputStream.close();
                 return false;
             }
@@ -323,7 +323,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
             inputStream.close();
         } catch (FileNotFoundException e) {
             System.out.println(this.fontFile.getName() + " not found!");
-            //extractionOperationManager.showMessageDialog(this.fontFile.getName() + " not found!");
+            EmojiTools.showErrorDialog("Unable to Locate Font", "The chosen font could not be found. Did it get deleted?");
         } catch (IOException e) {
             EmojiTools.submitError(Thread.currentThread(), e);
         }

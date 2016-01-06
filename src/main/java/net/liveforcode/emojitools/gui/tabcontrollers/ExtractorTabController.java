@@ -89,27 +89,20 @@ public class ExtractorTabController extends TabController {
         boolean shouldContinue = true;
 
         File extractionDirectory = new File(EmojiTools.getRootDirectory(), this.extractionDirectoryNameField.getText());
-        if (extractionDirectory.exists()) {
-            File[] files = extractionDirectory.listFiles();
-            if (files != null) {
-                if (files.length > 0) {
-                    System.out.println("Files will be overwritten. Asking user for confirmation.");
-                    if (new OverwriteWarningDialog(extractionDirectory).getResult()) {
-                        shouldContinue = EmojiTools.performDeletionOperation(extractionDirectory);
-                    }
-                } else {
-                    System.out.println("No files will be overwritten. Continuing.");
+        File[] files = extractionDirectory.listFiles();
+        if (extractionDirectory.exists() && files != null) {
+            if (files.length > 0) {
+                System.out.println("Files will be overwritten. Asking user for confirmation.");
+                if (new OverwriteWarningDialog(extractionDirectory).getResult()) {
+                    shouldContinue = EmojiTools.performDeletionOperation(extractionDirectory);
                 }
             } else {
-                boolean dirCreated = extractionDirectory.mkdir();
-                if (!dirCreated) {
-                    System.out.println("Could not create extraction directory.");
-                    shouldContinue = false;
-                }
+                System.out.println("No files will be overwritten. Continuing.");
             }
         } else {
             boolean dirCreated = extractionDirectory.mkdir();
             if (!dirCreated) {
+                EmojiTools.showErrorDialog("Could not create Extraction Directory", "The Extraction Directory could not be created. Does Emoji Tools have permission to write to this directory?");
                 System.out.println("Could not create extraction directory.");
                 shouldContinue = false;
             }
@@ -129,8 +122,9 @@ public class ExtractorTabController extends TabController {
             shouldContinue = EmojiTools.performConversionOperation(extractionDirectory, new ConversionInfo(ConversionInfo.DIRECTION_CGBI_RGBA));
         }
 
-        if(shouldContinue)
+        if (shouldContinue)
             new OperationFinishedDialog("Extraction Complete!", "Your emojis have been extracted to:", extractionDirectory).display();
-        //TODO: Show unsuccessful dialog
+        else
+            EmojiTools.showErrorDialog("Extraction Unsuccessful.", "Extraction was cancelled or unsuccessful.");
     }
 }

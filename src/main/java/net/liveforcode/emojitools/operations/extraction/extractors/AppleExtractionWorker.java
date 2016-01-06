@@ -51,7 +51,7 @@ public class AppleExtractionWorker extends ExtractionWorker {
 
 
                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                    //extractionOperationManager.showMessageDialog("Invalid 'post' table format! Contact developer for help.");
+                    EmojiTools.showErrorDialog("Invalid 'post' Table", "The font's 'post' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                     inputStream.close();
                     return false;
                 }
@@ -144,20 +144,19 @@ public class AppleExtractionWorker extends ExtractionWorker {
                         }
                     }
                 } else {
-                    //extractionOperationManager.showMessageDialog("Could not find 'sbix' table! Contact developer for help.");
+                    EmojiTools.showErrorDialog("Missing 'sbix' Table", "The font's 'sbix' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                     inputStream.close();
                     return false;
                 }
             } else {
-                //extractionOperationManager.showMessageDialog("Could not find 'post' table! Contact developer for help.");
+                EmojiTools.showErrorDialog("Missing 'post' Table", "The font's 'post' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                 inputStream.close();
                 return false;
             }
 
             inputStream.close();
         } catch (FileNotFoundException e) {
-            System.out.println(this.fontFile.getName() + " not found!");
-            //extractionOperationManager.showMessageDialog(this.font.getName() + " not found!");
+            EmojiTools.showErrorDialog("Unable to Locate Font", "The chosen font could not be found. Did it get deleted?");
         } catch (IOException e) {
             EmojiTools.submitError(Thread.currentThread(), e);
         }

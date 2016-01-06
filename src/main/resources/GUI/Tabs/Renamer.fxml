@@ -45,7 +45,7 @@
                   <children>
                       <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="2" />
                       <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                      <Label fx:id="filePathTitleLabel" text="Emoji Folder / .png File Path">
+                      <Label fx:id="filePathTitleLabel" text="Emoji Directory Path">
                           <font>
                               <Font name="System Bold" size="12.0" />
                           </font>
