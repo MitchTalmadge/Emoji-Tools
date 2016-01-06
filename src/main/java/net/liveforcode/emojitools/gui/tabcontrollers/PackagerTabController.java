@@ -68,7 +68,7 @@ public class PackagerTabController extends TabController {
             if (file.getName().endsWith(".png"))
                 pngFileFound = true; //We found a png file, good enough.
         if (!pngFileFound) {
-            EmojiTools.showErrorDialog("Directory Contains No Emojis", "The chosen directory contains no emojis. Please pick a directory containing emojis.");
+            EmojiTools.showWarningDialog("Directory Contains No Emojis", "The chosen directory contains no emojis. Please pick a directory containing emojis.");
             return false;
         }
 
@@ -82,7 +82,7 @@ public class PackagerTabController extends TabController {
         }
 
         if (ttxFile == null) {
-            EmojiTools.showErrorDialog("Cannot Package Emojis", "The emojis in the chosen directory cannot be packaged. Sorry for the inconvenience.");
+            EmojiTools.showWarningDialog("Cannot Package Emojis", "The emojis in the chosen directory cannot be packaged. Sorry for the inconvenience.");
             return false;
         }
 

@@ -58,6 +58,8 @@ public class EmojiTools extends Application {
     private static final ArrayList<JythonListener> jythonListenerList = new ArrayList<>();
     private static JythonHandler jythonHandler;
 
+    private static Stage mainGuiStage;
+
     public static void main(String[] args) {
         System.setProperty("python.cachedir.skip", "false");
         System.setProperty("python.console.encoding", "UTF-8");
@@ -78,6 +80,36 @@ public class EmojiTools extends Application {
      */
     public static Image getLogoImage() {
         return logoImage;
+    }
+
+    /**
+     * Calculates the center X position for a stage based upon the main GUI's X position and the stage's width.
+     *
+     * @param stageWidth The width of the stage.
+     * @return The calculated X position.
+     */
+    public static int getGuiCenterXPos(double stageWidth) {
+        return (int) (mainGuiStage.getX() + (mainGuiStage.getWidth() / 2) - (stageWidth / 2));
+    }
+
+    /**
+     * Calculates the center Y position for a stage based upon the main GUI's Y position and the stage's height.
+     *
+     * @param stageHeight The height of the stage.
+     * @return The calculated Y position.
+     */
+    public static int getGuiCenterYPos(double stageHeight) {
+        return (int) (mainGuiStage.getY() + (mainGuiStage.getHeight() / 2) - (stageHeight / 2));
+    }
+
+    /**
+     * Sets the specified stage's location to the center of the main GUI.
+     *
+     * @param stage The stage to move.
+     */
+    public static void setStageLocationRelativeToMainGui(Stage stage) {
+        stage.setX(getGuiCenterXPos(stage.getWidth()));
+        stage.setY(getGuiCenterYPos(stage.getHeight()));
     }
 
     /**
@@ -196,12 +228,16 @@ public class EmojiTools extends Application {
 
     /**
      * Displays an information dialog with the specified header and message.
-     * @param header The header text. Can be null for no header.
+     *
+     * @param header  The header text. Can be null for no header.
      * @param message The message.
      */
     public static void showInfoDialog(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        ((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(getLogoImage());
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(getLogoImage());
+        stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
+
         if (header != null) {
             alert.setTitle(header);
             alert.setHeaderText(header);
@@ -214,12 +250,16 @@ public class EmojiTools extends Application {
 
     /**
      * Displays a warning dialog with the specified header and message.
-     * @param header The header text. Can be null for no header.
+     *
+     * @param header  The header text. Can be null for no header.
      * @param message The message.
      */
     public static void showWarningDialog(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        ((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(getLogoImage());
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(getLogoImage());
+        stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
+
         if (header != null) {
             alert.setTitle(header);
             alert.setHeaderText(header);
@@ -232,12 +272,16 @@ public class EmojiTools extends Application {
 
     /**
      * Displays an error dialog with the specified header and message.
-     * @param header The header text. Can be null for no header.
+     *
+     * @param header  The header text. Can be null for no header.
      * @param message The message.
      */
     public static void showErrorDialog(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        ((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().add(getLogoImage());
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(getLogoImage());
+        stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
+
         if (header != null) {
             alert.setTitle(header);
             alert.setHeaderText(header);
@@ -250,6 +294,7 @@ public class EmojiTools extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        mainGuiStage = stage;
         stage.setTitle(new Versioning().getProgramNameWithVersion());
         stage.setResizable(false);
         stage.getIcons().add(EmojiTools.getLogoImage());

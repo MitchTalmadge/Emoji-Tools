@@ -73,6 +73,7 @@ public class OperationProgressDialog {
     }
 
     public void display() {
+        stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
         stage.showAndWait();
     }
 

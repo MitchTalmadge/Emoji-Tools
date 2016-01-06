@@ -81,7 +81,7 @@ public class ConverterTabController extends TabController {
             if (file.getName().endsWith(".png"))
                 return true; //We found a png file, good enough.
         {
-            EmojiTools.showErrorDialog("Directory Contains No Emojis", "The chosen directory contains no emojis. Please pick a directory containing emojis.");
+            EmojiTools.showWarningDialog("Directory Contains No Emojis", "The chosen directory contains no emojis. Please pick a directory containing emojis.");
             return false;
         }
     }

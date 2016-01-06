@@ -63,6 +63,7 @@ public class OverwriteWarningDialog {
     }
 
     public boolean getResult() {
+        stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
         stage.showAndWait();
         return result;
     }
