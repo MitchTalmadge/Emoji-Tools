@@ -1,6 +1,6 @@
 /*
  * Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
- * Copyright (C) 2015 Mitch Talmadge
+ * Copyright (C) 2015 - 2016 Mitch Talmadge
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

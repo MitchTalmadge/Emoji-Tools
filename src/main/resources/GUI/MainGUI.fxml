@@ -40,7 +40,7 @@
                         <Font size="21.0" />
                     </font>
                 </Label>
-                <Label fx:id="copyrightLabel" onMouseClicked="#onCopyrightLabelFired" text="Copyright 2015 Mitch Talmadge (https://liveforcode.net/)">
+                <Label fx:id="copyrightLabel" onMouseClicked="#onCopyrightLabelFired" text="Copyright 2015 - 2016 Mitch Talmadge (https://liveforcode.net/)" underline="true">
                     <font>
                         <Font name="System Italic" size="12.0" />
                     </font>
