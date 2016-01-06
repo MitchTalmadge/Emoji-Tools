@@ -43,7 +43,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
     protected Boolean doWork() throws Exception {
         //---- ttx.py ----//
         setProgressIndeterminate();
-        appendMessageToDialog("Converting Emoji Font... Please wait...");
+        appendMessageToDialog("Decompiling Emoji Font... Please wait...");
 
         //Set sys.argv
         ArrayList<String> argvList = new ArrayList<>();
@@ -309,7 +309,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
 
                         //TODO: Format 14
                     } else {
-                        EmojiTools.showErrorDialog("Invalid 'cmap' Table (Error Code 2:"+subTableId+")", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
+                        EmojiTools.showErrorDialog("Invalid 'cmap' Table (Error Code 2:" + subTableId + ")", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                         inputStream.close();
                         return false;
                     }

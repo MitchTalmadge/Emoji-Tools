@@ -61,7 +61,10 @@ public class OperationProgressDialogController {
 
     public void bindMessagesToProperty(ReadOnlyStringProperty property) {
         this.outputTextArea.textProperty().bind(property);
-        property.addListener((observable, oldValue, newValue) -> outputTextArea.setScrollTop(Double.MAX_VALUE));
+        property.addListener((observable, oldValue, newValue) -> {
+            outputTextArea.setScrollTop(Double.MAX_VALUE);
+            outputTextArea.positionCaret(outputTextArea.getText().length()-1);
+        });
     }
 
     public void setParent(OperationProgressDialog parent) {
