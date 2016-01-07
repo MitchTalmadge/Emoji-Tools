@@ -42,7 +42,7 @@ public class ConsoleManager {
             @Override
             public void write(final int b) throws IOException {
                 for (ConsoleListener listener : consoleListeners) {
-                    listener.write(String.valueOf((char) b));
+                    listener.sysOut(String.valueOf((char) b));
                 }
                 originalOutStream.write(b);
             }
@@ -50,7 +50,7 @@ public class ConsoleManager {
             @Override
             public void write(byte[] b, int off, int len) throws IOException {
                 for (ConsoleListener listener : consoleListeners) {
-                    listener.write(new String(b, off, len));
+                    listener.sysOut(new String(b, off, len));
                 }
                 originalOutStream.write(b, off, len);
             }
@@ -65,7 +65,7 @@ public class ConsoleManager {
             @Override
             public void write(final int b) throws IOException {
                 for (ConsoleListener listener : consoleListeners) {
-                    listener.write(String.valueOf((char) b));
+                    listener.sysErr(String.valueOf((char) b));
                 }
                 originalErrStream.write(b);
             }
@@ -73,7 +73,7 @@ public class ConsoleManager {
             @Override
             public void write(byte[] b, int off, int len) throws IOException {
                 for (ConsoleListener listener : consoleListeners) {
-                    listener.write(new String(b, off, len));
+                    listener.sysErr(new String(b, off, len));
                 }
                 originalErrStream.write(b, off, len);
             }
@@ -103,7 +103,9 @@ public class ConsoleManager {
     }
 
     public interface ConsoleListener {
-        void write(String message);
+        void sysOut(String message);
+
+        void sysErr(String message);
     }
 
 }

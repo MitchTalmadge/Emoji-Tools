@@ -59,10 +59,17 @@ public class EmojiTools extends Application {
     private static JythonHandler jythonHandler;
 
     private static Stage mainGuiStage;
+    private static LogManager logManager;
 
     public static void main(String[] args) {
         System.setProperty("python.cachedir.skip", "false");
         System.setProperty("python.console.encoding", "UTF-8");
+
+        try {
+            logManager = new LogManager(new File(getRootDirectory(), "logs"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
 
@@ -71,6 +78,14 @@ public class EmojiTools extends Application {
         launch(args);
 
         aptiAPI.checkForUpdates();
+    }
+
+    /**
+     * Gets the LogManager instance, which handles logging to files.
+     * @return The LogManager instance.
+     */
+    public static LogManager getLogManager() {
+        return logManager;
     }
 
     /**
@@ -244,6 +259,9 @@ public class EmojiTools extends Application {
         }
         alert.setContentText(message);
 
+        if(getLogManager() != null)
+            getLogManager().logInfo("Alert Shown: " + header + " - " + message);
+
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
     }
@@ -266,6 +284,9 @@ public class EmojiTools extends Application {
         }
         alert.setContentText(message);
 
+        if(getLogManager() != null)
+            getLogManager().logWarning("Alert Shown: " + header + " - " + message);
+
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
     }
@@ -287,6 +308,9 @@ public class EmojiTools extends Application {
             alert.setHeaderText(header);
         }
         alert.setContentText(message);
+
+        if(getLogManager() != null)
+            getLogManager().logSevere("Alert Shown: " + header + " - " + message);
 
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
