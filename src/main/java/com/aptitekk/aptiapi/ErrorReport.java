@@ -20,13 +20,19 @@
 
 package com.aptitekk.aptiapi;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class ErrorReport {
 
     private final String threadName;
     private final Throwable exception;
+    private File logFile;
     private String version;
     private String description;
     private String name;
@@ -44,7 +50,7 @@ public class ErrorReport {
         return stringWriter.toString();
     }
 
-    public String generateReport() {
+    public String generateExceptionReport() {
         String report = "<b>BEGIN ERROR REPORT</b><br>" +
                 "<br>" +
                 "<i>Version: </i>" + getVersion() + "<br>" +
@@ -61,6 +67,24 @@ public class ErrorReport {
                 "<b>END ERROR REPORT</b>";
 
         return report;
+    }
+
+    public File getLogFile() {
+        return logFile;
+    }
+
+    public void setLogFile(File logFile) {
+        this.logFile = logFile;
+    }
+
+    public String getLogFileContents() {
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get(logFile.getPath()));
+            return new String(encoded, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public String getDescription() {

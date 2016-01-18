@@ -28,6 +28,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
+import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 
 public class OperationProgressDialogController {

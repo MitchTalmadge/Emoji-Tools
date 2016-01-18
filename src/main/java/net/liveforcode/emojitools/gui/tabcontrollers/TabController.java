@@ -102,8 +102,8 @@ public abstract class TabController implements Initializable {
         Desktop desktop = Desktop.getDesktop();
         try {
             desktop.open(EmojiTools.getRootDirectory());
-        } catch (IOException e1) {
-            EmojiTools.submitError(Thread.currentThread(), e1);
+        } catch (IOException e) {
+            EmojiTools.submitError(e);
         }
     }
 

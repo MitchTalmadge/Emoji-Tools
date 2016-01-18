@@ -70,7 +70,7 @@ public class ExtractionOperation extends Operation {
 
             inputStream.close();
         } catch (IOException e) {
-            EmojiTools.submitError(Thread.currentThread(), e);
+            EmojiTools.submitError(e);
         }
     }
 
@@ -83,23 +83,6 @@ public class ExtractionOperation extends Operation {
         else {
             //gui.showMessageDialog("The selected font cannot be extracted. Contact developer for help.");
             return null;
-        }
-    }
-
-    public enum TTXType {
-        ANDROID("android.ttx"),
-        IOS("ios.ttx"),
-        OSX("osx.ttx");
-
-        private String fileName;
-
-        TTXType(String fileName) {
-
-            this.fileName = fileName;
-        }
-
-        public String getFileName() {
-            return fileName;
         }
     }
 }

@@ -26,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+import net.liveforcode.emojitools.EmojiTools;
 
 import java.awt.*;
 import java.io.File;
@@ -52,11 +53,15 @@ public class OperationFinishedDialogController {
 
     @FXML
     protected void onOkButtonFired(ActionEvent event) {
+        EmojiTools.getLogManager().logInfo("OperationFinishedDialog: User hit OK.");
         ((Stage) this.okButton.getScene().getWindow()).close();
     }
 
     @FXML
     protected void onOpenOutputDirectoryButtonFired(ActionEvent event) {
+        EmojiTools.getLogManager().logInfo("OperationFinishedDialog: User opened output directory.");
+        openOutputDirectoryButton.setText("Opening...");
+        openOutputDirectoryButton.setDisable(true);
         try {
             Desktop.getDesktop().browse(outputDirectory.toURI());
         } catch (IOException e) {

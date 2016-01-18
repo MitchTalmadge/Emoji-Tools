@@ -23,30 +23,37 @@ package net.liveforcode.emojitools;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.logging.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class LogManager implements ConsoleManager.ConsoleListener {
 
     private final static int LOG_SIZE = 1024 * 1024;
     private final static int LOG_COUNT = 10;
     private final ConsoleManager consoleManager;
+    private FileHandler fileHandler;
     private Logger logger;
+    private File logDirectory;
 
     public LogManager(File logDirectory) throws IOException {
+        this.logDirectory = logDirectory;
         if (!logDirectory.exists() && !logDirectory.mkdir()) {
             System.out.println("Emoji Tools could not create the log directory. Does it have permission?");
         } else {
             this.logger = Logger.getLogger(new Versioning().getProgramName());
 
-            Handler handler = new FileHandler(logDirectory.getAbsolutePath() + "/" + new Versioning().getProgramName().replaceAll("\\s+", "_") + ".%u.%g.log", LOG_SIZE, LOG_COUNT);
-            handler.setFormatter(new Formatter() {
+            fileHandler = new FileHandler(logDirectory.getAbsolutePath() + "/" + new Versioning().getProgramName().replaceAll("\\s+", "_") + ".%u.%g.log", LOG_SIZE, LOG_COUNT);
+            fileHandler.setFormatter(new Formatter() {
                 @Override
                 public String format(LogRecord record) {
                     return new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a").format(new Date()) + " - " + record.getLevel() + ": " + record.getMessage();
                 }
             });
-            logger.addHandler(handler);
+            logger.addHandler(fileHandler);
         }
 
         this.consoleManager = new ConsoleManager();
@@ -59,7 +66,7 @@ public class LogManager implements ConsoleManager.ConsoleListener {
      * @param message The message to log.
      */
     public void logInfo(String message) {
-        logger.info(message);
+        logger.info(message.endsWith("\n") ? message : message + "\n");
     }
 
     /**
@@ -68,7 +75,7 @@ public class LogManager implements ConsoleManager.ConsoleListener {
      * @param message The message to log.
      */
     public void logWarning(String message) {
-        logger.warning(message);
+        logger.warning(message.endsWith("\n") ? message : message + "\n");
     }
 
     /**
@@ -77,7 +84,7 @@ public class LogManager implements ConsoleManager.ConsoleListener {
      * @param message The message to log.
      */
     public void logSevere(String message) {
-        logger.severe(message);
+        logger.severe(message.endsWith("\n") ? message : message + "\n");
     }
 
     /**
@@ -99,5 +106,11 @@ public class LogManager implements ConsoleManager.ConsoleListener {
     @Override
     public void sysErr(String message) {
         //logger.severe(message);
+    }
+
+    public File getLogFile() {
+        File[] logFiles = logDirectory.listFiles(pathname -> pathname.getName().endsWith(".log"));
+        Arrays.sort(logFiles, (f1, f2) -> Long.valueOf(f2.lastModified()).compareTo(f1.lastModified()));
+        return logFiles[0];
     }
 }

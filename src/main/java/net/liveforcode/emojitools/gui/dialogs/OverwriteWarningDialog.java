@@ -64,11 +64,14 @@ public class OverwriteWarningDialog {
 
     public boolean getResult() {
         stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
+        EmojiTools.getLogManager().logInfo("OverwriteWarningDialog displayed.");
         stage.showAndWait();
         return result;
     }
 
     public void onResultAcquired(boolean result) {
+        if(!result)
+            EmojiTools.getLogManager().logInfo("OverwriteWarningDialog: User cancelled.");
         this.result = result;
         stage.close();
     }

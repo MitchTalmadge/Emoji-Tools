@@ -42,7 +42,7 @@ public class AptiAPI {
     private static final String ERROR_REPORTER = "ErrorReporter.php";
     private static final String UPDATE_CHECKER = "UpdateChecker.php";
     protected final ArrayList<AptiAPIListener> APIListeners = new ArrayList<>();
-    private final UncaughtExceptionHandler uncaughtExceptionHandler;
+    private AptiAPIErrorHandler errorHandler;
     private AptiCrypto aptiCrypto;
     private AptiAPIVersioningDetails versioningDetails;
     private Image icon;
@@ -50,7 +50,6 @@ public class AptiAPI {
     public AptiAPI(AptiAPIVersioningDetails versioningDetails, Image icon) {
         this.versioningDetails = versioningDetails;
         this.icon = icon;
-        this.uncaughtExceptionHandler = new UncaughtExceptionHandler(this);
     }
 
     public void addAPIListener(AptiAPIListener listener) {
@@ -206,7 +205,7 @@ public class AptiAPI {
             String token = getToken();
 
             if (token != null) {
-                String encryptedReport = aptiCrypto.encrypt(report.generateReport());
+                String encryptedReport = aptiCrypto.encrypt(report.generateExceptionReport());
 
                 String errorReportResponse = POSTData(token, API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + versioningDetails.getAptiAPIProjectID() + "&report=" + encryptedReport);
 
@@ -232,15 +231,19 @@ public class AptiAPI {
         return true;
     }
 
-    public UncaughtExceptionHandler getUncaughtExceptionHandler() {
-        return uncaughtExceptionHandler;
-    }
-
     public AptiAPIVersioningDetails getVersioningDetails() {
         return this.versioningDetails;
     }
 
     public Image getIconImage() {
         return icon;
+    }
+
+    public AptiAPIErrorHandler getErrorHandler() {
+        return errorHandler;
+    }
+
+    public void setErrorHandler(AptiAPIErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

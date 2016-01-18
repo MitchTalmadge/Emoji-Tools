@@ -66,6 +66,7 @@ public class OperationFinishedDialog {
 
     public void display() {
         stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
+        EmojiTools.getLogManager().logInfo("OperationFinishedDialog displayed.");
         stage.showAndWait();
     }
 

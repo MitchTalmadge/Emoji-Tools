@@ -24,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OverwriteWarningDialog;
 
 import java.io.File;
@@ -49,6 +50,7 @@ public class OverwriteWarningDialogController {
 
     @FXML
     protected void onContinueButtonFired(ActionEvent actionEvent) {
+        EmojiTools.getLogManager().logInfo("OverwriteWarningDialog: User continued.");
         parent.onResultAcquired(true);
     }
 

@@ -20,25 +20,38 @@
 
 package com.aptitekk.aptiapi;
 
-import com.aptitekk.aptiapi.gui.ErrorReportDialog;
+import javafx.application.Platform;
 
-public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+public abstract class AptiAPIErrorHandler implements Thread.UncaughtExceptionHandler {
 
     private final AptiAPI aptiAPI;
 
-    public UncaughtExceptionHandler(AptiAPI aptiAPI) {
+    public AptiAPIErrorHandler(AptiAPI aptiAPI) {
         this.aptiAPI = aptiAPI;
     }
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        ErrorReport errorReport = new ErrorReport(t, e);
-        errorReport.setVersion(aptiAPI.getVersioningDetails().getVersionString());
-
-        System.out.println("ERROR OCCURRED!");
-        System.out.println("Thread Name: " + t.getName());
-        System.out.println("Exception:\n" + errorReport.getStackTrace());
-
-        new ErrorReportDialog(aptiAPI, errorReport).setVisible(true);
+        ErrorReport errorReport = onErrorOccurred(t, e);
+        if(errorReport != null)
+        {
+            aptiAPI.sendErrorReport(errorReport);
+            shutDown();
+        }
     }
+
+    /**
+     * Called when an error occurs in the program. Determines whether a report should be sent or not.
+     * @param t The thread where the error occurred.
+     * @param e The throwable (exception).
+     * @return An ErrorReport object if one should be sent. Null otherwise.
+     */
+    public abstract ErrorReport onErrorOccurred(Thread t, Throwable e);
+
+    /**
+     * Called after the error has been handled and the program should close.
+     * All program cleanup operations should take place when this method is called,
+     * and Platform.exit() or System.exit(int) should be called within this method.
+     */
+    public abstract void shutDown();
 }

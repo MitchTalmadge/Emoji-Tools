@@ -18,48 +18,48 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.gui.dialogs;
+package net.liveforcode.emojitools.gui.aptiapi;
 
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
+import com.aptitekk.aptiapi.AptiAPI;
+import com.aptitekk.aptiapi.ErrorReport;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OperationProgressDialogController;
+import net.liveforcode.emojitools.gui.aptiapi.controllers.ErrorReportDialogController;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class OperationProgressDialog {
+public class ErrorReportDialog {
 
-    private Stage stage;
-    private OperationProgressDialogController controller;
+    private final Stage stage;
+    private ErrorReportDialogController controller;
+    private ErrorReport errorReport;
+    private AptiAPI aptiAPI;
+    private boolean result;
 
-    private List<DialogCloseListener> closeListeners = new ArrayList<>();
+    public ErrorReportDialog(ErrorReport errorReport) {
+        this.errorReport = errorReport;
 
-    public OperationProgressDialog(String headerText) {
         this.stage = new Stage();
-        stage.setTitle(headerText);
+        stage.setTitle("Emoji Tools has Crashed!");
         stage.getIcons().add(EmojiTools.getLogoImage());
-        stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
 
         stage.setOnCloseRequest(e -> {
-            cancel();
+            setResult(false);
             e.consume();
         });
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/Dialogs/OperationProgressDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/AptiAPI/ErrorReportDialog.fxml"));
             Parent root = loader.load();
 
             this.controller = loader.getController();
             controller.setParent(this);
-            controller.setHeaderText(headerText);
 
             stage.setScene(new Scene(root));
         } catch (IOException e) {
@@ -67,37 +67,24 @@ public class OperationProgressDialog {
         }
     }
 
-    public void addCloseListener(DialogCloseListener listener) {
-        if (!closeListeners.contains(listener))
-            closeListeners.add(listener);
-    }
-
-    public void display() {
+    public boolean getResult() {
         stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
-        EmojiTools.getLogManager().logInfo("OperationProgressDialog displayed.");
+        EmojiTools.getLogManager().logInfo("ErrorReportDialog displayed.");
         stage.showAndWait();
+        return result;
     }
 
-    public void cancel() {
-        EmojiTools.getLogManager().logInfo("OperationProgressDialog: User cancelled.");
-        closeListeners.forEach(DialogCloseListener::onDialogClosing);
-        close();
-    }
-
-    public void close() {
+    public void setResult(boolean result) {
+        this.result = result;
         stage.close();
     }
 
-    public void bindProgressToProperty(ReadOnlyDoubleProperty property) {
-        controller.bindProgressToProperty(property);
+    public ErrorReport getErrorReport() {
+        return errorReport;
     }
 
-    public void bindMessagesToProperty(ReadOnlyStringProperty property) {
-        controller.bindMessagesToProperty(property);
-    }
-
-    public interface DialogCloseListener {
-        void onDialogClosing();
+    public AptiAPI getAptiAPI() {
+        return aptiAPI;
     }
 
 }

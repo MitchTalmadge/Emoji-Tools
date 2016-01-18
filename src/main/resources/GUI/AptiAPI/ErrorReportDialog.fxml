@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+  ~ Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
+  ~ Copyright (C) 2015 - 2016 Mitch Talmadge
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ Contact Mitch Talmadge at mitcht@liveforcode.net
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="net.liveforcode.emojitools.gui.aptiapi.controllers.ErrorReportDialogController">
+    <top>
+        <Label text="Emoji Tools has Crashed!" BorderPane.alignment="CENTER">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </Label>
+    </top>
+    <opaqueInsets>
+        <Insets/>
+    </opaqueInsets>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label minHeight="-Infinity" text="Emoji Tools has encountered an error and needs to close."
+                       wrapText="true"/>
+                <Label minHeight="-Infinity"
+                       text="To help us fix this error, please review the report and send it to us by clicking the &quot;Send Report&quot; button below. All information shall be kept confidential, and will only serve to improve Emoji Tools. No information will be sent if you choose not to send the report."
+                       wrapText="true"/>
+                <Label minHeight="-Infinity"
+                       text="Every error report contains the details of the error and a log describing the events leading up to the error. The details will be processed by our developers and helps us to fix the error quickly."
+                       wrapText="true"/>
+                <Label minHeight="-Infinity"
+                       text="To view the contents of the report, click the &quot;View Details...&quot; button below."
+                       wrapText="true"/>
+                <Label text="Please describe what you were doing just before this error occurred:" wrapText="true">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <TextArea fx:id="descriptionTextArea" minHeight="-Infinity" minWidth="-Infinity" prefHeight="75.0"
+                          prefWidth="400.0" promptText="Optional"/>
+                <Label minHeight="-Infinity"
+                       text="If you choose to provide the contact information below, we may email you for more details regarding this error in the future."
+                       wrapText="true"/>
+                <GridPane hgap="10.0" vgap="5.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints vgrow="SOMETIMES"/>
+                        <RowConstraints vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <children>
+                        <TextField fx:id="nameField" promptText="Optional" GridPane.rowIndex="1"/>
+                        <TextField fx:id="emailField" promptText="Optional" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="1"/>
+                        <Label text="Your Name:">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <Label text="Your Email Address:" GridPane.columnIndex="1">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                    </children>
+                </GridPane>
+                <GridPane hgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <children>
+                        <Button fx:id="sendReportButton" defaultButton="true" maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false" onAction="#onSendReportButtonFired" text="Send Report"/>
+                        <Button fx:id="dontSendReportButton" cancelButton="true" maxWidth="1.7976931348623157E308"
+                                mnemonicParsing="false" onAction="#onDontSendReportButtonFired" text="Don't Send Report"
+                                GridPane.columnIndex="1"/>
+                        <Button fx:id="viewDetailsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                onAction="#onViewDetailsButtonFired" text="View Details..." GridPane.columnIndex="2"/>
+                    </children>
+                </GridPane>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

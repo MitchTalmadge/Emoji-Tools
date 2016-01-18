@@ -23,7 +23,6 @@ package net.liveforcode.emojitools.operations.packaging;
 import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
-import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
 import net.liveforcode.emojitools.operations.packaging.packagingthreads.AndroidPackagingWorker;
 
 import java.io.File;
@@ -38,6 +37,7 @@ public class PackagingOperation extends Operation {
 
     @Override
     protected OperationWorker getWorker() {
+        //TODO: Base on FontType
         //Check for .ttx file
         File ttxFile = null;
         File[] files = packagingDirectory.listFiles();
@@ -45,7 +45,7 @@ public class PackagingOperation extends Operation {
             return null;
 
         for (File file : files) {
-            if (file.getName().endsWith(".ttx")) {
+            if (file.getName().equals("font.ttx")) {
                 ttxFile = file;
                 break;
             }
@@ -55,27 +55,6 @@ public class PackagingOperation extends Operation {
             return null;
         }
 
-        ExtractionOperation.TTXType ttxType = null;
-        for (ExtractionOperation.TTXType type : ExtractionOperation.TTXType.values()) {
-            if (type.getFileName().equals(ttxFile.getName())) {
-                ttxType = type;
-                break;
-            }
-        }
-
-        if (ttxType == null)
-            return null;
-
-        switch (ttxType) {
-            case ANDROID:
-                return new AndroidPackagingWorker(this, new OperationProgressDialog("Packaging to NotoColorEmoji.ttf..."), packagingDirectory);
-            case IOS:
-            case OSX:
-                //showMessageDialog("iOS and OSX Emoji Fonts cannot be created yet. This feature is in development.");
-                return null;
-            default:
-                //showMessageDialog("The selected Emoji directory is invalid or cannot be packaged.");
-                return null;
-        }
+        return new AndroidPackagingWorker(this, new OperationProgressDialog("Packaging to NotoColorEmoji.ttf..."), packagingDirectory);
     }
 }

@@ -39,7 +39,7 @@ public class ErrorDetailsDialog extends JDialog implements ActionListener {
         setResizable(false);
         getRootPane().setDefaultButton(OKButton);
 
-        this.reportArea.setText("<html>" + report.generateReport().replaceAll("\n", "<br>").replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</html>");
+        this.reportArea.setText("<html>" + report.generateExceptionReport().replaceAll("\n", "<br>").replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;") + "</html>");
 
         this.OKButton.addActionListener(this);
 

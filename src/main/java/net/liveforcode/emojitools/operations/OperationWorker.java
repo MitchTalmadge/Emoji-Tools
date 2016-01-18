@@ -65,7 +65,7 @@ public abstract class OperationWorker extends Task<Boolean> implements EmojiTool
         try {
             return doWork();
         } catch (Exception e) {
-            EmojiTools.submitError(Thread.currentThread(), e);
+            EmojiTools.submitError(e);
             return false;
         }
     }

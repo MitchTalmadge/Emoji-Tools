@@ -60,22 +60,17 @@ public class AndroidPackagingWorker extends OperationWorker {
     @Override
     protected Boolean doWork() throws Exception {
         File outputDirectory = new File(EmojiTools.getRootDirectory(), "Output");
-        if (!outputDirectory.exists() && !outputDirectory.mkdir())
-        {
+        if (!outputDirectory.exists() && !outputDirectory.mkdir()) {
             EmojiTools.showErrorDialog("Unable to Create Directory", "Emoji Tools was unable to create a required directory. Does it have permission?");
             return false;
-        }
-        else
-        {
+        } else {
             File[] files = outputDirectory.listFiles();
-            if (files == null)
-            {
+            if (files == null) {
                 EmojiTools.showErrorDialog("Packaging Failed (Error Code 1)", "An internal error occurred. Please contact the developer for help.");
                 return false;
             }
             for (File file : files) {
-                if(!file.delete())
-                {
+                if (!file.delete()) {
                     EmojiTools.showErrorDialog("Could Not Delete File", "Emoji Tools was unable to delete a file that must be deleted. Does it have permission?");
                 }
             }
@@ -89,7 +84,7 @@ public class AndroidPackagingWorker extends OperationWorker {
             return false;
 
         //Open up ttx for reading and writing
-        Document infoDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(packagingDirectory, ExtractionOperation.TTXType.ANDROID.getFileName()));
+        Document infoDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(packagingDirectory, "font.ttx"));
 
         //Check for ttFont element
         Element rootElement = infoDocument.getDocumentElement();
@@ -173,8 +168,7 @@ public class AndroidPackagingWorker extends OperationWorker {
         //Begin mapping png file names to known glyph names
         HashMap<String, File> glyphNameFileMap = new HashMap<>();
         File[] files = packagingDirectory.listFiles();
-        if (files == null)
-        {
+        if (files == null) {
             EmojiTools.showErrorDialog("Packaging Failed (Error Code 2)", "An internal error occurred. Please contact the developer for help.");
             return false;
         }
@@ -283,7 +277,7 @@ public class AndroidPackagingWorker extends OperationWorker {
             return false;
 
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        Result output = new StreamResult(new File(getJythonHandler().getTempDirectory(), ExtractionOperation.TTXType.ANDROID.getFileName()));
+        Result output = new StreamResult(new File(getJythonHandler().getTempDirectory(), "font.ttx"));
         Source input = new DOMSource(infoDocument);
 
         transformer.transform(input, output);
@@ -302,7 +296,7 @@ public class AndroidPackagingWorker extends OperationWorker {
         argvList.add("package.py");                                                     //Python Script Name
         argvList.add("-o");                                                             //Output flag
         argvList.add(outputDirectory.getAbsolutePath() + "/NotoColorEmoji.ttf");        //Output ttf path
-        argvList.add(getJythonHandler().getTempDirectory().getAbsolutePath() + "/" + ExtractionOperation.TTXType.ANDROID.getFileName()); //Input ttx path
+        argvList.add(getJythonHandler().getTempDirectory().getAbsolutePath() + "/" + "font.ttx"); //Input ttx path
 
         getJythonHandler().getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
 

@@ -102,7 +102,7 @@ public class Converter {
                     }
                 }
             } catch (IOException e) {
-                EmojiTools.submitError(Thread.currentThread(), e);
+                EmojiTools.submitError(e);
             }
         }
     }
@@ -125,7 +125,7 @@ public class Converter {
                 while (!chunk.getName().equalsIgnoreCase("IEND"));
             }
         } catch (IOException e) {
-            EmojiTools.submitError(Thread.currentThread(), e);
+            EmojiTools.submitError(e);
         }
     }
 

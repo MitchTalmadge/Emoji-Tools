@@ -22,6 +22,7 @@ package net.liveforcode.emojitools.operations.extraction.extractors;
 
 import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
+import net.liveforcode.emojitools.operations.FontType;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.extraction.ExtractionUtilites;
 
@@ -103,7 +104,6 @@ public class AppleExtractionWorker extends ExtractionWorker {
                         strikeOffsets[i] = inputStream.readInt();
                     }
 
-                    //TODO: Figure out how to convert rgbl to png.. for now, use last strike..
                     inputStream.seek(sbixOffset + strikeOffsets[strikeOffsets.length - 1]);
                     inputStream.skipBytes(4);
 
@@ -154,11 +154,13 @@ public class AppleExtractionWorker extends ExtractionWorker {
                 return false;
             }
 
+            writeFontTypeFile(FontType.APPLE);
+
             inputStream.close();
         } catch (FileNotFoundException e) {
             EmojiTools.showErrorDialog("Unable to Locate Font", "The chosen font could not be found. Did it get deleted?");
         } catch (IOException e) {
-            EmojiTools.submitError(Thread.currentThread(), e);
+            EmojiTools.submitError(e);
         }
         return true;
     }

@@ -21,7 +21,6 @@
 package net.liveforcode.emojitools;
 
 import com.aptitekk.aptiapi.AptiAPI;
-import com.aptitekk.aptiapi.UncaughtExceptionHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -53,7 +52,6 @@ public class EmojiTools extends Application {
 
     private static final Image logoImage = new Image(EmojiTools.class.getResourceAsStream("/Images/EmojiToolsLogo.png"));
     private static final AptiAPI aptiAPI = new AptiAPI(new Versioning(), logoImage);
-    private static final UncaughtExceptionHandler uncaughtExceptionHandler = aptiAPI.getUncaughtExceptionHandler();
 
     private static final ArrayList<JythonListener> jythonListenerList = new ArrayList<>();
     private static JythonHandler jythonHandler;
@@ -71,7 +69,7 @@ public class EmojiTools extends Application {
             e.printStackTrace();
         }
 
-        Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
+        aptiAPI.setErrorHandler(new EmojiToolsErrorHandler(aptiAPI));
 
         new JythonLoader().execute();
 
@@ -82,6 +80,7 @@ public class EmojiTools extends Application {
 
     /**
      * Gets the LogManager instance, which handles logging to files.
+     *
      * @return The LogManager instance.
      */
     public static LogManager getLogManager() {
@@ -131,11 +130,10 @@ public class EmojiTools extends Application {
      * Creates an error report and notifies the user, asking them if they want to send or not, then
      * immediately closes the program.
      *
-     * @param thread    The thread that threw the exception.
      * @param throwable The exception thrown.
      */
-    public static void submitError(Thread thread, Throwable throwable) {
-        uncaughtExceptionHandler.uncaughtException(thread, throwable);
+    public static void submitError(Throwable throwable) {
+        aptiAPI.getErrorHandler().uncaughtException(Thread.currentThread(), throwable);
     }
 
     /**
@@ -147,7 +145,7 @@ public class EmojiTools extends Application {
         try {
             return new File(EmojiTools.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getAbsoluteFile();
         } catch (URISyntaxException e) {
-            submitError(Thread.currentThread(), e);
+            submitError(e);
             return null;
         }
     }
@@ -177,15 +175,6 @@ public class EmojiTools extends Application {
             else
                 iterator.remove();
         }
-    }
-
-    /**
-     * Gets the UncaughtExceptionHandler that creates error reports from uncaught exceptions.
-     *
-     * @return the UncaughtExceptionHandler object.
-     */
-    public static Thread.UncaughtExceptionHandler getUncaughtExceptionHandler() {
-        return uncaughtExceptionHandler;
     }
 
     /**
@@ -259,7 +248,7 @@ public class EmojiTools extends Application {
         }
         alert.setContentText(message);
 
-        if(getLogManager() != null)
+        if (getLogManager() != null)
             getLogManager().logInfo("Alert Shown: " + header + " - " + message);
 
         alert.initModality(Modality.APPLICATION_MODAL);
@@ -284,7 +273,7 @@ public class EmojiTools extends Application {
         }
         alert.setContentText(message);
 
-        if(getLogManager() != null)
+        if (getLogManager() != null)
             getLogManager().logWarning("Alert Shown: " + header + " - " + message);
 
         alert.initModality(Modality.APPLICATION_MODAL);
@@ -309,7 +298,7 @@ public class EmojiTools extends Application {
         }
         alert.setContentText(message);
 
-        if(getLogManager() != null)
+        if (getLogManager() != null)
             getLogManager().logSevere("Alert Shown: " + header + " - " + message);
 
         alert.initModality(Modality.APPLICATION_MODAL);
@@ -318,30 +307,41 @@ public class EmojiTools extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        mainGuiStage = stage;
-        stage.setTitle(new Versioning().getProgramNameWithVersion());
-        stage.setResizable(false);
-        stage.getIcons().add(EmojiTools.getLogoImage());
+        try {
+            mainGuiStage = stage;
+            stage.setTitle(new Versioning().getProgramNameWithVersion());
+            stage.setResizable(false);
+            stage.getIcons().add(EmojiTools.getLogoImage());
 
-        Parent root = FXMLLoader.load(getClass().getResource("/GUI/MainGUI.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/GUI/MainGUI.fxml"));
 
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+
+            getLogManager().logInfo("Main GUI Displayed.");
+
+            Integer.parseInt("foo");
+        } catch (Exception e) {
+            submitError(e);
+        }
     }
 
     @Override
     public void stop() throws Exception {
-        if (jythonHandler != null) {
-            jythonHandler.getPythonInterpreter().close();
+        try {
+            getLogManager().logInfo("Emoji Tools is stopping...");
+            if (jythonHandler != null) {
+                getLogManager().logInfo("Cleaning up jythonHandler...");
+                jythonHandler.getPythonInterpreter().close();
 
-            if (jythonHandler.getTempDirectory().exists()) {
-                try {
+                if (jythonHandler.getTempDirectory().exists()) {
                     org.apache.commons.io.FileUtils.deleteDirectory(jythonHandler.getTempDirectory());
-                } catch (IOException e) {
-                    EmojiTools.submitError(Thread.currentThread(), e);
                 }
             }
+            getLogManager().logInfo("Emoji Tools stopped gracefully.");
+        } catch (Exception e) {
+            submitError(e);
         }
     }
 

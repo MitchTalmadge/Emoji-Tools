@@ -22,8 +22,8 @@ package net.liveforcode.emojitools.operations.extraction.extractors;
 
 import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
+import net.liveforcode.emojitools.operations.FontType;
 import net.liveforcode.emojitools.operations.Operation;
-import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
 import net.liveforcode.emojitools.operations.extraction.ExtractionUtilites;
 import org.python.core.PyList;
 import org.python.core.PyType;
@@ -50,7 +50,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
         argvList.add("package.py");                                         //Python Script Name
         argvList.add("-o");                                                 //Output flag
         argvList.add(extractionDirectory.getAbsolutePath()
-                + "/" + ExtractionOperation.TTXType.ANDROID.getFileName());   //Output ttx path
+                + "/" + "font.ttx");   //Output ttx path
         argvList.add(fontFile.getAbsolutePath());                               //Input ttf path
 
         getJythonHandler().getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
@@ -320,12 +320,14 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                 return false;
             }
 
+            writeFontTypeFile(FontType.GOOGLE);
+
             inputStream.close();
         } catch (FileNotFoundException e) {
             System.out.println(this.fontFile.getName() + " not found!");
             EmojiTools.showErrorDialog("Unable to Locate Font", "The chosen font could not be found. Did it get deleted?");
         } catch (IOException e) {
-            EmojiTools.submitError(Thread.currentThread(), e);
+            EmojiTools.submitError(e);
         }
         return true;
     }

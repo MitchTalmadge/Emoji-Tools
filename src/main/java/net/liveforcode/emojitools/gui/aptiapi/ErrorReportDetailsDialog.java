@@ -18,48 +18,49 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.gui.dialogs;
+package net.liveforcode.emojitools.gui.aptiapi;
 
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
+import com.aptitekk.aptiapi.ErrorReport;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.liveforcode.emojitools.EmojiTools;
-import net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OperationProgressDialogController;
+import net.liveforcode.emojitools.gui.aptiapi.controllers.ErrorReportDetailsDialogController;
+import net.liveforcode.emojitools.gui.aptiapi.controllers.ErrorReportDialogController;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class OperationProgressDialog {
+public class ErrorReportDetailsDialog {
 
-    private Stage stage;
-    private OperationProgressDialogController controller;
+    private final Stage stage;
+    private ErrorReportDialogController errorReportDialogController;
+    private ErrorReportDetailsDialogController controller;
 
-    private List<DialogCloseListener> closeListeners = new ArrayList<>();
+    public ErrorReportDetailsDialog(ErrorReportDialogController errorReportDialogController, ErrorReport errorReport) {
+        this.errorReportDialogController = errorReportDialogController;
 
-    public OperationProgressDialog(String headerText) {
         this.stage = new Stage();
-        stage.setTitle(headerText);
+        stage.setTitle("Error Report Details");
         stage.getIcons().add(EmojiTools.getLogoImage());
-        stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
 
         stage.setOnCloseRequest(e -> {
-            cancel();
+            returnToErrorReportDialog();
             e.consume();
         });
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/Dialogs/OperationProgressDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/AptiAPI/ErrorReportDetailsDialog.fxml"));
             Parent root = loader.load();
 
             this.controller = loader.getController();
             controller.setParent(this);
-            controller.setHeaderText(headerText);
+            controller.setDetails("<html>"+errorReport.generateExceptionReport()+"</html>");
+            controller.setLogText(errorReport.getLogFileContents());
+            controller.setShouldIncludeLog(errorReportDialogController.isLogAttached());
 
             stage.setScene(new Scene(root));
         } catch (IOException e) {
@@ -67,37 +68,14 @@ public class OperationProgressDialog {
         }
     }
 
-    public void addCloseListener(DialogCloseListener listener) {
-        if (!closeListeners.contains(listener))
-            closeListeners.add(listener);
-    }
-
     public void display() {
         stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
-        EmojiTools.getLogManager().logInfo("OperationProgressDialog displayed.");
+        EmojiTools.getLogManager().logInfo("ErrorReportDetailsDialog displayed.");
         stage.showAndWait();
     }
 
-    public void cancel() {
-        EmojiTools.getLogManager().logInfo("OperationProgressDialog: User cancelled.");
-        closeListeners.forEach(DialogCloseListener::onDialogClosing);
-        close();
-    }
-
-    public void close() {
+    public void returnToErrorReportDialog() {
+        errorReportDialogController.setLogAttached(controller.getShouldIncludeLog());
         stage.close();
     }
-
-    public void bindProgressToProperty(ReadOnlyDoubleProperty property) {
-        controller.bindProgressToProperty(property);
-    }
-
-    public void bindMessagesToProperty(ReadOnlyStringProperty property) {
-        controller.bindMessagesToProperty(property);
-    }
-
-    public interface DialogCloseListener {
-        void onDialogClosing();
-    }
-
 }

@@ -20,12 +20,17 @@
 
 package net.liveforcode.emojitools.operations.extraction.extractors;
 
+import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
+import net.liveforcode.emojitools.operations.FontType;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 public abstract class ExtractionWorker extends OperationWorker {
     final static String[] standardOrderNames = {
@@ -301,6 +306,19 @@ public abstract class ExtractionWorker extends OperationWorker {
         this.tableNames = tableNames;
         this.tableOffsets = tableOffsets;
         this.tableLengths = tableLengths;
+    }
+
+    protected void writeFontTypeFile(FontType fontType) {
+        File propertiesFile = new File(extractionDirectory, FontType.FONT_PROPERTIES_FILE_NAME);
+        Properties properties = new Properties();
+        properties.setProperty(FontType.FONT_PROPERTY_NAME, fontType.name());
+
+        try {
+            properties.store(new FileOutputStream(propertiesFile), null);
+        } catch (IOException e) {
+            EmojiTools.getLogManager().logSevere("Could not store properties for font file!");
+            e.printStackTrace();
+        }
     }
 
     @Override
