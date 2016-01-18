@@ -25,12 +25,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.web.WebView;
 import net.liveforcode.emojitools.gui.aptiapi.ErrorReportDetailsDialog;
 
 public class ErrorReportDetailsDialogController {
 
     @FXML
-    protected TextArea detailsTextArea;
+    protected WebView detailsWebView;
 
     @FXML
     protected CheckBox includeLogCheckbox;
@@ -54,7 +55,7 @@ public class ErrorReportDetailsDialogController {
 
     public void setDetails(String details)
     {
-        this.detailsTextArea.setText(details);
+        this.detailsWebView.getEngine().loadContent(details);
     }
 
     public void setLogText(String logText)

@@ -20,8 +20,6 @@
 
 package com.aptitekk.aptiapi;
 
-import javafx.application.Platform;
-
 public abstract class AptiAPIErrorHandler implements Thread.UncaughtExceptionHandler {
 
     private final AptiAPI aptiAPI;
@@ -36,8 +34,8 @@ public abstract class AptiAPIErrorHandler implements Thread.UncaughtExceptionHan
         if(errorReport != null)
         {
             aptiAPI.sendErrorReport(errorReport);
-            shutDown();
         }
+        shutDown();
     }
 
     /**

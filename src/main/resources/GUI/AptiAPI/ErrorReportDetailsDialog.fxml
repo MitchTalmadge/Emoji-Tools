@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.aptiapi.controllers.ErrorReportDetailsDialogController">
    <top>
@@ -27,7 +27,7 @@
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <TextArea fx:id="detailsTextArea" editable="false" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="400.0" />
+            <WebView fx:id="detailsWebView" minHeight="200.0" minWidth="400.0" prefHeight="200.0" prefWidth="400.0" />
             <Label text="Log">
                <font>
                   <Font name="System Bold" size="12.0" />

@@ -58,7 +58,7 @@ public class ErrorReportDetailsDialog {
 
             this.controller = loader.getController();
             controller.setParent(this);
-            controller.setDetails("<html>"+errorReport.generateExceptionReport()+"</html>");
+            controller.setDetails("<html style='font-family:System;font-size:12px;'>"+errorReport.generateExceptionReport()+"</html>");
             controller.setLogText(errorReport.getLogFileContents());
             controller.setShouldIncludeLog(errorReportDialogController.isLogAttached());
 
