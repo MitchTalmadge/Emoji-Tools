@@ -22,9 +22,9 @@ package com.aptitekk.aptiapi;
 
 public interface AptiAPIListener {
 
-    void displayInfo(String message);
+    void aptiApiInfo(String message);
 
-    void displayError(String message);
+    void aptiApiError(String message);
 
     void shutdown();
 

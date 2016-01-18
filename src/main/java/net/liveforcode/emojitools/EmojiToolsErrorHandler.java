@@ -24,9 +24,14 @@ import com.aptitekk.aptiapi.AptiAPI;
 import com.aptitekk.aptiapi.AptiAPIErrorHandler;
 import com.aptitekk.aptiapi.ErrorReport;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import net.liveforcode.emojitools.gui.aptiapi.ErrorReportDialog;
+import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 
 public class EmojiToolsErrorHandler extends AptiAPIErrorHandler {
+
+    private OperationProgressDialog progressDialog;
 
     public EmojiToolsErrorHandler(AptiAPI aptiAPI) {
         super(aptiAPI);
@@ -43,9 +48,33 @@ public class EmojiToolsErrorHandler extends AptiAPIErrorHandler {
 
         boolean sendReport = new ErrorReportDialog(errorReport).getResult();
 
-        if (sendReport)
+        if (sendReport) {
+            this.progressDialog = new OperationProgressDialog("Sending Error Report...");
             return errorReport;
+        }
         return null;
+    }
+
+    @Override
+    public void bindProperties(ReadOnlyDoubleProperty progressProperty, ReadOnlyStringProperty messageProperty) {
+        //TODO: Allow for Cancelling
+        progressDialog.bindProgressToProperty(progressProperty);
+        progressDialog.bindMessagesToProperty(messageProperty);
+    }
+
+    @Override
+    public void onSendingStarted() {
+        progressDialog.display();
+    }
+
+    @Override
+    public void onSendingComplete(boolean completedSuccessfully) {
+        progressDialog.close();
+        if (completedSuccessfully)
+            EmojiTools.showInfoDialog("Error Report Sent!", "We have received your error report. Thank you!");
+        else
+            EmojiTools.showErrorDialog("Error Report Could Not be Sent.", "We were unable to receive your error report. Sorry for the inconvenience.");
+        shutDown();
     }
 
     @Override

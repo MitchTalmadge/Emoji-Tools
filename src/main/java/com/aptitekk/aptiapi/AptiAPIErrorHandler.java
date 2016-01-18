@@ -20,6 +20,9 @@
 
 package com.aptitekk.aptiapi;
 
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+
 public abstract class AptiAPIErrorHandler implements Thread.UncaughtExceptionHandler {
 
     private final AptiAPI aptiAPI;
@@ -31,20 +34,40 @@ public abstract class AptiAPIErrorHandler implements Thread.UncaughtExceptionHan
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         ErrorReport errorReport = onErrorOccurred(t, e);
-        if(errorReport != null)
-        {
+        if (errorReport != null) {
             aptiAPI.sendErrorReport(errorReport);
-        }
-        shutDown();
+        } else
+            shutDown();
     }
 
     /**
      * Called when an error occurs in the program. Determines whether a report should be sent or not.
+     *
      * @param t The thread where the error occurred.
      * @param e The throwable (exception).
      * @return An ErrorReport object if one should be sent. Null otherwise.
      */
     public abstract ErrorReport onErrorOccurred(Thread t, Throwable e);
+
+    /**
+     * Called before report sending has started, to allow for binding the task properties.
+     *
+     * @param progressProperty This property contains the current progress of sending.
+     * @param messageProperty  This property contains any messages sent during sending.
+     */
+    public abstract void bindProperties(ReadOnlyDoubleProperty progressProperty, ReadOnlyStringProperty messageProperty);
+
+    /**
+     * Called when report sending has started.
+     */
+    public abstract void onSendingStarted();
+
+    /**
+     * Called after sending has completed.
+     *
+     * @param completedSuccessfully Whether sending completed successfully or not.
+     */
+    public abstract void onSendingComplete(boolean completedSuccessfully);
 
     /**
      * Called after the error has been handled and the program should close.

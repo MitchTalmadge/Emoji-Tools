@@ -21,7 +21,9 @@
 package net.liveforcode.emojitools;
 
 import com.aptitekk.aptiapi.AptiAPI;
+import com.aptitekk.aptiapi.AptiAPIListener;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -48,7 +50,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
-public class EmojiTools extends Application {
+public class EmojiTools extends Application implements AptiAPIListener {
 
     private static final Image logoImage = new Image(EmojiTools.class.getResourceAsStream("/Images/EmojiToolsLogo.png"));
     private static final AptiAPI aptiAPI = new AptiAPI(new Versioning(), logoImage);
@@ -307,6 +309,8 @@ public class EmojiTools extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        aptiAPI.addAPIListener(this);
+
         try {
             mainGuiStage = stage;
             stage.setTitle(new Versioning().getProgramNameWithVersion());
@@ -343,6 +347,21 @@ public class EmojiTools extends Application {
         } catch (Exception e) {
             submitError(e);
         }
+    }
+
+    @Override
+    public void aptiApiInfo(String message) {
+        getLogManager().logInfo(message);
+    }
+
+    @Override
+    public void aptiApiError(String message) {
+        getLogManager().logSevere(message);
+    }
+
+    @Override
+    public void shutdown() {
+        Platform.exit();
     }
 
     public interface JythonListener {

@@ -20,8 +20,9 @@
 
 package com.aptitekk.aptiapi;
 
-import com.aptitekk.aptiapi.gui.ErrorReportProgressDialog;
 import com.aptitekk.aptiapi.gui.UpdateNoticeDialog;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 
 import java.io.BufferedReader;
@@ -33,6 +34,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class AptiAPI {
 
@@ -62,15 +64,15 @@ public class AptiAPI {
             APIListeners.remove(listener);
     }
 
-    protected void displayInfo(String message) {
+    protected void info(String message) {
         for (AptiAPIListener listener : APIListeners) {
-            listener.displayInfo(message);
+            listener.aptiApiInfo(message);
         }
     }
 
-    protected void displayError(String message) {
+    protected void error(String message) {
         for (AptiAPIListener listener : APIListeners) {
-            listener.displayError(message);
+            listener.aptiApiError(message);
         }
     }
 
@@ -138,12 +140,12 @@ public class AptiAPI {
 
         String[] responseSplit = tokenResponse.split("§");
         if (responseSplit.length < 3) {
-            displayError("Could not generate token: Response length is < 3!");
+            error("Could not generate token: Response length is < 3!");
             return null;
         }
 
         if (responseSplit[1].equals("FAILURE")) {
-            displayError("Could not generate token: " + responseSplit[2]);
+            error("Could not generate token: " + responseSplit[2]);
             return null;
         }
 
@@ -176,13 +178,13 @@ public class AptiAPI {
 
                 String[] response = updateInfo.split("§");
                 if (response[1].equals("FAILURE")) {
-                    displayError("Could not check for updates: " + response[2]);
+                    error("Could not check for updates: " + response[2]);
                     return;
                 }
 
                 if (response[2].equals("1")) {
                     if (response.length < 7) {
-                        displayError("Could not check for updates: Response length is < 7!");
+                        error("Could not check for updates: Response length is < 7!");
                         return;
                     }
 
@@ -196,39 +198,9 @@ public class AptiAPI {
 
     }
 
-    public boolean sendErrorReport(ErrorReport report) {
-
-        ErrorReportProgressDialog progressDialog = new ErrorReportProgressDialog(this, icon);
-        progressDialog.setVisible(true);
-
-        try {
-            String token = getToken();
-
-            if (token != null) {
-                String encryptedReport = aptiCrypto.encrypt(report.generateExceptionReport());
-
-                String errorReportResponse = POSTData(token, API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + versioningDetails.getAptiAPIProjectID() + "&report=" + encryptedReport);
-
-                if (errorReportResponse == null) {
-                    displayError("Could not submit report: Null response!");
-                    return false;
-                }
-
-                String[] response = errorReportResponse.split("§");
-                if (response.length < 2) {
-                    displayError("Could not submit report: Response length is < 2!");
-                    return false;
-                }
-
-                if (response[1].equals("FAILURE")) {
-                    displayError("Could not submit report: " + response[2]);
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return true;
+    public void sendErrorReport(ErrorReport errorReport) {
+        new Thread(new ErrorReportSenderTask(errorReport)).start();
+        getErrorHandler().onSendingStarted();
     }
 
     public AptiAPIVersioningDetails getVersioningDetails() {
@@ -245,5 +217,61 @@ public class AptiAPI {
 
     public void setErrorHandler(AptiAPIErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
+    }
+
+    private class ErrorReportSenderTask extends Task<Boolean> {
+
+        private ErrorReport errorReport;
+
+        public ErrorReportSenderTask(ErrorReport errorReport) {
+            this.errorReport = errorReport;
+            getErrorHandler().bindProperties(this.progressProperty(), this.messageProperty());
+        }
+
+        @Override
+        protected Boolean call() throws Exception {
+            try {
+                String token = getToken();
+
+                if (token != null) {
+                    String encryptedReport = aptiCrypto.encrypt(errorReport.generateExceptionReport());
+
+                    String errorReportResponse = POSTData(token, API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + versioningDetails.getAptiAPIProjectID() + "&report=" + encryptedReport);
+
+                    if (errorReportResponse == null) {
+                        updateMessage("Could not submit report: Null response!");
+                        error("Could not submit report: Null response!");
+                        return false;
+                    }
+
+                    String[] response = errorReportResponse.split("§");
+                    if (response.length < 2) {
+                        updateMessage("Could not submit report: Response length is < 2!");
+                        error("Could not submit report: Response length is < 2!");
+                        return false;
+                    }
+
+                    if (response[1].equals("FAILURE")) {
+                        updateMessage("Could not submit report: " + response[2]);
+                        error("Could not submit report: " + response[2]);
+                        return false;
+                    }
+                }
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                boolean result = get();
+                Platform.runLater(() -> getErrorHandler().onSendingComplete(result));
+            } catch (InterruptedException | ExecutionException e) {
+                error("Error occurred while sending report!");
+                error(e.getMessage());
+            }
+        }
     }
 }
