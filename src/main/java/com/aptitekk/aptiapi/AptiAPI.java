@@ -24,15 +24,18 @@ import com.aptitekk.aptiapi.gui.UpdateNoticeDialog;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -82,44 +85,26 @@ public class AptiAPI {
         }
     }
 
-    private String POSTData(String token, String url, String data) {
+    private String POSTData(String url, MultipartEntityBuilder entityBuilder) {
         try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            HttpPost post = new HttpPost(url);
 
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            HttpEntity httpEntity = entityBuilder.build();
+            post.setEntity(httpEntity);
 
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            CloseableHttpResponse httpResponse = httpClient.execute(post);
+            HttpEntity responseEntity = httpResponse.getEntity();
 
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(data + (token != null ? "&token=" + token : ""));
-            wr.flush();
-            wr.close();
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+            BufferedReader br = new BufferedReader(new InputStreamReader(responseEntity.getContent()));
+            String line;
+            StringBuilder builder = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                builder.append(line);
             }
-            in.close();
+            br.close();
 
-            String rawResponse = response.toString();
-
-            if (token != null && aptiCrypto != null) { //Data will be encrypted
-                try {
-                    return aptiCrypto.decrypt(rawResponse);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            } else {
-                return rawResponse;
-            }
+            return new String(builder);
 
         } catch (UnknownHostException e) {
             System.out.println("Could not connect to AptiTekk.");
@@ -131,7 +116,9 @@ public class AptiAPI {
     }
 
     private String getToken() {
-        String tokenResponse = POSTData(null, API_URL + API_VERSION + "/" + TOKEN_GENERATOR, "projectID=" + versioningDetails.getAptiAPIProjectID());
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+        entityBuilder.addTextBody("projectID", versioningDetails.getAptiAPIProjectID() + "");
+        String tokenResponse = POSTData(API_URL + API_VERSION + "/" + TOKEN_GENERATOR, entityBuilder);
 
         if (tokenResponse == null) {
             System.out.println("Could not generate token: Null response!");
@@ -169,7 +156,13 @@ public class AptiAPI {
         if (token != null) {
             try {
                 String versionIDEncrypted = aptiCrypto.encrypt(currentVersionID + "");
-                String updateInfo = POSTData(token, API_URL + API_VERSION + "/" + UPDATE_CHECKER, "projectID=" + versioningDetails.getAptiAPIProjectID() + "&currentVersionID=" + versionIDEncrypted);
+                MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+                entityBuilder.addTextBody("token", token);
+                entityBuilder.addTextBody("projectID", versioningDetails.getAptiAPIProjectID() + "");
+                entityBuilder.addTextBody("currentVersionID", versionIDEncrypted);
+                String updateInfo = POSTData(API_URL + API_VERSION + "/" + UPDATE_CHECKER, entityBuilder);
+
+                updateInfo = aptiCrypto.decrypt(updateInfo);
 
                 if (updateInfo == null) {
                     System.out.println("Could not check for updates: Null response!");
@@ -236,7 +229,17 @@ public class AptiAPI {
                 if (token != null) {
                     String encryptedReport = aptiCrypto.encrypt(errorReport.generateExceptionReport());
 
-                    String errorReportResponse = POSTData(token, API_URL + API_VERSION + "/" + ERROR_REPORTER, "projectID=" + versioningDetails.getAptiAPIProjectID() + "&report=" + encryptedReport);
+                    MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+                    entityBuilder.addTextBody("token", token);
+                    entityBuilder.addTextBody("projectID", versioningDetails.getAptiAPIProjectID() + "");
+                    entityBuilder.addTextBody("report", encryptedReport);
+                    if (errorReport.getLogFile() != null) {
+                        entityBuilder.addBinaryBody("logFile", errorReport.getLogFile(), ContentType.TEXT_PLAIN, "EmojiTools.log");
+                    }
+
+                    String errorReportResponse = POSTData(API_URL + API_VERSION + "/" + ERROR_REPORTER, entityBuilder);
+
+                    errorReportResponse = aptiCrypto.decrypt(errorReportResponse);
 
                     if (errorReportResponse == null) {
                         updateMessage("Could not submit report: Null response!");
@@ -256,11 +259,12 @@ public class AptiAPI {
                         error("Could not submit report: " + response[2]);
                         return false;
                     }
-                }
+                    return true;
+                } else
+                    return false;
             } catch (Exception e) {
                 return false;
             }
-            return true;
         }
 
         @Override
