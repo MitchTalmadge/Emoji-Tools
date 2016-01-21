@@ -36,26 +36,26 @@ public class UpdateNoticeDialog {
     private final Stage stage;
     private UpdateNoticeDialogController controller;
 
-    public UpdateNoticeDialog(String changeLog, String downloadUrl) {
+    public UpdateNoticeDialog(String newVersion, String changeLog, String downloadUrl) {
         this.stage = new Stage();
-        stage.setTitle("Emoji Tools has Crashed!");
+        stage.setTitle("Update Released!");
         stage.getIcons().add(EmojiTools.getLogoImage());
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
 
         stage.setOnCloseRequest(e -> {
-            stage.close();
+            close();
             e.consume();
         });
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/AptiAPI/ErrorReportDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/AptiAPI/UpdateNoticeDialog.fxml"));
             Parent root = loader.load();
 
             this.controller = loader.getController();
             controller.setParent(this);
-            controller.setChangeLogText("<html>"+changeLog+"</html>");
-            controller.setHeaderLabelText("Emoji Tools "+new Versioning().getVersionString()+" has been Released!");
+            controller.setChangeLogText("<html style='font-family: Arial, Helvetica, sans-serif'>"+changeLog+"</html>");
+            controller.setHeaderLabelText("Emoji Tools V"+newVersion+" has been Released!");
             controller.setDownloadUrl(downloadUrl);
 
             stage.setScene(new Scene(root));
@@ -64,4 +64,14 @@ public class UpdateNoticeDialog {
         }
     }
 
+    public void display()
+    {
+        stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
+        EmojiTools.getLogManager().logInfo("UpdateNoticeDialog displayed.");
+        this.stage.showAndWait();
+    }
+
+    public void close() {
+        stage.close();
+    }
 }

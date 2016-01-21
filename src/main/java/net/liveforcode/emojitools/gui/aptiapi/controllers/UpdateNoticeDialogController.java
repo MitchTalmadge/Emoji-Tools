@@ -27,6 +27,11 @@ import javafx.scene.control.Label;
 import javafx.scene.web.WebView;
 import net.liveforcode.emojitools.gui.aptiapi.UpdateNoticeDialog;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class UpdateNoticeDialogController {
 
     @FXML
@@ -46,12 +51,17 @@ public class UpdateNoticeDialogController {
 
     @FXML
     protected void onGoToDownloadsButtonFired(ActionEvent event) {
-
+        try {
+            Desktop.getDesktop().browse(new URI(downloadUrl));
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+        parent.close();
     }
 
     @FXML
     protected void onRemindMeLaterButtonFired(ActionEvent event) {
-
+        parent.close();
     }
 
     public void setParent(UpdateNoticeDialog parent) {
@@ -67,6 +77,8 @@ public class UpdateNoticeDialogController {
     }
 
     public void setDownloadUrl(String downloadUrl) {
+        if(downloadUrl == null)
+            this.goToDownloadsButton.setDisable(true);
         this.downloadUrl = downloadUrl;
     }
 }

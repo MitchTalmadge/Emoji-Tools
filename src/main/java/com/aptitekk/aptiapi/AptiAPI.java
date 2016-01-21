@@ -20,7 +20,6 @@
 
 package com.aptitekk.aptiapi;
 
-import com.aptitekk.aptiapi.gui.UpdateNoticeDialog;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
@@ -48,6 +47,7 @@ public class AptiAPI {
     private static final String UPDATE_CHECKER = "UpdateChecker.php";
     protected final ArrayList<AptiAPIListener> APIListeners = new ArrayList<>();
     private AptiAPIErrorHandler errorHandler;
+    private AptiAPIUpdateHandler updateHandler;
     private AptiCrypto aptiCrypto;
     private AptiAPIVersioningDetails versioningDetails;
     private Image icon;
@@ -181,7 +181,8 @@ public class AptiAPI {
                         return;
                     }
 
-                    new UpdateNoticeDialog(this, response[4], response[5], response[6]).setVisible(true);
+                    this.updateHandler.onUpdateAvailable(response[4], response[5], response[6]);
+
                 }
 
             } catch (Exception e) {
@@ -210,6 +211,10 @@ public class AptiAPI {
 
     public void setErrorHandler(AptiAPIErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
+    }
+
+    public void setUpdateHandler(AptiAPIUpdateHandler updateHandler) {
+        this.updateHandler = updateHandler;
     }
 
     private class ErrorReportSenderTask extends Task<Boolean> {

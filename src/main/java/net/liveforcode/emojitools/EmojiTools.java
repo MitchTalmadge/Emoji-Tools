@@ -72,6 +72,7 @@ public class EmojiTools extends Application implements AptiAPIListener {
         }
 
         aptiAPI.setErrorHandler(new EmojiToolsErrorHandler(aptiAPI));
+        aptiAPI.setUpdateHandler(new EmojiToolsUpdateHandler());
 
         new JythonLoader().execute();
 
