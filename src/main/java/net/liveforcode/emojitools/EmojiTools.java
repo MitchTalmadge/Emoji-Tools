@@ -77,8 +77,6 @@ public class EmojiTools extends Application implements AptiAPIListener {
         new JythonLoader().execute();
 
         launch(args);
-
-        aptiAPI.checkForUpdates();
     }
 
     /**
@@ -325,11 +323,11 @@ public class EmojiTools extends Application implements AptiAPIListener {
             stage.show();
 
             getLogManager().logInfo("Main GUI Displayed.");
-
-            Integer.parseInt("foo");
         } catch (Exception e) {
             submitError(e);
         }
+
+        aptiAPI.checkForUpdates();
     }
 
     @Override

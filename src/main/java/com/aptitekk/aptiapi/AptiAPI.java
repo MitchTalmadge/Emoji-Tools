@@ -45,7 +45,7 @@ public class AptiAPI {
     private static final String TOKEN_GENERATOR = "TokenGenerator.php";
     private static final String ERROR_REPORTER = "ErrorReporter.php";
     private static final String UPDATE_CHECKER = "UpdateChecker.php";
-    protected final ArrayList<AptiAPIListener> APIListeners = new ArrayList<>();
+    protected final ArrayList<AptiAPIListener> apiListeners = new ArrayList<>();
     private AptiAPIErrorHandler errorHandler;
     private AptiAPIUpdateHandler updateHandler;
     private AptiCrypto aptiCrypto;
@@ -58,29 +58,29 @@ public class AptiAPI {
     }
 
     public void addAPIListener(AptiAPIListener listener) {
-        if (!APIListeners.contains(listener))
-            APIListeners.add(listener);
+        if (!apiListeners.contains(listener))
+            apiListeners.add(listener);
     }
 
     public void removeAPIListener(AptiAPIListener listener) {
-        if (APIListeners.contains(listener))
-            APIListeners.remove(listener);
+        if (apiListeners.contains(listener))
+            apiListeners.remove(listener);
     }
 
     protected void info(String message) {
-        for (AptiAPIListener listener : APIListeners) {
+        for (AptiAPIListener listener : apiListeners) {
             listener.aptiApiInfo(message);
         }
     }
 
     protected void error(String message) {
-        for (AptiAPIListener listener : APIListeners) {
+        for (AptiAPIListener listener : apiListeners) {
             listener.aptiApiError(message);
         }
     }
 
     public void shutdownListeners() {
-        for (AptiAPIListener listener : APIListeners) {
+        for (AptiAPIListener listener : apiListeners) {
             listener.shutdown();
         }
     }
@@ -165,7 +165,7 @@ public class AptiAPI {
                 updateInfo = aptiCrypto.decrypt(updateInfo);
 
                 if (updateInfo == null) {
-                    System.out.println("Could not check for updates: Null response!");
+                    error("Could not check for updates: Null response!");
                     return;
                 }
 
