@@ -20,7 +20,6 @@
 
 package net.liveforcode.emojitools.operations.renaming;
 
-import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OperationProgressDialog;
 import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.OperationWorker;
@@ -47,7 +46,7 @@ public class RenamingWorker extends OperationWorker {
         File[] files = renamingDirectory.listFiles();
 
         if (files == null) {
-            EmojiTools.showErrorDialog("Renaming Failed (Error Code 1)", "An internal error occurred. Please contact the developer for help.");
+            showErrorDialog("Renaming Failed (Error Code 1)", "An internal error occurred. Please contact the developer for help.");
             return false;
         }
 
@@ -93,7 +92,7 @@ public class RenamingWorker extends OperationWorker {
             boolean renamed = file.renameTo(new File(file.getParent(), newFileName));
             if (!renamed)
             {
-                EmojiTools.showErrorDialog("Unable To Rename File", "Emoji Tools was unable to rename a file. Does it have permission?");
+                showErrorDialog("Unable To Rename File", "Emoji Tools was unable to rename a file. Does it have permission?");
                 return false;
             }
         }

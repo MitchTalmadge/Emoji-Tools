@@ -5,6 +5,7 @@ Demo script: Add an sbix table to an existing, specially crafted font (see end o
 Jens Kutilek, 2013-05-24
 """
 
+import sys
 from fontTools import ttLib
 from fontTools.ttLib.tables.sbixBitmapSet import BitmapSet
 from fontTools.ttLib.tables.sbixBitmap import Bitmap
@@ -14,13 +15,13 @@ from os.path import join
 
 def main():
     # open the source font
-    f = ttLib.TTFont("ExtractImages.ttf")
+    f = ttLib.TTFont(sys.argv[1]) #Arg 1 = Original Font Location
 
     # mapping of image size to directory name
     sets = {
-        20: "ExtractedImages/set_20", 32: "ExtractedImages/set_32", 40: "ExtractedImages/set_40",
-    48: "ExtractedImages/set_48", 64: "ExtractedImages/set_64", 96: "ExtractedImages/set_96",
-    160: "ExtractedImages/set_160"
+        20: sys.argv[2]+"/set_20", 32: sys.argv[2]+"/set_32", 40: sys.argv[2]+"/set_40",
+    48: sys.argv[2]+"/set_48", 64: sys.argv[2]+"/set_64", 96: sys.argv[2]+"/set_96",
+    160: sys.argv[2]+"/set_160"
 
     }
 
@@ -49,7 +50,7 @@ def main():
     # add sbix table to the source font
     f["sbix"] = sbix
     # save font under new name
-    f.save("AppleColorEmoji@2x.ttf")
+    f.save(sys.argv[2]+"/AppleColorEmoji@2x.ttf") #Arg 2 = Output Directory Location
 
 
 if __name__ == "__main__":

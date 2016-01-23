@@ -84,6 +84,15 @@ public abstract class OperationWorker extends Task<Boolean> implements EmojiTool
     protected final void appendMessageToDialog(String message) {
         messageBlock += message + "\n";
         this.updateMessage(messageBlock);
+
+        EmojiTools.getLogManager().logInfo(message);
+    }
+
+    /**
+     * Shows an error dialog on the JavaFX Application Thread
+     */
+    protected final void showErrorDialog(String header, String message) {
+        Platform.runLater(() -> EmojiTools.showErrorDialog(header, message));
     }
 
     /**

@@ -29,42 +29,6 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="300.0" prefWidth="267.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.tabcontrollers.PackagerTabController">
-    <top>
-        <VBox spacing="10.0">
-            <children>
-                <GridPane hgap="10.0" BorderPane.alignment="CENTER">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints />
-                        <RowConstraints />
-                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                    <children>
-                        <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="2" />
-                        <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label fx:id="filePathTitleLabel" text="Emoji Folder Path">
-                            <font>
-                                <Font name="System Bold" size="12.0" />
-                            </font>
-                        </Label>
-                        <Label text="Select a folder of .png files to package. &#10;The folder must have been created by Emoji Tools." wrapText="true" GridPane.rowIndex="1" />
-                    </children>
-                </GridPane>
-                <Label text="Note: iOS and OSX Emoji Fonts cannot be packaged yet. This feature is in development." wrapText="true">
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
-                </Label>
-                <Label text="The type of Emoji Font that will be created depends upon the type of Emoji Font that was used during extraction.&#10;For example, the Emojis in a directory created by extracting an Android Emoji Font will be packaged into an Android Emoji Font." wrapText="true" />
-            </children>
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </VBox>
-    </top>
     <bottom>
         <GridPane hgap="10.0" BorderPane.alignment="CENTER">
             <columnConstraints>
@@ -87,4 +51,54 @@
          </padding>
         </GridPane>
     </bottom>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="fontInfoLabel" text="No Font Folder Selected." />
+            <VBox fx:id="deviceSelectionBox" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+               <children>
+                  <Label text="Which device are you packaging for?">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <RadioButton fx:id="androidDeviceToggle" mnemonicParsing="false" text="Android">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="deviceToggleGroup" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="iosDeviceToggle" mnemonicParsing="false" text="iOS" toggleGroup="$deviceToggleGroup" />
+                  <RadioButton fx:id="osxDeviceToggle" mnemonicParsing="false" text="OS X" toggleGroup="$deviceToggleGroup" />
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </center>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+   <top>
+          <GridPane hgap="10.0" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+              <children>
+                  <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="2" />
+                  <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label fx:id="filePathTitleLabel" text="Emoji Folder Path">
+                      <font>
+                          <Font name="System Bold" size="12.0" />
+                      </font>
+                  </Label>
+                  <Label text="Select a folder of .png files to package. &#10;The folder must have been created by Emoji Tools." wrapText="true" GridPane.rowIndex="1" />
+              </children>
+          </GridPane>
+   </top>
 </BorderPane>

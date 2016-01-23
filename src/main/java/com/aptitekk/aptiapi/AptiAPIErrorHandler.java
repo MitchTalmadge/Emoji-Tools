@@ -20,6 +20,7 @@
 
 package com.aptitekk.aptiapi;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 
@@ -33,11 +34,21 @@ public abstract class AptiAPIErrorHandler implements Thread.UncaughtExceptionHan
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        ErrorReport errorReport = onErrorOccurred(t, e);
-        if (errorReport != null) {
-            aptiAPI.sendErrorReport(errorReport);
-        } else
-            shutDown();
+        try {
+            Platform.runLater(() -> {
+                ErrorReport errorReport = onErrorOccurred(t, e);
+                if (errorReport != null) {
+                    aptiAPI.sendErrorReport(errorReport);
+                } else
+                    shutDown();
+            });
+        } catch (IllegalStateException ex) {
+            ErrorReport errorReport = onErrorOccurred(t, e);
+            if (errorReport != null) {
+                aptiAPI.sendErrorReport(errorReport);
+            } else
+                shutDown();
+        }
     }
 
     /**

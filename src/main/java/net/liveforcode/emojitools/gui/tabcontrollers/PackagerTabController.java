@@ -20,15 +20,32 @@
 
 package net.liveforcode.emojitools.gui.tabcontrollers;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import net.liveforcode.emojitools.EmojiTools;
 import net.liveforcode.emojitools.gui.dialogs.OperationFinishedDialog;
-import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
-import net.liveforcode.emojitools.operations.renaming.RenamingInfo;
 
 import java.io.File;
 
 public class PackagerTabController extends TabController {
+
+    @FXML
+    public VBox deviceSelectionBox;
+
+    @FXML
+    public RadioButton androidDeviceToggle;
+
+    @FXML
+    public RadioButton iosDeviceToggle;
+
+    @FXML
+    public RadioButton osxDeviceToggle;
+
+    @FXML
+    protected Label fontInfoLabel;
 
     @Override
     void initializeTab() {
@@ -72,38 +89,12 @@ public class PackagerTabController extends TabController {
             return false;
         }
 
-        //Check for .ttx file
-        File ttxFile = null;
-        for (File file : files) {
-            if (file.getName().endsWith(".ttx")) {
-                ttxFile = file;
-                break;
-            }
-        }
-
-        if (ttxFile == null) {
-            EmojiTools.showWarningDialog("Cannot Package Emojis", "The emojis in the chosen directory cannot be packaged. Sorry for the inconvenience.");
-            return false;
-        }
-
         return true;
     }
 
     @Override
     void startOperations() {
-        boolean shouldContinue = true;
-
-        shouldContinue = EmojiTools.performRenamingOperation(selectedFile, new RenamingInfo(RenamingInfo.PREFIX_SET_UNI, RenamingInfo.CASE_LOWER, false));
-
-        if (shouldContinue) {
-            shouldContinue = EmojiTools.performConversionOperation(selectedFile, new ConversionInfo(ConversionInfo.DIRECTION_CGBI_RGBA));
-        }
-
-        if (shouldContinue) {
-            shouldContinue = EmojiTools.performPackagingOperation(selectedFile);
-        }
-
-        if (shouldContinue)
+        if (EmojiTools.performPackagingOperation(selectedFile))
             new OperationFinishedDialog("Packaging Complete!", "Your packaged emoji font can be found in:", new File(EmojiTools.getRootDirectory(), "Output")).display();
         else
             EmojiTools.showErrorDialog("Packaging Unsuccessful.", "Packaging was cancelled or unsuccessful.");

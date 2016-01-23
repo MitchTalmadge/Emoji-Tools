@@ -48,11 +48,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AndroidPackagingWorker extends OperationWorker {
+public class GooglePackagingWorker extends OperationWorker {
 
     private final File packagingDirectory;
 
-    public AndroidPackagingWorker(Operation operation, OperationProgressDialog operationProgressDialog, File packagingDirectory) {
+    public GooglePackagingWorker(Operation operation, OperationProgressDialog operationProgressDialog, File packagingDirectory) {
         super(operation, operationProgressDialog, true);
         this.packagingDirectory = packagingDirectory;
     }
@@ -61,19 +61,8 @@ public class AndroidPackagingWorker extends OperationWorker {
     protected Boolean doWork() throws Exception {
         File outputDirectory = new File(EmojiTools.getRootDirectory(), "Output");
         if (!outputDirectory.exists() && !outputDirectory.mkdir()) {
-            EmojiTools.showErrorDialog("Unable to Create Directory", "Emoji Tools was unable to create a required directory. Does it have permission?");
+            showErrorDialog("Unable to Create Directory", "Emoji Tools was unable to create a required directory. Does it have permission?");
             return false;
-        } else {
-            File[] files = outputDirectory.listFiles();
-            if (files == null) {
-                EmojiTools.showErrorDialog("Packaging Failed (Error Code 1)", "An internal error occurred. Please contact the developer for help.");
-                return false;
-            }
-            for (File file : files) {
-                if (!file.delete()) {
-                    EmojiTools.showErrorDialog("Could Not Delete File", "Emoji Tools was unable to delete a file that must be deleted. Does it have permission?");
-                }
-            }
         }
 
         appendMessageToDialog("Building Emoji List...");
@@ -89,21 +78,21 @@ public class AndroidPackagingWorker extends OperationWorker {
         //Check for ttFont element
         Element rootElement = infoDocument.getDocumentElement();
         if (!rootElement.getTagName().equals("ttFont")) {
-            EmojiTools.showErrorDialog("Invalid '.ttx' File (Error Code 1)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            showErrorDialog("Invalid '.ttx' File (Error Code 1)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
             return false;
         }
 
         //Check for cmap element
         Element cmapElement = (Element) rootElement.getElementsByTagName("cmap").item(0);
         if (cmapElement == null) {
-            EmojiTools.showErrorDialog("Invalid '.ttx' File (Error Code 2)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            showErrorDialog("Invalid '.ttx' File (Error Code 2)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
             return false;
         }
 
         //Check for cmap_format_12 element
         Element cmapFormat12Element = (Element) cmapElement.getElementsByTagName("cmap_format_12").item(0);
         if (cmapFormat12Element == null) {
-            EmojiTools.showErrorDialog("Invalid '.ttx' File (Error Code 3)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            showErrorDialog("Invalid '.ttx' File (Error Code 3)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
             return false;
         }
 
@@ -169,7 +158,7 @@ public class AndroidPackagingWorker extends OperationWorker {
         HashMap<String, File> glyphNameFileMap = new HashMap<>();
         File[] files = packagingDirectory.listFiles();
         if (files == null) {
-            EmojiTools.showErrorDialog("Packaging Failed (Error Code 2)", "An internal error occurred. Please contact the developer for help.");
+            showErrorDialog("Packaging Failed (Error Code 2)", "An internal error occurred. Please contact the developer for help.");
             return false;
         }
         for (File file : files) {
@@ -220,13 +209,13 @@ public class AndroidPackagingWorker extends OperationWorker {
 
         Element cbdtElement = (Element) rootElement.getElementsByTagName("CBDT").item(0);
         if (cbdtElement == null) {
-            EmojiTools.showErrorDialog("Invalid '.ttx' File (Error Code 4)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            showErrorDialog("Invalid '.ttx' File (Error Code 4)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
             return false;
         }
 
         Element strikeDataElement = (Element) cbdtElement.getElementsByTagName("strikedata").item(0);
         if (strikeDataElement == null) {
-            EmojiTools.showErrorDialog("Invalid '.ttx' File (Error Code 5)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            showErrorDialog("Invalid '.ttx' File (Error Code 5)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
             return false;
         }
 
@@ -242,7 +231,7 @@ public class AndroidPackagingWorker extends OperationWorker {
             File pngFile = glyphNameFileMap.get(glyphName);
 
             if (pngFile == null) {
-                EmojiTools.showErrorDialog("Invalid '.ttx' File (Error Code 6)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+                showErrorDialog("Invalid '.ttx' File (Error Code 6)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
                 return false;
             }
 
@@ -261,7 +250,7 @@ public class AndroidPackagingWorker extends OperationWorker {
             //Rewrite content of rawimagedata element with the hex string generated from the png file
             Element rawImageDataElement = (Element) cbdtBitmapFormat17Element.getElementsByTagName("rawimagedata").item(0);
             if (rawImageDataElement == null) {
-                EmojiTools.showErrorDialog("Invalid '.ttx' File (Error Code 7)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+                showErrorDialog("Invalid '.ttx' File (Error Code 7)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
                 return false;
             }
 

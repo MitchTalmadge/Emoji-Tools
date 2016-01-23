@@ -27,6 +27,7 @@ import net.liveforcode.emojitools.operations.Operation;
 import net.liveforcode.emojitools.operations.extraction.ExtractionUtilites;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.List;
 
 public class AppleExtractionWorker extends ExtractionWorker {
@@ -52,7 +53,7 @@ public class AppleExtractionWorker extends ExtractionWorker {
 
 
                 if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                    EmojiTools.showErrorDialog("Invalid 'post' Table", "The font's 'post' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
+                    showErrorDialog("Invalid 'post' Table", "The font's 'post' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                     inputStream.close();
                     return false;
                 }
@@ -144,21 +145,22 @@ public class AppleExtractionWorker extends ExtractionWorker {
                         }
                     }
                 } else {
-                    EmojiTools.showErrorDialog("Missing 'sbix' Table", "The font's 'sbix' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
+                    showErrorDialog("Missing 'sbix' Table", "The font's 'sbix' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                     inputStream.close();
                     return false;
                 }
             } else {
-                EmojiTools.showErrorDialog("Missing 'post' Table", "The font's 'post' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
+                showErrorDialog("Missing 'post' Table", "The font's 'post' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                 inputStream.close();
                 return false;
             }
 
+            Files.copy(fontFile.toPath(), new File(extractionDirectory, "Original.ttf").toPath());
             writeFontTypeFile(FontType.APPLE);
 
             inputStream.close();
         } catch (FileNotFoundException e) {
-            EmojiTools.showErrorDialog("Unable to Locate Font", "The chosen font could not be found. Did it get deleted?");
+            showErrorDialog("Unable to Locate Font", "The chosen font could not be found. Did it get deleted?");
         } catch (IOException e) {
             EmojiTools.submitError(e);
         }

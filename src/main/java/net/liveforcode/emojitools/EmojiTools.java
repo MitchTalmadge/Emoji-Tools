@@ -38,6 +38,8 @@ import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
 import net.liveforcode.emojitools.operations.packaging.PackagingOperation;
 import net.liveforcode.emojitools.operations.renaming.RenamingInfo;
 import net.liveforcode.emojitools.operations.renaming.RenamingOperation;
+import net.liveforcode.emojitools.operations.resizing.ResizingInfo;
+import net.liveforcode.emojitools.operations.resizing.ResizingOperation;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
@@ -230,6 +232,19 @@ public class EmojiTools extends Application implements AptiAPIListener {
     public static boolean performPackagingOperation(File packagingDirectory) {
         return new PackagingOperation(packagingDirectory).runOperation();
     }
+
+    /**
+     * Starts an Operation to resize all emojis within a source directory into a destination directory.
+     *
+     * @param sourceDirectory      The directory containing emojis to resize.
+     * @param destinationDirectory The directory where the resized emojis should be placed.
+     * @param resizingInfo         The ResizingInfo object that specifies how resizing should be performed.
+     * @return True if operation completed successfully, False if unsuccessful or cancelled.
+     */
+    public static boolean performResizingOperation(File sourceDirectory, File destinationDirectory, ResizingInfo resizingInfo) {
+        return new ResizingOperation(sourceDirectory, destinationDirectory, resizingInfo).runOperation();
+    }
+
 
     /**
      * Displays an information dialog with the specified header and message.

@@ -41,7 +41,7 @@ public class DeletionWorker extends OperationWorker {
     protected Boolean doWork() throws Exception {
         totalFileNum = countFilesRecursive(totalFileNum, deletionDirectory);
 
-        System.out.println("# of Files to Delete: " + totalFileNum);
+        appendMessageToDialog("# of Files to Delete: " + totalFileNum);
 
         if (isCancelled()) {
             return false;
