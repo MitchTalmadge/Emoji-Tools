@@ -17,13 +17,12 @@ def main():
     # open the source font
     f = ttLib.TTFont(sys.argv[1]) #Arg 1 = Original Font Location
 
-    # mapping of image size to directory name
-    sets = {
-        20: sys.argv[2]+"/set_20", 32: sys.argv[2]+"/set_32", 40: sys.argv[2]+"/set_40",
-    48: sys.argv[2]+"/set_48", 64: sys.argv[2]+"/set_64", 96: sys.argv[2]+"/set_96",
-    160: sys.argv[2]+"/set_160"
+    resolutions = sys.argv[3]
+    resolutionsList = resolutions.split(",")
 
-    }
+    sets = {}
+    for resolution in resolutionsList:
+        sets[int(resolution)] = sys.argv[2]+"/set_"+resolution
 
     sbix = ttLib.newTable("sbix")
     go = f.getGlyphOrder()

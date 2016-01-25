@@ -108,9 +108,6 @@
                     </children>
                 </VBox>
          </children>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
       </VBox>
     </top>
     <bottom>
@@ -127,9 +124,9 @@
                 <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory" />
                 <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButtonFired" text="Start Extraction" GridPane.columnIndex="1" GridPane.columnSpan="2" />
             </children>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
         </GridPane>
     </bottom>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
 </BorderPane>

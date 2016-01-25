@@ -308,10 +308,18 @@ public abstract class ExtractionWorker extends OperationWorker {
         this.tableLengths = tableLengths;
     }
 
-    protected void writeFontTypeFile(FontType fontType) {
+    protected void writeFontTypeFile(FontType fontType, short[] resolutions) {
         File propertiesFile = new File(extractionDirectory, FontType.FONT_PROPERTIES_FILE_NAME);
         Properties properties = new Properties();
         properties.setProperty(FontType.FONT_PROPERTY_NAME, fontType.name());
+        StringBuilder stringBuilder = new StringBuilder();
+        if (resolutions != null) {
+            for (short resolution : resolutions) {
+                stringBuilder.append(resolution).append(",");
+            }
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1); //Remove last comma
+            properties.setProperty(FontType.FONT_RESOLUTIONS_PROPERTY_NAME, new String(stringBuilder));
+        }
 
         try {
             properties.store(new FileOutputStream(propertiesFile), null);

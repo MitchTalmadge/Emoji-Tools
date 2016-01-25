@@ -18,14 +18,30 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package net.liveforcode.emojitools.operations;
+package net.liveforcode.emojitools.operations.packaging;
 
-public enum FontType {
-    GOOGLE,
-    APPLE,
-    OTHER;
+public class PackagingInfo {
 
-    public static final String FONT_PROPERTIES_FILE_NAME = "EmojiTools.info";
-    public static final String FONT_PROPERTY_NAME = "fontType";
-    public static final String FONT_RESOLUTIONS_PROPERTY_NAME = "resolutions";
+    public static final int DEVICE_ANDROID = 0;
+    public static final int DEVICE_IOS = 1;
+    public static final int DEVICE_OSX = 2;
+    private final int deviceToPackageFor;
+    private short[] resolutions;
+
+    public PackagingInfo(int deviceToPackageFor, short[] resolutions) {
+        if (deviceToPackageFor < 0 || deviceToPackageFor > 2) {
+            deviceToPackageFor = 0;
+        }
+        this.deviceToPackageFor = deviceToPackageFor;
+
+        this.resolutions = resolutions;
+    }
+
+    public int getDeviceToPackageFor() {
+        return deviceToPackageFor;
+    }
+
+    public short[] getResolutions() {
+        return resolutions;
+    }
 }

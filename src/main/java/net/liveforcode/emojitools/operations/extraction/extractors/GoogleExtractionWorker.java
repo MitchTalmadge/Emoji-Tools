@@ -288,6 +288,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                                     }
                                 }
 
+                                writeFontTypeFile(FontType.GOOGLE, null);
                             } else {
                                 showErrorDialog("Missing 'CBDT' Table", "The font's 'CBDT' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                                 inputStream.close();
@@ -307,7 +308,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                             return false;
                         }
 
-                        //TODO: Format 14
+                        writeFontTypeFile(FontType.GOOGLE, null);
                     } else {
                         showErrorDialog("Invalid 'cmap' Table (Error Code 2:" + subTableId + ")", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                         inputStream.close();
@@ -319,8 +320,6 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                 inputStream.close();
                 return false;
             }
-
-            writeFontTypeFile(FontType.GOOGLE);
 
             inputStream.close();
         } catch (FileNotFoundException e) {

@@ -34,10 +34,12 @@ import java.util.ArrayList;
 public class ApplePackagingWorker extends OperationWorker {
 
     private final File packagingDirectory;
+    private final short[] resolutions;
 
-    public ApplePackagingWorker(Operation operation, OperationProgressDialog operationProgressDialog, File packagingDirectory) {
+    public ApplePackagingWorker(Operation operation, OperationProgressDialog operationProgressDialog, File packagingDirectory, short[] resolutions) {
         super(operation, operationProgressDialog, true);
         this.packagingDirectory = packagingDirectory;
+        this.resolutions = resolutions;
     }
 
     @Override
@@ -95,6 +97,13 @@ public class ApplePackagingWorker extends OperationWorker {
         argvList.add("addSbixImages.py"); //Python Script Name
         argvList.add(originalFont.getAbsolutePath()); //Original font location
         argvList.add(outputDirectory.getAbsolutePath()); //Output directory location
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (short resolution : resolutions) {
+            stringBuilder.append(resolution).append(",");
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1); //Remove last comma
+        argvList.add(new String(stringBuilder)); //Resolutions list
 
         getJythonHandler().getPySystemState().argv = new PyList(PyType.fromClass(String.class), argvList);
 

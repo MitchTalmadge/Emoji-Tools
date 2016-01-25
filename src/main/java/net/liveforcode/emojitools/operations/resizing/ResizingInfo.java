@@ -23,9 +23,9 @@ package net.liveforcode.emojitools.operations.resizing;
 public class ResizingInfo {
 
 
-    private int newMaxSize;
+    private short newMaxSize;
 
-    public ResizingInfo(int newMaxSize) {
+    public ResizingInfo(short newMaxSize) {
         if (newMaxSize < 1) {
             newMaxSize = 1;
         }

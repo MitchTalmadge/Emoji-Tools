@@ -46,15 +46,11 @@
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
         </GridPane>
     </bottom>
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="fontInfoLabel" text="No Font Folder Selected." />
             <VBox fx:id="deviceSelectionBox" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                <children>
                   <Label text="Which device are you packaging for?">

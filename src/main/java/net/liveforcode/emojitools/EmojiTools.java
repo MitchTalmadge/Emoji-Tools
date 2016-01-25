@@ -35,6 +35,7 @@ import net.liveforcode.emojitools.operations.conversion.ConversionInfo;
 import net.liveforcode.emojitools.operations.conversion.ConversionOperation;
 import net.liveforcode.emojitools.operations.deletion.DeletionOperation;
 import net.liveforcode.emojitools.operations.extraction.ExtractionOperation;
+import net.liveforcode.emojitools.operations.packaging.PackagingInfo;
 import net.liveforcode.emojitools.operations.packaging.PackagingOperation;
 import net.liveforcode.emojitools.operations.renaming.RenamingInfo;
 import net.liveforcode.emojitools.operations.renaming.RenamingOperation;
@@ -227,10 +228,11 @@ public class EmojiTools extends Application implements AptiAPIListener {
      * Starts an Operation to package all emojis within the specified directory into a new emoji font with a ProgressDialog.
      *
      * @param packagingDirectory The directory containing emojis to package.
+     * @param packagingInfo      The PackagingInfo object that specifies how resizing should be performed.
      * @return True if operation completed successfully, False if unsuccessful or cancelled.
      */
-    public static boolean performPackagingOperation(File packagingDirectory) {
-        return new PackagingOperation(packagingDirectory).runOperation();
+    public static boolean performPackagingOperation(File packagingDirectory, PackagingInfo packagingInfo) {
+        return new PackagingOperation(packagingDirectory, packagingInfo).runOperation();
     }
 
     /**

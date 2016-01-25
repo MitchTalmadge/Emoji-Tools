@@ -93,9 +93,8 @@ public class ExtractorTabController extends TabController {
         if (extractionDirectory.exists() && files != null) {
             if (files.length > 0) {
                 System.out.println("Files will be overwritten. Asking user for confirmation.");
-                if (new OverwriteWarningDialog(extractionDirectory).getResult()) {
+                if (shouldContinue = new OverwriteWarningDialog(extractionDirectory).getResult())
                     shouldContinue = EmojiTools.performDeletionOperation(extractionDirectory);
-                }
             } else {
                 System.out.println("No files will be overwritten. Continuing.");
             }

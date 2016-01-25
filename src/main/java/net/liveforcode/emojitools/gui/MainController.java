@@ -74,7 +74,7 @@ public class MainController implements Initializable {
     @FXML
     protected void onDonateLabelFired(MouseEvent mouseEvent) {
         try {
-            Desktop.getDesktop().browse(new URI("https://donate.liveforcode.net"));
+            Desktop.getDesktop().browse(new URI("https://donate.mitchtalmadge.com"));
         } catch (IOException | URISyntaxException e1) {
             e1.printStackTrace();
         }
@@ -83,7 +83,7 @@ public class MainController implements Initializable {
     @FXML
     protected void onCopyrightLabelFired(MouseEvent mouseEvent) {
         try {
-            Desktop.getDesktop().browse(new URI("https://liveforcode.net"));
+            Desktop.getDesktop().browse(new URI("https://mitchtalmadge.com"));
         } catch (IOException | URISyntaxException e1) {
             e1.printStackTrace();
         }

@@ -105,6 +105,13 @@ public class AppleExtractionWorker extends ExtractionWorker {
                         strikeOffsets[i] = inputStream.readInt();
                     }
 
+                    short[] resolutions = new short[numStrikes];
+                    for(int i = 0; i < numStrikes; i++)
+                    {
+                        inputStream.seek(sbixOffset + strikeOffsets[i]);
+                        resolutions[i] = inputStream.readShort();
+                    }
+
                     inputStream.seek(sbixOffset + strikeOffsets[strikeOffsets.length - 1]);
                     inputStream.skipBytes(4);
 
@@ -144,6 +151,9 @@ public class AppleExtractionWorker extends ExtractionWorker {
                             }
                         }
                     }
+
+                    Files.copy(fontFile.toPath(), new File(extractionDirectory, "Original.ttf").toPath());
+                    writeFontTypeFile(FontType.APPLE, resolutions);
                 } else {
                     showErrorDialog("Missing 'sbix' Table", "The font's 'sbix' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
                     inputStream.close();
@@ -154,9 +164,6 @@ public class AppleExtractionWorker extends ExtractionWorker {
                 inputStream.close();
                 return false;
             }
-
-            Files.copy(fontFile.toPath(), new File(extractionDirectory, "Original.ttf").toPath());
-            writeFontTypeFile(FontType.APPLE);
 
             inputStream.close();
         } catch (FileNotFoundException e) {
