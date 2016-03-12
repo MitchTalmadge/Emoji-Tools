@@ -312,7 +312,7 @@ public class GooglePackagingWorker extends OperationWorker {
                             return false;
                         }
 
-                        Element newGlyphLocElement = (Element) lastGlyphIDElement.cloneNode(false);
+                        Element newGlyphLocElement = (Element) lastGlyphLocElement.cloneNode(false);
                         newGlyphLocElement.setAttribute("id", newID + "");
                         newGlyphLocElement.setAttribute("name", "uni"+splitFileName[0]);
                         glyphLocListElement.appendChild(newGlyphLocElement);
