@@ -26,7 +26,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OverwriteWarningDialogController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.dialogs.dialogcontrollers.OverwriteWarningDialogController">
    <center>
       <VBox spacing="5.0" BorderPane.alignment="CENTER">
          <children>

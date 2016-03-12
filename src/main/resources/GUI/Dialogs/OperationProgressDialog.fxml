@@ -28,7 +28,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.dialogs.dialogcontrollers.OperationProgressDialogController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.dialogs.dialogcontrollers.OperationProgressDialogController">
     <top>
         <Label fx:id="headerLabel" text="Extracting Emojis..." BorderPane.alignment="CENTER">
             <font>

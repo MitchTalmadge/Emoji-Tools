@@ -27,7 +27,7 @@
 <?import javafx.scene.text.Font?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="net.liveforcode.emojitools.gui.aptiapi.controllers.ErrorReportDialogController">
+            fx:controller="com.mitchtalmadge.emojitools.gui.aptiapi.controllers.ErrorReportDialogController">
     <top>
         <Label text="Emoji Tools has Crashed!" BorderPane.alignment="CENTER">
             <font>

@@ -7,7 +7,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.aptiapi.controllers.ErrorReportDetailsDialogController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.aptiapi.controllers.ErrorReportDetailsDialogController">
    <top>
       <Label minHeight="-Infinity" text="Error Report Details" BorderPane.alignment="CENTER">
          <font>

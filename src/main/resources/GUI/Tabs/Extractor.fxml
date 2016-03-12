@@ -27,9 +27,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<?import net.liveforcode.emojitools.gui.*?>
+<?import com.mitchtalmadge.emojitools.gui.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.liveforcode.emojitools.gui.tabcontrollers.ExtractorTabController">
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.ExtractorTabController">
     <top>
       <VBox spacing="10.0">
          <children>
