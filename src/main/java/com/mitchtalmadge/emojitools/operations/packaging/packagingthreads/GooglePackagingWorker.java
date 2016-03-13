@@ -25,6 +25,7 @@ import com.mitchtalmadge.emojitools.gui.dialogs.OperationProgressDialog;
 import com.mitchtalmadge.emojitools.operations.Operation;
 import com.mitchtalmadge.emojitools.operations.OperationWorker;
 import com.mitchtalmadge.emojitools.operations.packaging.LigatureSet;
+import com.mitchtalmadge.emojitools.operations.packaging.PackagingException;
 import org.python.core.PyList;
 import org.python.core.PyType;
 import org.w3c.dom.Document;
@@ -42,6 +43,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -201,124 +203,20 @@ public class GooglePackagingWorker extends OperationWorker {
                         glyphNameFileMap.put(glyphCodeNameMap.get(splitFileName[0]), file);
                         appendMessageToDialog("File " + file.getName() + " has been assigned to " + glyphCodeNameMap.get(splitFileName[0]));
                     } else { //Not in cmap table! Must be a new emoji. Let's try to add it to font.ttx
-                        Element glyphOrderElement = (Element) rootElement.getElementsByTagName("GlyphOrder").item(0);
-                        if (glyphOrderElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 8)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+                        try {
+                            String hex = splitFileName[0].toLowerCase();
+
+                            int glyphId = appendToGlyphOrderTable(rootElement, hex);
+                            appendToHmtxTable(rootElement, hex);
+                            appendToCmapTable(rootElement, hex);
+                            appendToCbdtTable(rootElement, hex, file, null);
+                            appendToCblcTable(rootElement, hex, glyphId);
+
+                            glyphNameFileMap.put("uni" + hex, file);
+                            appendMessageToDialog("File " + file.getName() + " has been assigned to " + "uni" + hex);
+                        } catch (PackagingException e) {
                             return false;
                         }
-
-                        Element lastGlyphIDElement = (Element) glyphOrderElement.getElementsByTagName("GlyphID").item(glyphOrderElement.getElementsByTagName("GlyphID").getLength() - 1);
-                        if (lastGlyphIDElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 9)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        String lastID = lastGlyphIDElement.getAttribute("id");
-                        int newID = Integer.parseInt(lastID) + 1;
-
-                        Element newGlyphIDElement = (Element) lastGlyphIDElement.cloneNode(false);
-                        newGlyphIDElement.setAttribute("id", newID + "");
-                        newGlyphIDElement.setAttribute("name", "uni"+splitFileName[0]);
-                        glyphOrderElement.appendChild(newGlyphIDElement);
-
-                        Element hmtxElement = (Element) rootElement.getElementsByTagName("hmtx").item(0);
-                        if (hmtxElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 10)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element lastMtxElement = (Element) hmtxElement.getElementsByTagName("mtx").item(hmtxElement.getElementsByTagName("mtx").getLength() - 1);
-                        if (lastMtxElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 11)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element newMtxElement = (Element) lastMtxElement.cloneNode(false);
-                        newMtxElement.setAttribute("name", "uni"+splitFileName[0]);
-                        newMtxElement.setAttribute("width", "2550");
-                        newMtxElement.setAttribute("lsb", "0");
-                        hmtxElement.appendChild(newMtxElement);
-
-                        Element lastMapElement = (Element) cmapFormat12Element.getElementsByTagName("map").item(cmapFormat12Element.getElementsByTagName("map").getLength() - 1);
-                        if (lastMapElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 12)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element newMapElement = (Element) lastMapElement.cloneNode(false);
-                        newMapElement.setAttribute("code", "0x" + splitFileName[0].toLowerCase());
-                        newMapElement.setAttribute("name", "uni"+splitFileName[0]);
-                        cmapFormat12Element.appendChild(newMapElement);
-
-                        Element cbdtElement = (Element) rootElement.getElementsByTagName("CBDT").item(0);
-                        if (cbdtElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 13)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element strikeDataElement = (Element) cbdtElement.getElementsByTagName("strikedata").item(0);
-                        if (strikeDataElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 14)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element lastStrikeElement = (Element) strikeDataElement.getElementsByTagName("cbdt_bitmap_format_17").item(strikeDataElement.getElementsByTagName("cbdt_bitmap_format_17").getLength() - 1);
-                        if (lastStrikeElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 15)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element newStrikeElement = (Element) lastStrikeElement.cloneNode(true);
-                        newStrikeElement.setAttribute("name", "uni"+splitFileName[0]);
-
-                        BufferedImage image = ImageIO.read(file);
-                        int width = image.getWidth();
-                        int height = image.getHeight();
-
-                        Element smallGlyphMetrics = (Element) newStrikeElement.getElementsByTagName("SmallGlyphMetrics").item(0);
-                        Element widthElement = (Element) smallGlyphMetrics.getElementsByTagName("width").item(0);
-                        widthElement.setAttribute("value", width + "");
-                        Element heightElement = (Element) smallGlyphMetrics.getElementsByTagName("height").item(0);
-                        heightElement.setAttribute("value", height + "");
-                        Element advanceElement = (Element) smallGlyphMetrics.getElementsByTagName("Advance").item(0);
-                        advanceElement.setAttribute("value", width + "");
-
-                        Element rawImageDataElement = (Element) newStrikeElement.getElementsByTagName("rawimagedata").item(0);
-                        rawImageDataElement.setTextContent("");
-
-                        strikeDataElement.appendChild(newStrikeElement);
-
-                        Element cblcElement = (Element) rootElement.getElementsByTagName("CBLC").item(0);
-                        if (cblcElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 16)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element cblcStrikeElement = (Element) cblcElement.getElementsByTagName("strike").item(0);
-                        if (cblcStrikeElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 17)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element glyphLocListElement = (Element) cblcStrikeElement.getElementsByTagName("eblc_index_sub_table_1").item(0);
-                        if (glyphLocListElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 18)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element lastGlyphLocElement = (Element) glyphLocListElement.getElementsByTagName("glyphLoc").item(glyphLocListElement.getElementsByTagName("glyphLoc").getLength() - 1);
-                        if (lastGlyphLocElement == null) {
-                            showErrorDialog("Invalid '.ttx' File (Error Code 19)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                            return false;
-                        }
-
-                        Element newGlyphLocElement = (Element) lastGlyphLocElement.cloneNode(false);
-                        newGlyphLocElement.setAttribute("id", newID + "");
-                        newGlyphLocElement.setAttribute("name", "uni"+splitFileName[0]);
-                        glyphLocListElement.appendChild(newGlyphLocElement);
-
-                        glyphNameFileMap.put("uni"+splitFileName[0], file);
-                        appendMessageToDialog("File " + file.getName() + " has been assigned to " + "uni"+splitFileName[0]);
                     }
                 }
             }
@@ -333,13 +231,13 @@ public class GooglePackagingWorker extends OperationWorker {
 
         Element cbdtElement = (Element) rootElement.getElementsByTagName("CBDT").item(0);
         if (cbdtElement == null) {
-            showErrorDialog("Invalid '.ttx' File (Error Code 4)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            showErrorDialog("Invalid '.ttx' File (Missing CBDT Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
             return false;
         }
 
         Element strikeDataElement = (Element) cbdtElement.getElementsByTagName("strikedata").item(0);
         if (strikeDataElement == null) {
-            showErrorDialog("Invalid '.ttx' File (Error Code 5)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            showErrorDialog("Invalid '.ttx' File (Missing strikedata Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
             return false;
         }
 
@@ -355,7 +253,7 @@ public class GooglePackagingWorker extends OperationWorker {
             File pngFile = glyphNameFileMap.get(glyphName);
 
             if (pngFile == null) {
-                showErrorDialog("Invalid '.ttx' File (Error Code 6)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+                showErrorDialog("Invalid '.ttx' File (Missing PNG File)", "An Emoji that was specified in the '.ttx' file was not found. Packaging cannot continue.");
                 return false;
             }
 
@@ -375,7 +273,7 @@ public class GooglePackagingWorker extends OperationWorker {
             //Rewrite content of rawimagedata element with the hex string generated from the png file
             Element rawImageDataElement = (Element) cbdtBitmapFormat17Element.getElementsByTagName("rawimagedata").item(0);
             if (rawImageDataElement == null) {
-                showErrorDialog("Invalid '.ttx' File (Error Code 7)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+                showErrorDialog("Invalid '.ttx' File (Missing rawimagedata)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
                 return false;
             }
 
@@ -423,4 +321,145 @@ public class GooglePackagingWorker extends OperationWorker {
         updateProgress(100, 100);
         return true;
     }
+
+    private int appendToGlyphOrderTable(Element rootElement, String hex) throws PackagingException {
+        Element glyphOrderElement = (Element) rootElement.getElementsByTagName("GlyphOrder").item(0);
+        if (glyphOrderElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing GlyphOrder Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element lastGlyphIDElement = (Element) glyphOrderElement.getElementsByTagName("GlyphID").item(glyphOrderElement.getElementsByTagName("GlyphID").getLength() - 1);
+        if (lastGlyphIDElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Empty GlyphOrder Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        String lastID = lastGlyphIDElement.getAttribute("id");
+        int newID = Integer.parseInt(lastID) + 1;
+
+        Element newGlyphIDElement = (Element) lastGlyphIDElement.cloneNode(false);
+        newGlyphIDElement.setAttribute("id", newID + "");
+        newGlyphIDElement.setAttribute("name", "uni" + hex);
+        glyphOrderElement.appendChild(newGlyphIDElement);
+
+        return newID;
+    }
+
+    private void appendToHmtxTable(Element rootElement, String hex) throws PackagingException {
+        Element hmtxElement = (Element) rootElement.getElementsByTagName("hmtx").item(0);
+        if (hmtxElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing hmtx Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element lastMtxElement = (Element) hmtxElement.getElementsByTagName("mtx").item(hmtxElement.getElementsByTagName("mtx").getLength() - 1);
+        if (lastMtxElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Empty hmtx Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element newMtxElement = (Element) lastMtxElement.cloneNode(false);
+        newMtxElement.setAttribute("name", "uni" + hex);
+        newMtxElement.setAttribute("width", "2550");
+        newMtxElement.setAttribute("lsb", "0");
+        hmtxElement.appendChild(newMtxElement);
+    }
+
+    private void appendToCmapTable(Element rootElement, String hex) throws PackagingException {
+        Element cmapElement = (Element) rootElement.getElementsByTagName("cmap").item(0);
+        if (cmapElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing CMAP Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element cmapFormat12Element = (Element) cmapElement.getElementsByTagName("cmap_format_12").item(0);
+        if (cmapFormat12Element == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing cmap_format_12 Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element lastMapElement = (Element) cmapFormat12Element.getElementsByTagName("map").item(cmapFormat12Element.getElementsByTagName("map").getLength() - 1);
+        if (lastMapElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Empty CMAP Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element newMapElement = (Element) lastMapElement.cloneNode(false);
+        newMapElement.setAttribute("code", "0x" + hex);
+        newMapElement.setAttribute("name", "uni" + hex);
+        cmapFormat12Element.appendChild(newMapElement);
+    }
+
+    private void appendToCbdtTable(Element rootElement, String hex, File emojiFile, String optionalRawData) throws PackagingException, IOException {
+        Element cbdtElement = (Element) rootElement.getElementsByTagName("CBDT").item(0);
+        if (cbdtElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing CBDT Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element strikeDataElement = (Element) cbdtElement.getElementsByTagName("strikedata").item(0);
+        if (strikeDataElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing strikedata Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element lastStrikeElement = (Element) strikeDataElement.getElementsByTagName("cbdt_bitmap_format_17").item(strikeDataElement.getElementsByTagName("cbdt_bitmap_format_17").getLength() - 1);
+        if (lastStrikeElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing cbdt_bitmap_format_17 Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element newStrikeElement = (Element) lastStrikeElement.cloneNode(true);
+        newStrikeElement.setAttribute("name", "uni" + hex);
+
+        BufferedImage image = ImageIO.read(emojiFile);
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        Element smallGlyphMetrics = (Element) newStrikeElement.getElementsByTagName("SmallGlyphMetrics").item(0);
+        Element widthElement = (Element) smallGlyphMetrics.getElementsByTagName("width").item(0);
+        widthElement.setAttribute("value", width + "");
+        Element heightElement = (Element) smallGlyphMetrics.getElementsByTagName("height").item(0);
+        heightElement.setAttribute("value", height + "");
+        Element advanceElement = (Element) smallGlyphMetrics.getElementsByTagName("Advance").item(0);
+        advanceElement.setAttribute("value", width + "");
+
+        Element rawImageDataElement = (Element) newStrikeElement.getElementsByTagName("rawimagedata").item(0);
+        rawImageDataElement.setTextContent(optionalRawData != null ? optionalRawData : "");
+
+        strikeDataElement.appendChild(newStrikeElement);
+    }
+
+    private void appendToCblcTable(Element rootElement, String hex, int glyphId) throws PackagingException {
+        Element cblcElement = (Element) rootElement.getElementsByTagName("CBLC").item(0);
+        if (cblcElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing CBLC Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element cblcStrikeElement = (Element) cblcElement.getElementsByTagName("strike").item(0);
+        if (cblcStrikeElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing strike Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element glyphLocListElement = (Element) cblcStrikeElement.getElementsByTagName("eblc_index_sub_table_1").item(0);
+        if (glyphLocListElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing eblc_index_sub_table_1 Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element lastGlyphLocElement = (Element) glyphLocListElement.getElementsByTagName("glyphLoc").item(glyphLocListElement.getElementsByTagName("glyphLoc").getLength() - 1);
+        if (lastGlyphLocElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Empty eblc_index_sub_table_1 Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            throw new PackagingException();
+        }
+
+        Element newGlyphLocElement = (Element) lastGlyphLocElement.cloneNode(false);
+        newGlyphLocElement.setAttribute("id", glyphId + "");
+        newGlyphLocElement.setAttribute("name", "uni" + hex);
+        glyphLocListElement.appendChild(newGlyphLocElement);
+    }
+
 }
