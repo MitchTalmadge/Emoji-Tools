@@ -22,14 +22,13 @@ package com.mitchtalmadge.emojitools.gui.aptiapi.controllers;
 
 import com.aptitekk.aptiapi.ErrorReport;
 import com.mitchtalmadge.emojitools.EmojiTools;
+import com.mitchtalmadge.emojitools.gui.aptiapi.ErrorReportDetailsDialog;
+import com.mitchtalmadge.emojitools.gui.aptiapi.ErrorReportDialog;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import com.mitchtalmadge.emojitools.EmojiTools;
-import com.mitchtalmadge.emojitools.gui.aptiapi.ErrorReportDetailsDialog;
-import com.mitchtalmadge.emojitools.gui.aptiapi.ErrorReportDialog;
 
 public class ErrorReportDialogController {
 

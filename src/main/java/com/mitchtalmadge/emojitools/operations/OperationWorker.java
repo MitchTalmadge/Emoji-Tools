@@ -65,6 +65,9 @@ public abstract class OperationWorker extends Task<Boolean> implements EmojiTool
         Thread.currentThread().setName(threadName);
         try {
             return doWork();
+        } catch (OutOfMemoryError e) {
+            EmojiTools.showErrorDialog("Out Of Memory!", "Emoji Tools has run out of memory and cannot continue the current operation.");
+            return false;
         } catch (Exception e) {
             EmojiTools.submitError(e);
             return false;

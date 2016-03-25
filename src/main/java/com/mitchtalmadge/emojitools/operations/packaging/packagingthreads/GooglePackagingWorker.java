@@ -191,6 +191,10 @@ public class GooglePackagingWorker extends OperationWorker {
                             }
 
                             LigatureSet ligatureSet = ligatureSetMap.get(mainGlyphName);
+                            if (ligatureSet == null) {
+                                appendMessageToDialog("Skipping " + file.getName());
+                                continue;
+                            }
                             String glyphNameFromComponents = ligatureSet.getGlyphNameFromComponents(components);
                             glyphNameFileMap.put(glyphNameFromComponents, file);
                             appendMessageToDialog("File " + file.getName() + " has been assigned to " + glyphNameFromComponents);
