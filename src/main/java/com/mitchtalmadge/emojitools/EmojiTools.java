@@ -22,16 +22,6 @@ package com.mitchtalmadge.emojitools;
 
 import com.aptitekk.aptiapi.AptiAPI;
 import com.aptitekk.aptiapi.AptiAPIListener;
-import com.mitchtalmadge.emojitools.operations.renaming.RenamingOperation;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.image.Image;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import com.mitchtalmadge.emojitools.operations.conversion.ConversionInfo;
 import com.mitchtalmadge.emojitools.operations.conversion.ConversionOperation;
 import com.mitchtalmadge.emojitools.operations.deletion.DeletionOperation;
@@ -42,6 +32,15 @@ import com.mitchtalmadge.emojitools.operations.renaming.RenamingInfo;
 import com.mitchtalmadge.emojitools.operations.renaming.RenamingOperation;
 import com.mitchtalmadge.emojitools.operations.resizing.ResizingInfo;
 import com.mitchtalmadge.emojitools.operations.resizing.ResizingOperation;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
@@ -57,7 +56,7 @@ import java.util.concurrent.ExecutionException;
 public class EmojiTools extends Application implements AptiAPIListener {
 
     private static final Image logoImage = new Image(EmojiTools.class.getResourceAsStream("/Images/EmojiToolsLogo.png"));
-    private static final AptiAPI aptiAPI = new AptiAPI(new Versioning(), logoImage);
+    private static final AptiAPI aptiAPI = new AptiAPI(new Versioning());
 
     private static final ArrayList<JythonListener> jythonListenerList = new ArrayList<>();
     private static JythonHandler jythonHandler;
