@@ -281,15 +281,6 @@ public class GooglePackagingWorker extends OperationWorker {
             } else
                 appendMessageToDialog("Could not Package " + pngFile.getName());
 
-            /*StringBuilder hexStringBuilder = new StringBuilder();
-
-            int value;
-            while ((value = fileInputStream.read()) != -1) {
-                hexStringBuilder.append(String.format("%02X ", value));
-            }
-
-            String hexString = hexStringBuilder.toString();*/
-
             fileInputStream.close();
 
             updateProgress(25 + (int) (((float) i / cbdtBitmapFormat17ElementList.getLength()) * 50), 100);
