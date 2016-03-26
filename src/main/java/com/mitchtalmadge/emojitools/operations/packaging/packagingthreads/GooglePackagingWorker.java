@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -264,26 +265,33 @@ public class GooglePackagingWorker extends OperationWorker {
             //Create a hex string out of the png file
             FileInputStream fileInputStream = new FileInputStream(pngFile);
 
-            StringBuilder hexStringBuilder = new StringBuilder();
+            byte[] fileData = new byte[fileInputStream.available()];
+            int read = fileInputStream.read(fileData);
+            if (read != -1) {
+                String hexString = DatatypeConverter.printHexBinary(fileData);
+                //Rewrite content of rawimagedata element with the hex string generated from the png file
+                Element rawImageDataElement = (Element) cbdtBitmapFormat17Element.getElementsByTagName("rawimagedata").item(0);
+                if (rawImageDataElement == null) {
+                    showErrorDialog("Invalid '.ttx' File (Missing rawimagedata)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+                    return false;
+                }
+
+                rawImageDataElement.setTextContent(hexString);
+                appendMessageToDialog("Packaged " + pngFile.getName());
+            } else
+                appendMessageToDialog("Could not Package " + pngFile.getName());
+
+            /*StringBuilder hexStringBuilder = new StringBuilder();
 
             int value;
             while ((value = fileInputStream.read()) != -1) {
                 hexStringBuilder.append(String.format("%02X ", value));
             }
 
+            String hexString = hexStringBuilder.toString();*/
+
             fileInputStream.close();
-            String hexString = hexStringBuilder.toString();
 
-            //Rewrite content of rawimagedata element with the hex string generated from the png file
-            Element rawImageDataElement = (Element) cbdtBitmapFormat17Element.getElementsByTagName("rawimagedata").item(0);
-            if (rawImageDataElement == null) {
-                showErrorDialog("Invalid '.ttx' File (Missing rawimagedata)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
-                return false;
-            }
-
-            rawImageDataElement.setTextContent(hexString);
-
-            appendMessageToDialog("Packaged " + pngFile.getName());
             updateProgress(25 + (int) (((float) i / cbdtBitmapFormat17ElementList.getLength()) * 50), 100);
         }
 
@@ -302,6 +310,20 @@ public class GooglePackagingWorker extends OperationWorker {
 
         if (isCancelled())
             return false;
+
+        //Cleanup
+        infoDocument = null;
+        rootElement = null;
+        cbdtElement = null;
+        cmapElement = null;
+        gsubTableElement = null;
+        strikeDataElement = null;
+        cbdtBitmapFormat17ElementList = null;
+        cmapFormat12Element = null;
+        glyphCodeNameMap = null;
+        glyphNameFileMap = null;
+        ligatureSetMap = null;
+        System.gc();
 
         appendMessageToDialog("Building font... (This can take a while - Please wait)");
 
