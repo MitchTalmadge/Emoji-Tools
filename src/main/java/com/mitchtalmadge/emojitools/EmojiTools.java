@@ -341,7 +341,7 @@ public class EmojiTools extends Application implements AptiAPIListener {
             submitError(e);
         }
 
-        aptiAPI.checkForUpdates();
+         aptiAPI.checkForUpdates();
     }
 
     @Override
