@@ -24,12 +24,12 @@ import com.aptitekk.aptiapi.AptiAPIVersioningDetails;
 
 public class Versioning implements AptiAPIVersioningDetails {
 
-    private static final double VERSION = 1.9;
+    private static final double VERSION = 1.91;
     private static final String VERSION_STRING = VERSION + "";
     private static final String PROGRAM_NAME = "Emoji Tools";
     private static final String PROGRAM_NAME_WITH_VERSION = PROGRAM_NAME + " V" + VERSION_STRING;
     private static final int APTIAPI_PROJECT_ID = 1;
-    private static final int APTIAPI_VERSION_ID = 1;
+    private static final int APTIAPI_VERSION_ID = 2;
 
     @Override
     public double getVersion() {
