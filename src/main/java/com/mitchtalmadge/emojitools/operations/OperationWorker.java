@@ -20,12 +20,11 @@
 
 package com.mitchtalmadge.emojitools.operations;
 
-import com.mitchtalmadge.emojitools.JythonHandler;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 import com.mitchtalmadge.emojitools.EmojiTools;
 import com.mitchtalmadge.emojitools.JythonHandler;
 import com.mitchtalmadge.emojitools.gui.dialogs.OperationProgressDialog;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 
 import java.util.concurrent.ExecutionException;
 
@@ -106,6 +105,10 @@ public abstract class OperationWorker extends Task<Boolean> implements EmojiTool
     protected final void done() {
         Platform.runLater(() -> operationProgressDialog.close());
         try {
+            //Cleanup
+            if (jythonHandler != null)
+                jythonHandler.close();
+
             if (isCancelled()) {
                 System.out.println("Operation " + threadName + " has been cancelled by user.");
                 this.operation.done(false);

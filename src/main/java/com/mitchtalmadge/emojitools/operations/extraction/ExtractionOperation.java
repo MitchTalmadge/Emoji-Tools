@@ -26,12 +26,6 @@ import com.mitchtalmadge.emojitools.operations.Operation;
 import com.mitchtalmadge.emojitools.operations.OperationWorker;
 import com.mitchtalmadge.emojitools.operations.extraction.extractors.AppleExtractionWorker;
 import com.mitchtalmadge.emojitools.operations.extraction.extractors.GoogleExtractionWorker;
-import com.mitchtalmadge.emojitools.EmojiTools;
-import com.mitchtalmadge.emojitools.gui.dialogs.OperationProgressDialog;
-import com.mitchtalmadge.emojitools.operations.Operation;
-import com.mitchtalmadge.emojitools.operations.OperationWorker;
-import com.mitchtalmadge.emojitools.operations.extraction.extractors.AppleExtractionWorker;
-import com.mitchtalmadge.emojitools.operations.extraction.extractors.GoogleExtractionWorker;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,7 +81,7 @@ public class ExtractionOperation extends Operation {
         else if (tableNames.contains("CBLC") && tableNames.contains("CBDT"))
             return new GoogleExtractionWorker(this, new OperationProgressDialog("Extracting Android Emojis..."), fontFile, extractionDirectory, tableNames, tableOffsets, tableLengths);
         else {
-            //gui.showMessageDialog("The selected font cannot be extracted. Contact developer for help.");
+            EmojiTools.showErrorDialog("Cannot Extract", "The selected font cannot be extracted. Contact developer for help.");
             return null;
         }
     }

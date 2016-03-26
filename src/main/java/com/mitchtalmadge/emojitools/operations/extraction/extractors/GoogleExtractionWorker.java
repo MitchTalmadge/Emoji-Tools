@@ -21,19 +21,21 @@
 package com.mitchtalmadge.emojitools.operations.extraction.extractors;
 
 import com.mitchtalmadge.emojitools.EmojiTools;
-import com.mitchtalmadge.emojitools.operations.extraction.ExtractionUtilites;
-import com.mitchtalmadge.emojitools.EmojiTools;
 import com.mitchtalmadge.emojitools.gui.dialogs.OperationProgressDialog;
 import com.mitchtalmadge.emojitools.operations.FontType;
 import com.mitchtalmadge.emojitools.operations.Operation;
-import com.mitchtalmadge.emojitools.operations.extraction.ExtractionUtilites;
+import com.mitchtalmadge.emojitools.operations.extraction.Ligature;
 import org.python.core.PyList;
 import org.python.core.PyType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.*;
 
 public class GoogleExtractionWorker extends ExtractionWorker {
 
@@ -64,272 +66,154 @@ public class GoogleExtractionWorker extends ExtractionWorker {
         getJythonHandler().getPythonInterpreter().execfile(getJythonHandler().getTempDirectory().getAbsolutePath()
                 + "/PythonScripts/package.py");
 
-        try {
-            RandomAccessFile inputStream = new RandomAccessFile(fontFile, "r");
+        getJythonHandler().getPythonInterpreter().cleanup();
 
-            appendMessageToDialog("Searching for Emojis - Please wait until complete!");
+        File ttxFile = new File(extractionDirectory, "font.ttx");
 
-            //Get numGlyphs, ordinal numbers, and glyphNames from post table
-            int cmapIndex = tableNames.indexOf("cmap");
-            if (cmapIndex > -1) {
-                int cmapOffset = tableOffsets.get(cmapIndex);
-                int cmapLength = tableLengths.get(cmapIndex);
+        if (!ttxFile.exists()) {
+            EmojiTools.showErrorDialog("font.ttx File Missing!", "The font.ttx file appears to be missing. Did it get deleted?");
+            return false;
+        }
 
-                inputStream.seek(cmapOffset);
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(ttxFile);
 
-                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x00)) {
-                    showErrorDialog("Invalid 'cmap' Table (Error Code 1)", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                    inputStream.close();
-                    return false;
-                }
+        //Check for ttFont element
+        Element rootElement = document.getDocumentElement();
+        if (!rootElement.getTagName().equals("ttFont")) {
+            showErrorDialog("Invalid '.ttx' File (Incorrect Root Element)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            return false;
+        }
 
-                short numSubTables = inputStream.readShort();
-                short[] platformIDs = new short[numSubTables];
-                short[] platformSpecificIDs = new short[numSubTables];
-                int[] subTableOffsets = new int[numSubTables];
+        //Check for cmap element
+        Element cmapElement = (Element) rootElement.getElementsByTagName("cmap").item(0);
+        if (cmapElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing cmap Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            return false;
+        }
 
-                //Key: GlyphID, Value: Unicode Name String (i.e. uni00a9)
-                HashMap<Integer, String> unicodeNameMap = new HashMap<>();
+        //Check for cmap_format_12 element
+        Element cmapFormat12Element = (Element) cmapElement.getElementsByTagName("cmap_format_12").item(0);
+        if (cmapFormat12Element == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing cmap_format_12 Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            return false;
+        }
 
-                for (short subTableId = 0; subTableId < numSubTables; subTableId++) {
-                    platformIDs[subTableId] = inputStream.readShort();
-                    platformSpecificIDs[subTableId] = inputStream.readShort();
-                    subTableOffsets[subTableId] = inputStream.readInt();
-                }
+        Map<String, String> cmap = new HashMap<>();
+        NodeList cmapMapElementList = cmapElement.getElementsByTagName("map");
+        for (int i = 0; i < cmapMapElementList.getLength(); i++) {
+            Element map = (Element) cmapMapElementList.item(i);
+            String code = map.getAttribute("code");
+            if (code.startsWith("0x")) //Remove beginning "0x"
+                code = code.substring(2);
+            if (code.endsWith("L")) //Remove ending "L"
+                code = code.substring(0, code.length() - 1);
+            if (code.length() < 4) //Pad with 0s to make at least 4 long
+                for (int j = code.length(); j != 4; j++)
+                    code = "0" + code;
 
-                for (int subTableId = 0; subTableId < numSubTables; subTableId++) {
+            cmap.put(map.getAttribute("name"), code);
+        }
 
-                    //Go to beginning of subTable
-                    inputStream.seek(cmapOffset + subTableOffsets[subTableId]);
-
-                    if (platformIDs[subTableId] == 3 && platformSpecificIDs[subTableId] == 10) {
-                        //Platform ID = Microsoft, Platform Specific ID = Unicode UCS-4
-
-                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x0C)) {
-                            showErrorDialog("Invalid 'cmap' Table (Error Code 3:1)", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                            inputStream.close();
-                            return false;
-                        }
-
-                        inputStream.skipBytes(10); //Skip Reserved, Length, and Language
-
-                        int numGroupings = inputStream.readInt();
-
-                        //Iterate over each grouping and build unicode name table
-                        for (int i = 0; i < numGroupings; i++) {
-                            int startCharCode = inputStream.readInt();
-                            int endCharCode = inputStream.readInt();
-                            int startGlyphID = inputStream.readInt();
-                            for (int j = 0; j < (endCharCode - startCharCode) + 1; j++) {
-                                String unicode = Integer.toHexString(startCharCode + j);
-                                if (unicode.length() < 4)
-                                    for (int k = unicode.length(); k != 4; k++)
-                                        unicode = "0" + unicode;
-                                if (unicode.length() == 6 && unicode.startsWith("0"))
-                                    unicode = unicode.substring(1);
-                                unicode = "uni" + unicode;
-                                appendMessageToDialog("Added glyph name " + unicode + " for glyphID " + (startGlyphID + j));
-                                unicodeNameMap.put(startGlyphID + j, unicode);
-                            }
-                        }
-
-                        int CBLCIndex = tableNames.indexOf("CBLC");
-                        if (CBLCIndex > -1) {
-                            int CBLCOffset = tableOffsets.get(CBLCIndex);
-                            int CBLCLength = tableLengths.get(CBLCIndex);
-
-                            inputStream.seek(CBLCOffset);
-
-                            if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                                showErrorDialog("Invalid 'CBLC' Table", "The font's 'CBLC' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                                inputStream.close();
+        //Create a glyph substitution list if the gsub element exists.
+        List<Ligature> glyphSubList = null;
+        Element gsubTableElement = (Element) rootElement.getElementsByTagName("GSUB").item(0);
+        if (gsubTableElement != null) {
+            Element lookupListElement = (Element) gsubTableElement.getElementsByTagName("LookupList").item(0);
+            if (lookupListElement != null) {
+                Element lookupElement = (Element) lookupListElement.getElementsByTagName("Lookup").item(0);
+                if (lookupElement != null) {
+                    Element ligatureSubstElement = (Element) lookupElement.getElementsByTagName("LigatureSubst").item(0);
+                    if (ligatureSubstElement != null) {
+                        glyphSubList = new ArrayList<>();
+                        NodeList ligatureSetElementList = ligatureSubstElement.getElementsByTagName("LigatureSet");
+                        for (int i = 0; i < ligatureSetElementList.getLength(); i++) {
+                            if (isCancelled())
                                 return false;
+
+                            Element ligatureSetElement = (Element) ligatureSetElementList.item(i);
+                            String mainGlyphName = ligatureSetElement.getAttribute("glyph");
+
+                            NodeList ligatureList = ligatureSetElement.getElementsByTagName("Ligature");
+                            for (int j = 0; j < ligatureList.getLength(); j++) {
+                                Element ligatureElement = (Element) ligatureList.item(j);
+                                List<String> components = Arrays.asList(ligatureElement.getAttribute("components").split(","));
+                                String glyph = ligatureElement.getAttribute("glyph");
+
+                                glyphSubList.add(new Ligature(glyph, mainGlyphName, components));
                             }
-
-                            inputStream.skipBytes(44);
-
-                            short beginGlyphID = inputStream.readShort();
-
-                            short endGlyphID = inputStream.readShort();
-
-                            int GSUBIndex = tableNames.indexOf("GSUB");
-                            if (GSUBIndex > -1) {
-                                int GSUBOffset = tableOffsets.get(GSUBIndex);
-                                int GSUBLength = tableLengths.get(GSUBIndex);
-
-                                inputStream.seek(GSUBOffset);
-
-                                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00)) {
-                                    showErrorDialog("Invalid 'GSUB' Table (Error Code 1)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                                    inputStream.close();
-                                    return false;
-                                }
-
-                                inputStream.skipBytes(4); //Skip ScriptList and FeatureList offsets
-
-                                int lookupListOffset = GSUBOffset + inputStream.readShort(); //Get offset of LookupList
-                                inputStream.seek(lookupListOffset); //Navigate to LookupList
-
-                                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01)) { //Get LookupCount
-                                    showErrorDialog("Invalid 'GSUB' Table (Error Code 2)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                                    inputStream.close();
-                                    return false;
-                                }
-
-                                int lookupTableOffset = lookupListOffset + inputStream.readShort(); //Get first LookupTable Offset
-                                inputStream.seek(lookupTableOffset); //Navigate to first LookupTable
-
-                                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01)) { //Get LookupType, LookupFlag, and SubTableCount.
-                                    showErrorDialog("Invalid 'GSUB' Table (Error Code 3)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                                    inputStream.close();
-                                    return false;
-                                }
-
-                                int ligatureTableOffset = lookupTableOffset + inputStream.readShort(); //Get offset of Ligature Substitution Subtable
-                                inputStream.seek(ligatureTableOffset); //Navigate to Ligature Substitution Subtable
-
-                                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x01)) { //Get SubstFormat
-                                    showErrorDialog("Invalid 'GSUB' Table (Error Code 4)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                                    inputStream.close();
-                                    return false;
-                                }
-
-                                int coverageOffset = ligatureTableOffset + inputStream.readShort(); //Get Coverage Offset
-
-                                short ligSetCount = inputStream.readShort(); //Get LigSetCount
-
-                                int[] ligSetOffsets = new int[ligSetCount];
-
-                                for (int i = 0; i < ligSetCount; i++) {
-                                    ligSetOffsets[i] = ligatureTableOffset + inputStream.readShort();
-                                }
-
-                                /* Coverage Table */
-                                inputStream.seek(coverageOffset);
-                                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02)) {
-                                    showErrorDialog("Invalid 'GSUB' Table (Error Code 5)", "The font's 'GSUB' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                                    inputStream.close();
-                                    return false;
-                                }
-
-                                short rangeCount = inputStream.readShort();
-                                short[] coverageGlyphIDs = new short[ligSetCount]; //Array of Glyph IDs to be replaced, as specified by the coverage table
-                                for (int i = 0; i < rangeCount; i++) {
-                                    short startGlyph = inputStream.readShort();
-                                    short endGlyph = inputStream.readShort();
-                                    short startCoverageIndex = inputStream.readShort();
-                                    for (int j = 0; j <= endGlyph - startGlyph; j++) {
-                                        coverageGlyphIDs[j + startCoverageIndex] = (short) (startGlyph + j);
-                                    }
-                                }
-
-                                /* LigSet Tables */
-                                for (int i = 0; i < ligSetCount; i++) {
-                                    inputStream.seek(ligSetOffsets[i]);
-
-                                    short ligatureCount = inputStream.readShort();
-                                    int[] ligatureOffsets = new int[ligatureCount];
-                                    /* Ligature Tables */
-                                    for (int j = 0; j < ligatureCount; j++) {
-                                        ligatureOffsets[j] = ligSetOffsets[i] + inputStream.readShort();
-                                    }
-                                    for (int j = 0; j < ligatureCount; j++) {
-                                        inputStream.seek(ligatureOffsets[j]);
-                                        short ligGlyph = inputStream.readShort();
-                                        short compCount = inputStream.readShort();
-                                        StringBuilder stringBuilder = new StringBuilder(unicodeNameMap.get((int) coverageGlyphIDs[i]));
-                                        if (compCount > 1) {
-                                            for (int k = 0; k < compCount - 1; k++) {
-                                                stringBuilder.append("_").append(unicodeNameMap.get((int) inputStream.readShort()));
-                                            }
-                                        }
-                                        appendMessageToDialog("Added substituted glyph name " + stringBuilder.toString() + " for glyphID " + ligGlyph);
-                                        unicodeNameMap.put((int) ligGlyph, stringBuilder.toString());
-                                    }
-                                }
-                            } else {
-                                appendMessageToDialog("Could not find 'GSUB' table! Continuing...");
-                            }
-
-                            //Get number of strikes, and scan for PNG files.
-                            int CBDTIndex = tableNames.indexOf("CBDT");
-                            if (CBDTIndex > -1) {
-                                int CBDTOffset = tableOffsets.get(CBDTIndex);
-                                int CBDTLength = tableLengths.get(CBDTIndex);
-
-                                inputStream.seek(CBDTOffset);
-
-                                if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x00)) {
-                                    showErrorDialog("Invalid 'CBDT' Table", "The font's 'CBDT' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                                    inputStream.close();
-                                    return false;
-                                }
-
-                                System.out.println("# Emojis to Extract: " + (endGlyphID - beginGlyphID));
-                                System.out.println("Begin: " + beginGlyphID + " - End: " + endGlyphID);
-
-                                for (int i = beginGlyphID; i <= endGlyphID; i++) {
-                                    if (isCancelled()) {
-                                        inputStream.close();
-                                        return false;
-                                    }
-                                    inputStream.skipBytes(5);
-
-                                    int glyphLength = inputStream.readInt();
-                                    if (glyphLength > 0) {
-                                        byte[] b = new byte[glyphLength];
-                                        if (unicodeNameMap.get(i) != null) {
-                                            appendMessageToDialog("Extracting Emoji #" + i + " to '" + unicodeNameMap.get(i) + ".png'");
-                                            FileOutputStream outputStream = new FileOutputStream(new File(extractionDirectory, unicodeNameMap.get(i) + ".png"));
-                                            inputStream.readFully(b);
-                                            outputStream.write(b);
-                                            outputStream.close();
-                                        } else
-                                            inputStream.skipBytes(glyphLength);
-                                        updateProgress(i - beginGlyphID, endGlyphID - beginGlyphID);
-                                    }
-                                }
-
-                                writeFontTypeFile(FontType.GOOGLE, null);
-                            } else {
-                                showErrorDialog("Missing 'CBDT' Table", "The font's 'CBDT' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                                inputStream.close();
-                                return false;
-                            }
-                        } else {
-                            showErrorDialog("Missing 'CBLC' Table", "The font's 'CBLC' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                            inputStream.close();
-                            return false;
                         }
-                    } else if (platformIDs[subTableId] == 0 && platformSpecificIDs[subTableId] == 5) {
-                        //Platform ID = Unicode, //Platform Specific ID = Unicode Variation Sequences
-
-                        if (!ExtractionUtilites.compareBytes(inputStream, (byte) 0x00, (byte) 0x0E)) {
-                            showErrorDialog("Invalid 'cmap' Table (Error Code 3:2)", "The font's 'cmap' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                            inputStream.close();
-                            return false;
-                        }
-
-                        writeFontTypeFile(FontType.GOOGLE, null);
-                    } else {
-                        showErrorDialog("Invalid 'cmap' Table (Error Code 2:" + subTableId + ")", "The font's 'cmap' table is an invalid format. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                        inputStream.close();
-                        return false;
                     }
                 }
-            } else {
-                showErrorDialog("Missing 'cmap' Table", "The font's 'cmap' table is missing. Most likely, support for this font has not been added yet. Please contact the developer for help.");
-                inputStream.close();
-                return false;
             }
-
-            inputStream.close();
-        } catch (FileNotFoundException e) {
-            System.out.println(this.fontFile.getName() + " not found!");
-            showErrorDialog("Unable to Locate Font", "The chosen font could not be found. Did it get deleted?");
-        } catch (IOException e) {
-            EmojiTools.submitError(e);
         }
+
+        Element cbdtElement = (Element) rootElement.getElementsByTagName("CBDT").item(0);
+        if (cbdtElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing CBDT Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            return false;
+        }
+
+        Element strikeDataElement = (Element) cbdtElement.getElementsByTagName("strikedata").item(0);
+        if (strikeDataElement == null) {
+            showErrorDialog("Invalid '.ttx' File (Missing strikedata Table)", "The '.ttx' file in the emojis directory appears to have been incorrectly modified. Packaging cannot continue.");
+            return false;
+        }
+
+        NodeList cbdtBitmapFormat17ElementList = cbdtElement.getElementsByTagName("cbdt_bitmap_format_17");
+        for (int i = 0; i < cbdtBitmapFormat17ElementList.getLength(); i++) {
+            Element imageElement = (Element) cbdtBitmapFormat17ElementList.item(i);
+            String name = imageElement.getAttribute("name");
+            Element rawImageData = (Element) imageElement.getElementsByTagName("rawimagedata").item(0);
+
+            if (cmap.containsKey(name)) {
+                File outputFile = new File(extractionDirectory, "uni" + cmap.get(name) + ".png");
+
+                appendMessageToDialog("Extracting Emoji: " + outputFile.getName());
+                updateProgress(i, cbdtBitmapFormat17ElementList.getLength());
+
+                FileOutputStream outputStream = new FileOutputStream(outputFile);
+                String imageDataHex = rawImageData.getTextContent();
+                imageDataHex = imageDataHex.replaceAll("\\s|\\n|\\r|\\t", "");
+                byte[] imageDataBytes = DatatypeConverter.parseHexBinary(imageDataHex);
+                outputStream.write(imageDataBytes);
+                outputStream.close();
+            } else {
+                if (glyphSubList != null) {
+                    for (Ligature ligature : glyphSubList) {
+                        if (ligature.getLigatureGlyphName().equals(name)) {
+                            String fileName = cmap.get(ligature.getSetGlyphName());
+                            for (String component : ligature.getComponents()) {
+                                fileName += "_" + cmap.get(component);
+                            }
+
+                            File outputFile = new File(extractionDirectory, "uni" + fileName + ".png");
+
+                            appendMessageToDialog("Extracting Emoji: " + outputFile.getName());
+                            updateProgress(i, cbdtBitmapFormat17ElementList.getLength());
+
+                            FileOutputStream outputStream = new FileOutputStream(outputFile);
+                            String imageDataHex = rawImageData.getTextContent();
+                            imageDataHex = imageDataHex.replaceAll("\\s|\\n|\\r|\\t", "");
+                            byte[] imageDataBytes = DatatypeConverter.parseHexBinary(imageDataHex);
+                            outputStream.write(imageDataBytes);
+                            outputStream.close();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        writeFontTypeFile(FontType.GOOGLE, null);
+
+        //Cleanup memory...
+        cmap.clear();
+        cmap = null;
+        if (glyphSubList != null)
+            glyphSubList.clear();
+        glyphSubList = null;
+        System.gc();
+
         return true;
     }
 }

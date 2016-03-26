@@ -20,6 +20,7 @@
 
 package com.mitchtalmadge.emojitools;
 
+import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 
@@ -27,21 +28,51 @@ import java.io.File;
 
 public class JythonHandler {
 
-    private final PySystemState pySystemState;
-    private final PythonInterpreter pythonInterpreter;
     private final File tempDirectory;
+    private PySystemState pySystemState;
+    private PythonInterpreter pythonInterpreter;
 
-    public JythonHandler(PySystemState pySystemState, PythonInterpreter pythonInterpreter, File tempDirectory) {
-        this.pySystemState = pySystemState;
-        this.pythonInterpreter = pythonInterpreter;
+    public JythonHandler(File tempDirectory) {
         this.tempDirectory = tempDirectory;
+        begin();
+    }
+
+    private void begin() {
+        //Create Interpreter
+        pySystemState = new PySystemState();
+        pythonInterpreter = new PythonInterpreter(null, pySystemState);
+
+        //Set encoding to UTF8
+        pythonInterpreter.exec("import sys\n" +
+                "reload(sys)\n" +
+                "sys.setdefaultencoding('UTF8')\n" +
+                "print('Encoding: '+sys.getdefaultencoding())");
+
+        //Set Outputs
+        pythonInterpreter.setOut(System.out);
+        pythonInterpreter.setErr(System.err);
+
+        //Set sys.path
+        String pythonScriptsPath = tempDirectory.getAbsolutePath() + "/PythonScripts";
+        pySystemState.path.append(new PyString(pythonScriptsPath));
+    }
+
+    public void close() {
+        pySystemState.close();
+        pythonInterpreter.close();
+        pySystemState = null;
+        pythonInterpreter = null;
     }
 
     public PySystemState getPySystemState() {
+        if (pySystemState == null)
+            begin();
         return pySystemState;
     }
 
     public PythonInterpreter getPythonInterpreter() {
+        if (pythonInterpreter == null)
+            begin();
         return pythonInterpreter;
     }
 

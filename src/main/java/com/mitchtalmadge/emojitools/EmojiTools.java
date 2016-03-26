@@ -41,9 +41,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.python.core.PyString;
-import org.python.core.PySystemState;
-import org.python.util.PythonInterpreter;
 
 import javax.swing.*;
 import java.io.File;
@@ -387,27 +384,7 @@ public class EmojiTools extends Application implements AptiAPIListener {
     private static class JythonLoader extends SwingWorker<JythonHandler, Void> {
         @Override
         protected JythonHandler doInBackground() throws Exception {
-            File tempDirectory = extractScriptsToTempDir();
-
-            //Create Interpreter
-            PySystemState pySystemState = new PySystemState();
-            PythonInterpreter pythonInterpreter = new PythonInterpreter(null, pySystemState);
-
-            //Set encoding to UTF8
-            pythonInterpreter.exec("import sys\n" +
-                    "reload(sys)\n" +
-                    "sys.setdefaultencoding('UTF8')\n" +
-                    "print('Encoding: '+sys.getdefaultencoding())");
-
-            //Set Outputs
-            pythonInterpreter.setOut(System.out);
-            pythonInterpreter.setErr(System.err);
-
-            //Set sys.path
-            String pythonScriptsPath = tempDirectory.getAbsolutePath() + "/PythonScripts";
-            pySystemState.path.append(new PyString(pythonScriptsPath));
-
-            return new JythonHandler(pySystemState, pythonInterpreter, tempDirectory);
+            return new JythonHandler(extractScriptsToTempDir());
         }
 
         private File extractScriptsToTempDir() throws Exception {

@@ -18,38 +18,32 @@
  * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
-package com.mitchtalmadge.emojitools.operations;
+package com.mitchtalmadge.emojitools.operations.extraction;
 
-public abstract class Operation {
+import java.util.List;
 
-    boolean successfullyCompleted = false;
+public class Ligature {
 
-    protected abstract OperationWorker getWorker();
+    private String ligatureGlyphName;
 
-    /**
-     * Runs the operation.
-     *
-     * @return True if operation is completed successfully, False if unsuccessful or cancelled.
-     */
-    public boolean runOperation() {
+    private String setGlyphName;
+    private List<String> components;
 
-        OperationWorker worker = getWorker();
-
-        if (worker == null) {
-            System.out.println("Tried to perform operation, but no worker was given!");
-            return false;
-        }
-
-        worker.executeWorker();
-
-        //Cleanup
-        worker = null;
-        System.gc();
-
-        return successfullyCompleted;
+    public Ligature(String ligatureGlyphName, String setGlyphName, List<String> components){
+        this.ligatureGlyphName = ligatureGlyphName;
+        this.setGlyphName = setGlyphName;
+        this.components = components;
     }
 
-    public void done(boolean successfullyCompleted) {
-        this.successfullyCompleted = successfullyCompleted;
+    public String getLigatureGlyphName() {
+        return ligatureGlyphName;
+    }
+
+    public String getSetGlyphName() {
+        return setGlyphName;
+    }
+
+    public List<String> getComponents() {
+        return components;
     }
 }
