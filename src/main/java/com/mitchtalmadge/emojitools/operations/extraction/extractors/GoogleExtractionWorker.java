@@ -181,12 +181,12 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                 if (glyphSubList != null) {
                     for (Ligature ligature : glyphSubList) {
                         if (ligature.getLigatureGlyphName().equals(name)) {
-                            String fileName = cmap.get(ligature.getSetGlyphName());
+                            String fileName = "uni" + cmap.get(ligature.getSetGlyphName());
                             for (String component : ligature.getComponents()) {
-                                fileName += "_" + cmap.get(component);
+                                fileName += "_" + "uni" + cmap.get(component);
                             }
 
-                            File outputFile = new File(extractionDirectory, "uni" + fileName + ".png");
+                            File outputFile = new File(extractionDirectory, fileName + ".png");
 
                             appendMessageToDialog("Extracting Emoji: " + outputFile.getName());
                             updateProgress(i, cbdtBitmapFormat17ElementList.getLength());
