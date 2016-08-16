@@ -16,23 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.mitchtalmadge.emojitools.operations.conversion;
+package com.mitchtalmadge.emojitools.gui.dialogs.dialogcontrollers;
 
-public class ConversionInfo {
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
-    public static final int DIRECTION_CGBI_RGBA = 0;
-    public static final int DIRECTION_RGBA_CGBI = 1;
+public class ErrorReportDialogController {
 
-    private int conversionDirection;
+    @FXML
+    protected TextArea descriptionTextArea;
 
-    public ConversionInfo(int conversionDirection) {
-        if (conversionDirection < 0 || conversionDirection > 1) {
-            conversionDirection = 0;
-        }
-        this.conversionDirection = conversionDirection;
+    @FXML
+    protected TextField nameField;
+
+    @FXML
+    protected Button viewDetailsButton;
+
+    @FXML
+    protected TextField emailField;
+
+    @FXML
+    protected Button dontSendReportButton;
+
+    @FXML
+    protected Button sendReportButton;
+
+    private boolean logAttached = true;
+
+    public boolean isLogAttached() {
+        return logAttached;
     }
 
-    public int getConversionDirection() {
-        return conversionDirection;
+    public void setLogAttached(boolean logAttached) {
+        this.logAttached = logAttached;
     }
 }

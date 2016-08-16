@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+  ~ Copyright (C) 2015 - 2016 Mitch Talmadge (https://mitchtalmadge.com/)
   ~ Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
-  ~ Copyright (C) 2015 Mitch Talmadge
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,54 +16,49 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ Contact Mitch Talmadge at mitcht@liveforcode.net
   -->
 
-<?import javafx.scene.*?>
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane prefHeight="425" prefWidth="400" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.MainController">
+<BorderPane prefHeight="425" prefWidth="400" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mitchtalmadge.emojitools.gui.MainController">
     <top>
         <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
-            <children>
-                <Label fx:id="headerLabel" alignment="CENTER" text="Emoji Tools Vx.x">
-                    <font>
-                        <Font size="21.0" />
-                    </font>
-                </Label>
-                <Label fx:id="copyrightLabel" onMouseClicked="#onCopyrightLabelFired" text="Copyright 2015 - 2016 Mitch Talmadge (https://MitchTalmadge.com/)" underline="true">
-                    <font>
-                        <Font name="System Italic" size="12.0" />
-                    </font>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-                </Label>
-            </children>
             <padding>
-                <Insets bottom="5.0" top="5.0" />
+                <Insets bottom="5.0" top="5.0"/>
             </padding>
+            <Label fx:id="headerLabel" alignment="CENTER" text="Emoji Tools Vx.x">
+                <font>
+                    <Font size="21.0"/>
+                </font>
+            </Label>
+            <Label fx:id="copyrightLabel" onMouseClicked="#onCopyrightLabelFired"
+                   text="Copyright 2015 - 2016 Mitch Talmadge (https://MitchTalmadge.com/)" underline="true">
+                <font>
+                    <Font name="System Italic" size="12.0"/>
+                </font>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Label>
         </VBox>
     </top>
     <center>
-        <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" styleClass="floating" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-            <tabs>
-            </tabs>
+        <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" styleClass="floating"
+                 tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         </TabPane>
     </center>
     <bottom>
-        <Label fx:id="donationLabel" onMouseClicked="#onDonateLabelFired" text="If these tools help you, please consider donating (Click here). Thank you!" underline="true" BorderPane.alignment="CENTER">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></Label>
+        <Label fx:id="donationLabel" onMouseClicked="#onDonateLabelFired"
+               text="If these tools help you, please consider donating (Click here). Thank you!" underline="true"
+               BorderPane.alignment="CENTER">
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+        </Label>
     </bottom>
 </BorderPane>

@@ -1,2 +1,7 @@
-target
-src/main/java/net/liveforcode/emojitools/operations/extraction/extractors/AppleExtractionThread1_7.java
+/.idea/libraries
+/.idea/dictionaries
+/.idea/workspace.xml
+/.idea/uiDesigner.xml
+/target
+/out/
+/Emoji-Tools_exe.xml

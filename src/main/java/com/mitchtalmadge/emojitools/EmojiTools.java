@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2015 - 2016 Mitch Talmadge (https://mitchtalmadge.com/)
  * Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
- * Copyright (C) 2015 - 2016 Mitch Talmadge
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,14 +14,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
 package com.mitchtalmadge.emojitools;
 
-import com.aptitekk.aptiapi.AptiAPI;
-import com.aptitekk.aptiapi.AptiAPIListener;
 import com.mitchtalmadge.emojitools.operations.conversion.ConversionInfo;
 import com.mitchtalmadge.emojitools.operations.conversion.ConversionOperation;
 import com.mitchtalmadge.emojitools.operations.deletion.DeletionOperation;
@@ -33,7 +29,6 @@ import com.mitchtalmadge.emojitools.operations.renaming.RenamingOperation;
 import com.mitchtalmadge.emojitools.operations.resizing.ResizingInfo;
 import com.mitchtalmadge.emojitools.operations.resizing.ResizingOperation;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -50,10 +45,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
-public class EmojiTools extends Application implements AptiAPIListener {
+public class EmojiTools extends Application {
 
     private static final Image logoImage = new Image(EmojiTools.class.getResourceAsStream("/Images/EmojiToolsLogo.png"));
-    private static final AptiAPI aptiAPI = new AptiAPI(new Versioning());
 
     private static final ArrayList<JythonListener> jythonListenerList = new ArrayList<>();
     private static JythonHandler jythonHandler;
@@ -70,9 +64,6 @@ public class EmojiTools extends Application implements AptiAPIListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        aptiAPI.setErrorHandler(new EmojiToolsErrorHandler(aptiAPI));
-        aptiAPI.setUpdateHandler(new EmojiToolsUpdateHandler());
 
         new JythonLoader().execute();
 
@@ -134,7 +125,7 @@ public class EmojiTools extends Application implements AptiAPIListener {
      * @param throwable The exception thrown.
      */
     public static void submitError(Throwable throwable) {
-        aptiAPI.getErrorHandler().uncaughtException(Thread.currentThread(), throwable);
+        //TODO
     }
 
     /**
@@ -322,8 +313,6 @@ public class EmojiTools extends Application implements AptiAPIListener {
 
     @Override
     public void start(Stage stage) throws Exception {
-        aptiAPI.addAPIListener(this);
-
         try {
             mainGuiStage = stage;
             stage.setTitle(new Versioning().getProgramNameWithVersion());
@@ -340,8 +329,6 @@ public class EmojiTools extends Application implements AptiAPIListener {
         } catch (Exception e) {
             submitError(e);
         }
-
-         aptiAPI.checkForUpdates();
     }
 
     @Override
@@ -360,21 +347,6 @@ public class EmojiTools extends Application implements AptiAPIListener {
         } catch (Exception e) {
             submitError(e);
         }
-    }
-
-    @Override
-    public void aptiApiInfo(String message) {
-        getLogManager().logInfo(message);
-    }
-
-    @Override
-    public void aptiApiError(String message) {
-        getLogManager().logSevere(message);
-    }
-
-    @Override
-    public void shutdown() {
-        Platform.exit();
     }
 
     public interface JythonListener {

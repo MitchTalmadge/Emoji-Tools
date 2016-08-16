@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2015 - 2016 Mitch Talmadge (https://mitchtalmadge.com/)
  * Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
- * Copyright (C) 2015 - 2016 Mitch Talmadge
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Contact Mitch Talmadge at mitcht@liveforcode.net
  */
 
 package com.mitchtalmadge.emojitools.operations.resizing;

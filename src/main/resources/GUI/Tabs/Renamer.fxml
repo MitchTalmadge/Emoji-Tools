@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+  ~ Copyright (C) 2015 - 2016 Mitch Talmadge (https://mitchtalmadge.com/)
   ~ Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
-  ~ Copyright (C) 2015 Mitch Talmadge
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,122 +16,123 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ Contact Mitch Talmadge at mitcht@liveforcode.net
   -->
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane prefHeight="300.0" prefWidth="267.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.RenamerTabController">
+<BorderPane prefHeight="300.0" prefWidth="267.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.RenamerTabController">
     <top>
-      <VBox spacing="10.0">
-         <children>
-              <GridPane hgap="10.0" BorderPane.alignment="CENTER">
-                  <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                      <RowConstraints />
-                      <RowConstraints />
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                  <children>
-                      <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="2" />
-                      <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                      <Label fx:id="filePathTitleLabel" text="Emoji Directory Path">
-                          <font>
-                              <Font name="System Bold" size="12.0" />
-                          </font>
-                      </Label>
-                  <Label text="Select a folder of .png files to rename." wrapText="true" GridPane.rowIndex="1" />
-                  </children>
-              </GridPane>
-            <GridPane>
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" percentWidth="50.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-               </rowConstraints>
-               <children>
-                      <VBox spacing="5.0" GridPane.columnIndex="1">
-                          <children>
-                              <Label text="Capitalization">
-                                  <font>
-                                      <Font name="System Bold" size="12.0" />
-                                  </font>
-                              </Label>
-                              <RadioButton fx:id="caseNoChangeToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" selected="true" text="Don't Change Case">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="caseGroup" />
-                           </toggleGroup>
-                              </RadioButton>
-                              <RadioButton fx:id="caseUpperToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Capitalize" toggleGroup="$caseGroup" />
-                        <RadioButton fx:id="caseLowerToggle" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Lowercase" toggleGroup="$caseGroup" />
-                        <CheckBox fx:id="casePrefixOppositeCheckBox" disable="true" mnemonicParsing="false" onAction="#onCaseTogglesChanged" text="Make Prefix Case Opposite" />
-                          </children>
-                      </VBox>
-                      <VBox spacing="5.0">
-                          <children>
-                              <Label text="Prefixes">
-                                  <font>
-                                      <Font name="System Bold" size="12.0" />
-                                  </font>
-                              </Label>
-                              <RadioButton fx:id="prefixesNoChangeToggle" mnemonicParsing="false" onAction="#onPrefixTogglesChanged" selected="true" text="Don't Change Prefixes">
-                           <toggleGroup>
-                              <ToggleGroup fx:id="prefixes" />
-                           </toggleGroup>
-                              </RadioButton>
-                              <RadioButton fx:id="prefixesRemoveAllToggle" mnemonicParsing="false" onAction="#onPrefixTogglesChanged" text="Remove &quot;uni&quot; &amp; &quot;u&quot; Prefixes" toggleGroup="$prefixes" />
-                        <RadioButton fx:id="prefixesSetUniToggle" mnemonicParsing="false" onAction="#onPrefixTogglesChanged" text="Set Prefix to &quot;uni&quot;" toggleGroup="$prefixes" />
-                        <RadioButton fx:id="prefixesSetUToggle" mnemonicParsing="false" onAction="#onPrefixTogglesChanged" text="Set Prefix to &quot;u&quot;" toggleGroup="$prefixes" />
-                          </children>
-                      </VBox>
-               </children>
+        <VBox spacing="10.0">
+            <GridPane hgap="10.0" BorderPane.alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <TextField fx:id="filePathField" editable="false" mouseTransparent="true"
+                           promptText="Click Browse..." GridPane.rowIndex="2"/>
+                <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired"
+                        text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label fx:id="filePathTitleLabel" text="Emoji Directory Path">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label text="Select a folder of .png files to rename." wrapText="true" GridPane.rowIndex="1"/>
             </GridPane>
-                <VBox>
-                    <children>
-                        <Label text="Example Output">
-                            <font>
-                                <Font name="System Bold" size="12.0" />
-                            </font>
-                        </Label>
-                        <Label text="Actual results may vary." />
-                        <TextField fx:id="exampleOutputField" editable="false" mouseTransparent="true" />
-                    </children>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" percentWidth="50.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <VBox spacing="5.0" GridPane.columnIndex="1">
+                    <Label text="Capitalization">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <RadioButton fx:id="caseNoChangeToggle" mnemonicParsing="false"
+                                 onAction="#onCaseTogglesChanged" selected="true" text="Don't Change Case">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="caseGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="caseUpperToggle" mnemonicParsing="false"
+                                 onAction="#onCaseTogglesChanged" text="Capitalize"
+                                 toggleGroup="$caseGroup"/>
+                    <RadioButton fx:id="caseLowerToggle" mnemonicParsing="false"
+                                 onAction="#onCaseTogglesChanged" text="Lowercase"
+                                 toggleGroup="$caseGroup"/>
+                    <CheckBox fx:id="casePrefixOppositeCheckBox" disable="true" mnemonicParsing="false"
+                              onAction="#onCaseTogglesChanged" text="Make Prefix Case Opposite"/>
                 </VBox>
-         </children>
-      </VBox>
+                <VBox spacing="5.0">
+                    <Label text="Prefixes">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <RadioButton fx:id="prefixesNoChangeToggle" mnemonicParsing="false"
+                                 onAction="#onPrefixTogglesChanged" selected="true"
+                                 text="Don't Change Prefixes">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="prefixes"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="prefixesRemoveAllToggle" mnemonicParsing="false"
+                                 onAction="#onPrefixTogglesChanged"
+                                 text="Remove &quot;uni&quot; &amp; &quot;u&quot; Prefixes"
+                                 toggleGroup="$prefixes"/>
+                    <RadioButton fx:id="prefixesSetUniToggle" mnemonicParsing="false"
+                                 onAction="#onPrefixTogglesChanged" text="Set Prefix to &quot;uni&quot;"
+                                 toggleGroup="$prefixes"/>
+                    <RadioButton fx:id="prefixesSetUToggle" mnemonicParsing="false"
+                                 onAction="#onPrefixTogglesChanged" text="Set Prefix to &quot;u&quot;"
+                                 toggleGroup="$prefixes"/>
+                </VBox>
+            </GridPane>
+            <VBox>
+                <Label text="Example Output">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label text="Actual results may vary."/>
+                <TextField fx:id="exampleOutputField" editable="false" mouseTransparent="true"/>
+            </VBox>
+        </VBox>
     </top>
     <bottom>
         <GridPane hgap="10.0" BorderPane.alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0" />
-                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                <ColumnConstraints />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0"/>
+                <ColumnConstraints/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
-            <children>
-                <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory" />
-                <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButtonFired" text="Start Renaming" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-            </children>
-         <BorderPane.margin>
-            <Insets />
-         </BorderPane.margin>
+            <BorderPane.margin>
+                <Insets/>
+            </BorderPane.margin>
+            <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory"/>
+            <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#onStartButtonFired" text="Start Renaming" GridPane.columnIndex="1"
+                    GridPane.columnSpan="2"/>
         </GridPane>
     </bottom>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
 </BorderPane>

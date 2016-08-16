@@ -2,8 +2,8 @@
 
 
 <!--
+  ~ Copyright (C) 2015 - 2016 Mitch Talmadge (https://mitchtalmadge.com/)
   ~ Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
-  ~ Copyright (C) 2015 - 2016 Mitch Talmadge
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ Contact Mitch Talmadge at mitcht@liveforcode.net
   -->
 
 <?import javafx.geometry.Insets?>
@@ -27,7 +25,7 @@
 <?import javafx.scene.text.Font?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.mitchtalmadge.emojitools.gui.aptiapi.controllers.ErrorReportDialogController">
+            fx:controller="com.mitchtalmadge.emojitools.gui.dialogs.dialogcontrollers.ErrorReportDialogController">
     <top>
         <Label text="Emoji Tools has Crashed!" BorderPane.alignment="CENTER">
             <font>

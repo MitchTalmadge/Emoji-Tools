@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+  ~ Copyright (C) 2015 - 2016 Mitch Talmadge (https://mitchtalmadge.com/)
   ~ Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
-  ~ Copyright (C) 2015 Mitch Talmadge
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,117 +16,108 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ Contact Mitch Talmadge at mitcht@liveforcode.net
   -->
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
+<?import com.mitchtalmadge.emojitools.gui.LimitingTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<?import com.mitchtalmadge.emojitools.gui.*?>
-
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.ExtractorTabController">
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.ExtractorTabController">
     <top>
-      <VBox spacing="10.0">
-         <children>
-              <GridPane hgap="10.0" BorderPane.alignment="CENTER">
-                  <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                      <RowConstraints />
-                      <RowConstraints />
-                  <RowConstraints />
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                  <children>
-                      <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="3" />
-                      <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                      <Label fx:id="filePathTitleLabel" text="Emoji Font .ttf Path">
-                          <font>
-                              <Font name="System Bold" size="12.0" />
-                          </font>
-                      </Label>
-                  <Label text="Select an Emoji Font to Extract." GridPane.rowIndex="2" />
-                  </children>
-              </GridPane>
-            <GridPane>
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" percentWidth="50.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints vgrow="NEVER" />
-               </rowConstraints>
-               <children>
-                      <VBox spacing="5.0" GridPane.columnIndex="1">
-                          <children>
-                              <Label text="Automatic CgBI Conversion">
-                                  <font>
-                                      <Font name="System Bold" size="12.0" />
-                                  </font>
-                              </Label>
-                              <RadioButton fx:id="convertFalseToggle" mnemonicParsing="false" selected="true" text="Don't Convert CgBI Emojis">
-                                  <toggleGroup>
-                                      <ToggleGroup fx:id="automaticConversion" />
-                                  </toggleGroup>
-                              </RadioButton>
-                              <RadioButton fx:id="convertTrueToggle" mnemonicParsing="false" text="Convert CgBI Emojis to RGBA" toggleGroup="$automaticConversion" />
-                          </children>
-                      </VBox>
-                      <VBox spacing="5.0">
-                          <children>
-                              <Label text="Automatic Renaming">
-                                  <font>
-                                      <Font name="System Bold" size="12.0" />
-                                  </font>
-                              </Label>
-                              <RadioButton fx:id="renameFalseToggle" mnemonicParsing="false" selected="true" text="Don't Rename Emojis">
-                                  <toggleGroup>
-                                      <ToggleGroup fx:id="automaticRenaming" />
-                                  </toggleGroup>
-                              </RadioButton>
-                              <RadioButton fx:id="renameTrueToggle" mnemonicParsing="false" text="Remove &quot;uni&quot; &amp; &quot;u&quot; Prefixes" toggleGroup="$automaticRenaming" />
-                          </children>
-                      </VBox>
-               </children>
+        <VBox spacing="10.0">
+            <GridPane hgap="10.0" BorderPane.alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <TextField fx:id="filePathField" editable="false" mouseTransparent="true"
+                           promptText="Click Browse..." GridPane.rowIndex="3"/>
+                <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired"
+                        text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <Label fx:id="filePathTitleLabel" text="Emoji Font .ttf / .ttc Path">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label text="Select an Emoji Font to Extract." GridPane.rowIndex="2"/>
             </GridPane>
-                <VBox>
-                    <children>
-                        <Label text="Extraction Directory Name">
-                            <font>
-                                <Font name="System Bold" size="12.0" />
-                            </font>
-                        </Label>
-                        <Label text="Allowed Characters: A-Z, a-z, 0-9, underscore, hyphen" />
-                        <LimitingTextField fx:id="extractionDirectoryNameField" text="ExtractedEmojis" />
-                    </children>
+            <GridPane>
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" percentWidth="50.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints vgrow="NEVER"/>
+                </rowConstraints>
+                <VBox spacing="5.0" GridPane.columnIndex="1">
+                    <Label text="Automatic CgBI Conversion">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <RadioButton fx:id="convertFalseToggle" mnemonicParsing="false" selected="true"
+                                 text="Don't Convert CgBI Emojis">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="automaticConversion"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="convertTrueToggle" mnemonicParsing="false"
+                                 text="Convert CgBI Emojis to RGBA" toggleGroup="$automaticConversion"/>
                 </VBox>
-         </children>
-      </VBox>
+                <VBox spacing="5.0">
+                    <Label text="Automatic Renaming">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <RadioButton fx:id="renameFalseToggle" mnemonicParsing="false" selected="true"
+                                 text="Don't Rename Emojis">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="automaticRenaming"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="renameTrueToggle" mnemonicParsing="false"
+                                 text="Remove &quot;uni&quot; &amp; &quot;u&quot; Prefixes"
+                                 toggleGroup="$automaticRenaming"/>
+                </VBox>
+            </GridPane>
+            <VBox>
+                <Label text="Extraction Directory Name">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label text="Allowed Characters: A-Z, a-z, 0-9, underscore, hyphen"/>
+                <LimitingTextField fx:id="extractionDirectoryNameField" text="ExtractedEmojis"/>
+            </VBox>
+        </VBox>
     </top>
     <bottom>
         <GridPane hgap="10.0" BorderPane.alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0" />
-                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                <ColumnConstraints />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0"/>
+                <ColumnConstraints/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
-            <children>
-                <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory" />
-                <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButtonFired" text="Start Extraction" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-            </children>
+            <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory"/>
+            <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#onStartButtonFired" text="Start Extraction" GridPane.columnIndex="1"
+                    GridPane.columnSpan="2"/>
         </GridPane>
     </bottom>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
 </BorderPane>

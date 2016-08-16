@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+  ~ Copyright (C) 2015 - 2016 Mitch Talmadge (https://mitchtalmadge.com/)
   ~ Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
-  ~ Copyright (C) 2015 Mitch Talmadge
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,85 +16,80 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ Contact Mitch Talmadge at mitcht@liveforcode.net
   -->
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane prefHeight="300.0" prefWidth="267.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.PackagerTabController">
+<BorderPane prefHeight="300.0" prefWidth="267.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.PackagerTabController">
     <bottom>
         <GridPane hgap="10.0" BorderPane.alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0" />
-                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                <ColumnConstraints />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0"/>
+                <ColumnConstraints/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
-            <children>
-                <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory" />
-                <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButtonFired" text="Start Packaging" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-            </children>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
+            <opaqueInsets>
+                <Insets/>
+            </opaqueInsets>
+            <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory"/>
+            <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#onStartButtonFired" text="Start Packaging" GridPane.columnIndex="1"
+                    GridPane.columnSpan="2"/>
         </GridPane>
     </bottom>
-   <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
-         <children>
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
             <VBox fx:id="deviceSelectionBox" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
-               <children>
-                  <Label text="Which device are you packaging for?">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Label>
-                  <RadioButton fx:id="androidDeviceToggle" mnemonicParsing="false" text="Android">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="deviceToggleGroup" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton fx:id="iosDeviceToggle" mnemonicParsing="false" text="iOS" toggleGroup="$deviceToggleGroup" />
-                  <RadioButton fx:id="osxDeviceToggle" mnemonicParsing="false" text="OS X" toggleGroup="$deviceToggleGroup" />
-               </children>
+                <Label text="Which device are you packaging for?">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <RadioButton fx:id="androidDeviceToggle" mnemonicParsing="false" text="Android">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="deviceToggleGroup"/>
+                    </toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="iosDeviceToggle" mnemonicParsing="false" text="iOS"
+                             toggleGroup="$deviceToggleGroup"/>
+                <RadioButton fx:id="osxDeviceToggle" mnemonicParsing="false" text="OS X"
+                             toggleGroup="$deviceToggleGroup"/>
             </VBox>
-         </children>
-      </VBox>
-   </center>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <top>
-          <GridPane hgap="10.0" BorderPane.alignment="CENTER">
-              <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0" />
-              </columnConstraints>
-              <rowConstraints>
-                  <RowConstraints />
-                  <RowConstraints />
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-              <children>
-                  <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="2" />
-                  <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Label fx:id="filePathTitleLabel" text="Emoji Folder Path">
-                      <font>
-                          <Font name="System Bold" size="12.0" />
-                      </font>
-                  </Label>
-                  <Label text="Select a folder of .png files to package. &#10;The folder must have been created by Emoji Tools." wrapText="true" GridPane.rowIndex="1" />
-              </children>
-          </GridPane>
-   </top>
+        </VBox>
+    </center>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+    <top>
+        <GridPane hgap="10.0" BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints/>
+                <RowConstraints/>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..."
+                       GridPane.rowIndex="2"/>
+            <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..."
+                    GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            <Label fx:id="filePathTitleLabel" text="Emoji Folder Path">
+                <font>
+                    <Font name="System Bold" size="12.0"/>
+                </font>
+            </Label>
+            <Label text="Select a folder of .png files to package. &#10;The folder must have been created by Emoji Tools."
+                   wrapText="true" GridPane.rowIndex="1"/>
+        </GridPane>
+    </top>
 </BorderPane>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+  ~ Copyright (C) 2015 - 2016 Mitch Talmadge (https://mitchtalmadge.com/)
   ~ Emoji Tools helps users and developers of Android, iOS, and OS X extract, modify, and repackage Emoji fonts.
-  ~ Copyright (C) 2015 Mitch Talmadge
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,78 +16,72 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  ~
-  ~ Contact Mitch Talmadge at mitcht@liveforcode.net
   -->
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<BorderPane prefHeight="187.0" prefWidth="86.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.ConverterTabController">
+<BorderPane prefHeight="187.0" prefWidth="86.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mitchtalmadge.emojitools.gui.tabcontrollers.ConverterTabController">
     <top>
-      <VBox spacing="10.0">
-         <children>
-              <GridPane hgap="10.0" BorderPane.alignment="CENTER">
-                  <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                      <RowConstraints />
-                      <RowConstraints />
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                  <children>
-                      <TextField fx:id="filePathField" editable="false" mouseTransparent="true" promptText="Click Browse..." GridPane.rowIndex="2" />
-                      <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                      <Label fx:id="filePathTitleLabel" text="Emoji Directory Path">
-                          <font>
-                              <Font name="System Bold" size="12.0" />
-                          </font>
-                      </Label>
-                  <Label text="Select a folder of .png files to convert." wrapText="true" GridPane.rowIndex="1" />
-                  </children>
-              </GridPane>
-                <VBox spacing="5.0">
-                    <children>
-                        <Label text="Conversion Direction">
-                            <font>
-                                <Font name="System Bold" size="12.0" />
-                            </font>
-                        </Label>
-                        <RadioButton fx:id="conversionCgBItoRGBAToggle" mnemonicParsing="false" selected="true" text="CgBI to RGBA (Pincrushed to Normal)">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="direction" />
-                     </toggleGroup>
-                        </RadioButton>
-                        <RadioButton fx:id="conversionRGBAtoCgBIToggle" mnemonicParsing="false" text="RGBA to CgBI (Normal to Pincrushed)" toggleGroup="$direction" />
-                    </children>
-                </VBox>
-         </children>
-      </VBox>
+        <VBox spacing="10.0">
+            <GridPane hgap="10.0" BorderPane.alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" percentWidth="40.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints/>
+                    <RowConstraints/>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <TextField fx:id="filePathField" editable="false" mouseTransparent="true"
+                           promptText="Click Browse..." GridPane.rowIndex="2"/>
+                <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseButtonFired"
+                        text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label fx:id="filePathTitleLabel" text="Emoji Directory Path">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <Label text="Select a folder of .png files to convert." wrapText="true" GridPane.rowIndex="1"/>
+            </GridPane>
+            <VBox spacing="5.0">
+                <Label text="Conversion Direction">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </Label>
+                <RadioButton fx:id="conversionCgBItoRGBAToggle" mnemonicParsing="false" selected="true"
+                             text="CgBI to RGBA (Pincrushed to Normal)">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="direction"/>
+                    </toggleGroup>
+                </RadioButton>
+                <RadioButton fx:id="conversionRGBAtoCgBIToggle" mnemonicParsing="false"
+                             text="RGBA to CgBI (Normal to Pincrushed)" toggleGroup="$direction"/>
+            </VBox>
+        </VBox>
     </top>
     <bottom>
         <GridPane hgap="10.0" BorderPane.alignment="CENTER">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0" />
-                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
-                <ColumnConstraints />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" percentWidth="40.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0"/>
+                <ColumnConstraints/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
-            <children>
-                <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory" />
-                <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartButtonFired" text="Start Conversion" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-            </children>
+            <Button fx:id="openRootDirectoryButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#onOpenRootDirectoryButtonFired" text="Open Root Directory"/>
+            <Button fx:id="startButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#onStartButtonFired" text="Start Conversion" GridPane.columnIndex="1"
+                    GridPane.columnSpan="2"/>
         </GridPane>
     </bottom>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
 </BorderPane>
