@@ -20,7 +20,7 @@ package com.mitchtalmadge.emojitools;
 
 public class Versioning {
 
-    private static final double VERSION = 1.91;
+    private static final double VERSION = 1.92;
     private static final String VERSION_STRING = VERSION + "";
     private static final String PROGRAM_NAME = "Emoji Tools";
     private static final String PROGRAM_NAME_WITH_VERSION = PROGRAM_NAME + " V" + VERSION_STRING;

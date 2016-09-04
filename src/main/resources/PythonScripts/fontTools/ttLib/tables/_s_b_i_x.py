@@ -119,7 +119,7 @@ class table__s_b_i_x(DefaultTable.DefaultTable):
 		for i in sorted(self.bitmapSets.keys()):
 			self.bitmapSets[i].toXML(xmlWriter, ttFont)
 	
-	def fromXML(self, (name, attrs, content), ttFont):
+	def fromXML(self, name, attrs, content, ttFont):
 		if name in ["usVal1", "usVal2"]:
 			setattr(self, name, int(attrs["value"]))
 		elif name == "bitmapSet":
