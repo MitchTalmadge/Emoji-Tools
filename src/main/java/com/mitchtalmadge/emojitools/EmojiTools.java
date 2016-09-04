@@ -18,6 +18,7 @@
 
 package com.mitchtalmadge.emojitools;
 
+import com.mitchtalmadge.emojitools.gui.dialogs.ErrorReportDialog;
 import com.mitchtalmadge.emojitools.operations.conversion.ConversionInfo;
 import com.mitchtalmadge.emojitools.operations.conversion.ConversionOperation;
 import com.mitchtalmadge.emojitools.operations.deletion.DeletionOperation;
@@ -40,12 +41,14 @@ import javafx.stage.Stage;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
-public class EmojiTools extends Application {
+public class EmojiTools extends Application implements Thread.UncaughtExceptionHandler {
 
     private static final Image logoImage = new Image(EmojiTools.class.getResourceAsStream("/Images/EmojiToolsLogo.png"));
 
@@ -119,13 +122,36 @@ public class EmojiTools extends Application {
     }
 
     /**
-     * Creates an error report and notifies the user, asking them if they want to send or not, then
+     * Creates an error report and notifies the user, then
      * immediately closes the program.
      *
-     * @param throwable The exception thrown.
+     * @param e The exception thrown.
      */
-    public static void submitError(Throwable throwable) {
-        //TODO
+    public static void submitError(Throwable e) {
+        submitError(Thread.currentThread(), e);
+    }
+
+    /**
+     * Creates an error report and notifies the user, then
+     * immediately closes the program.
+     *
+     * @param t The origin thread of the exception.
+     * @param e The exception thrown.
+     */
+    public static void submitError(Thread t, Throwable e) {
+        EmojiTools.getLogManager().logSevere("AN ERROR HAS OCCURRED!");
+        EmojiTools.getLogManager().logSevere("Thread Name: " + t);
+
+        StringWriter stringWriter = new StringWriter();
+        e.printStackTrace(new PrintWriter(stringWriter));
+        EmojiTools.getLogManager().logSevere("Exception:\n" + stringWriter.toString());
+
+        new ErrorReportDialog().display();
+    }
+
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+        submitError(t, e);
     }
 
     /**
@@ -314,6 +340,8 @@ public class EmojiTools extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         try {
+            Thread.setDefaultUncaughtExceptionHandler(this);
+
             mainGuiStage = stage;
             stage.setTitle(new Versioning().getProgramNameWithVersion());
             stage.setResizable(false);

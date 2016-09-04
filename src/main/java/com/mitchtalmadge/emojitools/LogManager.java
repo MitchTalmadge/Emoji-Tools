@@ -111,4 +111,8 @@ public class LogManager implements ConsoleManager.ConsoleListener {
         Arrays.sort(logFiles, (f1, f2) -> Long.valueOf(f2.lastModified()).compareTo(f1.lastModified()));
         return logFiles[0];
     }
+
+    public Logger getLogger() {
+        return logger;
+    }
 }

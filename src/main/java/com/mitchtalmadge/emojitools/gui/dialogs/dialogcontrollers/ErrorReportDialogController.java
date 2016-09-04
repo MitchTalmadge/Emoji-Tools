@@ -18,38 +18,50 @@
 
 package com.mitchtalmadge.emojitools.gui.dialogs.dialogcontrollers;
 
+import com.mitchtalmadge.emojitools.EmojiTools;
+import com.sun.glass.ui.Application;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.stage.*;
+
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class ErrorReportDialogController {
 
     @FXML
-    protected TextArea descriptionTextArea;
+    protected Button openLogDirButton;
 
     @FXML
-    protected TextField nameField;
+    protected Button openGitHubButton;
 
     @FXML
-    protected Button viewDetailsButton;
+    protected Button closeButton;
 
     @FXML
-    protected TextField emailField;
-
-    @FXML
-    protected Button dontSendReportButton;
-
-    @FXML
-    protected Button sendReportButton;
-
-    private boolean logAttached = true;
-
-    public boolean isLogAttached() {
-        return logAttached;
+    protected void onOpenLogDirButtonFired(ActionEvent event) {
+        try {
+            Desktop.getDesktop().open(EmojiTools.getLogManager().getLogFile().getParentFile());
+        } catch (IOException ignored) {
+        }
     }
 
-    public void setLogAttached(boolean logAttached) {
-        this.logAttached = logAttached;
+    @FXML
+    protected void onOpenGitHubButtonFired(ActionEvent event) {
+        try {
+            Desktop.getDesktop().browse(new URI("https://github.com/MitchTalmadge/Emoji-Tools/issues"));
+        } catch (IOException | URISyntaxException ignored) {
+        }
     }
+
+    @FXML
+    protected void onCloseButtonFired(ActionEvent event) {
+        closeButton.getScene().getWindow().hide();
+        Platform.exit();
+    }
+
 }

@@ -20,6 +20,7 @@ package com.mitchtalmadge.emojitools.gui.dialogs;
 
 import com.mitchtalmadge.emojitools.EmojiTools;
 import com.mitchtalmadge.emojitools.gui.dialogs.dialogcontrollers.ErrorReportDialogController;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,8 +32,6 @@ import java.io.IOException;
 public class ErrorReportDialog {
 
     private final Stage stage;
-    private ErrorReportDialogController controller;
-    private boolean result;
 
     public ErrorReportDialog() {
         this.stage = new Stage();
@@ -42,8 +41,7 @@ public class ErrorReportDialog {
         stage.setResizable(false);
 
         stage.setOnCloseRequest(e -> {
-            setResult(false);
-            e.consume();
+            Platform.exit();
         });
 
         try {
@@ -56,16 +54,10 @@ public class ErrorReportDialog {
         }
     }
 
-    public boolean getResult() {
+    public void display() {
         stage.setOnShown(e -> EmojiTools.setStageLocationRelativeToMainGui(stage));
         EmojiTools.getLogManager().logInfo("ErrorReportDialog displayed.");
         stage.showAndWait();
-        return result;
-    }
-
-    public void setResult(boolean result) {
-        this.result = result;
-        stage.close();
     }
 
 }
