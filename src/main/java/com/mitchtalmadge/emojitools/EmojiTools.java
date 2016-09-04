@@ -29,6 +29,7 @@ import com.mitchtalmadge.emojitools.operations.renaming.RenamingInfo;
 import com.mitchtalmadge.emojitools.operations.renaming.RenamingOperation;
 import com.mitchtalmadge.emojitools.operations.resizing.ResizingInfo;
 import com.mitchtalmadge.emojitools.operations.resizing.ResizingOperation;
+import com.mitchtalmadge.emojitools.operations.splitting.SplittingOperation;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -261,6 +262,17 @@ public class EmojiTools extends Application implements Thread.UncaughtExceptionH
         return new ResizingOperation(sourceDirectory, destinationDirectory, resizingInfo).runOperation();
     }
 
+    /**
+     * Starts an Operation to split a ttc emoji font file into two ttf emoji font files with a ProgressDialog.
+     *
+     * @param fontFile            The emoji font file to split.
+     * @param extractionDirectory The directory to split the fonts into.
+     * @return True if operation completed successfully, False if unsuccessful or cancelled.
+     */
+    public static boolean performSplittingOperation(File fontFile, File extractionDirectory) {
+        return new SplittingOperation(fontFile, extractionDirectory).runOperation();
+    }
+
 
     /**
      * Displays an information dialog with the specified header and message.
@@ -389,6 +401,8 @@ public class EmojiTools extends Application implements Thread.UncaughtExceptionH
 
         private File extractScriptsToTempDir() throws Exception {
             File tempFolder = new File(getRootDirectory().getAbsolutePath() + "/tmp");
+            if (tempFolder.exists())
+                org.apache.commons.io.FileUtils.deleteDirectory(tempFolder);
             tempFolder.mkdir();
 
             FileUtils.copyResourcesRecursively(getClass().getResource("/PythonScripts"), tempFolder);

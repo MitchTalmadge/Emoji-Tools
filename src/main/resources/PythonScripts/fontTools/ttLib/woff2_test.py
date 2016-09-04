@@ -7,7 +7,7 @@ from .woff2 import (WOFF2Reader, woff2DirectorySize, woff2DirectoryFormat,
 	WOFF2FlavorData, woff2TransformedTableTags, WOFF2GlyfTable, WOFF2LocaTable,
 	WOFF2Writer)
 import unittest
-import sstruct
+from fontTools.misc import sstruct
 import os
 import random
 import copy
@@ -44,12 +44,12 @@ def setUpModule():
 	assert os.path.exists(OTX)
 	# import TT-flavoured test font and save it as WOFF2
 	ttf = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False)
-	ttf.importXML(TTX, quiet=True)
+	ttf.importXML(TTX)
 	ttf.flavor = "woff2"
 	ttf.save(TT_WOFF2, reorderTables=None)
 	# import CFF-flavoured test font and save it as WOFF2
 	otf = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False)
-	otf.importXML(OTX, quiet=True)
+	otf.importXML(OTX)
 	otf.flavor = "woff2"
 	otf.save(CFF_WOFF2, reorderTables=None)
 
@@ -60,7 +60,7 @@ class WOFF2ReaderTest(unittest.TestCase):
 	def setUpClass(cls):
 		cls.file = BytesIO(CFF_WOFF2.getvalue())
 		cls.font = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False)
-		cls.font.importXML(OTX, quiet=True)
+		cls.font.importXML(OTX)
 
 	def setUp(self):
 		self.file.seek(0)
@@ -130,7 +130,7 @@ class WOFF2ReaderTTFTest(WOFF2ReaderTest):
 	def setUpClass(cls):
 		cls.file = BytesIO(TT_WOFF2.getvalue())
 		cls.font = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False)
-		cls.font.importXML(TTX, quiet=True)
+		cls.font.importXML(TTX)
 
 	def setUp(self):
 		self.file.seek(0)
@@ -169,7 +169,7 @@ def normalise_table(font, tag, padding=4):
 			origLocations = font['loca'].locations[:]
 		else:
 			origLocations = []
-		glyfTable = ttLib.getTableClass('glyf')()
+		glyfTable = ttLib.newTable('glyf')
 		glyfTable.decompile(font.getTableData('glyf'), font)
 		glyfTable.padding = padding
 		if tag == 'glyf':
@@ -357,7 +357,7 @@ class WOFF2WriterTest(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
 		cls.font = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False, flavor="woff2")
-		cls.font.importXML(OTX, quiet=True)
+		cls.font.importXML(OTX)
 		cls.tags = [t for t in cls.font.keys() if t != 'GlyphOrder']
 		cls.numTables = len(cls.tags)
 		cls.file = BytesIO(CFF_WOFF2.getvalue())
@@ -501,7 +501,7 @@ class WOFF2WriterTest(unittest.TestCase):
 		# version from head.fontRevision
 		fontRevision = self.font['head'].fontRevision
 		versionTuple = tuple(int(i) for i in str(fontRevision).split("."))
-		entry = self.writer.tables['head'] = ttLib.getTableClass('head')()
+		entry = self.writer.tables['head'] = ttLib.newTable('head')
 		entry.data = self.font.getTableData('head')
 		self.assertEqual(versionTuple, self.writer._getVersion())
 		# version from writer.flavorData
@@ -515,7 +515,7 @@ class WOFF2WriterTTFTest(WOFF2WriterTest):
 	@classmethod
 	def setUpClass(cls):
 		cls.font = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False, flavor="woff2")
-		cls.font.importXML(TTX, quiet=True)
+		cls.font.importXML(TTX)
 		cls.tags = [t for t in cls.font.keys() if t != 'GlyphOrder']
 		cls.numTables = len(cls.tags)
 		cls.file = BytesIO(TT_WOFF2.getvalue())
@@ -542,7 +542,7 @@ class WOFF2LocaTableTest(unittest.TestCase):
 
 	def setUp(self):
 		self.font = font = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False)
-		font['head'] = ttLib.getTableClass('head')
+		font['head'] = ttLib.newTable('head')
 		font['loca'] = WOFF2LocaTable()
 		font['glyf'] = WOFF2GlyfTable()
 
@@ -602,7 +602,7 @@ class WOFF2GlyfTableTest(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
 		font = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False)
-		font.importXML(TTX, quiet=True)
+		font.importXML(TTX)
 		cls.tables = {}
 		cls.transformedTags = ('maxp', 'head', 'loca', 'glyf')
 		for tag in reversed(cls.transformedTags):  # compile in inverse order
@@ -616,8 +616,8 @@ class WOFF2GlyfTableTest(unittest.TestCase):
 	def setUp(self):
 		self.font = font = ttLib.TTFont(recalcBBoxes=False, recalcTimestamp=False)
 		font.setGlyphOrder(self.glyphOrder)
-		font['head'] = ttLib.getTableClass('head')()
-		font['maxp'] = ttLib.getTableClass('maxp')()
+		font['head'] = ttLib.newTable('head')
+		font['maxp'] = ttLib.newTable('maxp')
 		font['loca'] = WOFF2LocaTable()
 		font['glyf'] = WOFF2GlyfTable()
 		for tag in self.transformedTags:

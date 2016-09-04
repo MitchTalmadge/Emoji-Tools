@@ -15,7 +15,7 @@ class TTGlyphPenTest(unittest.TestCase):
         ttx_path = os.path.join(
             os.path.abspath(os.path.dirname(os.path.realpath(__file__))),
             '..', 'ttLib', 'testdata', filename)
-        font.importXML(ttx_path, quiet=True)
+        font.importXML(ttx_path)
 
         glyphSet = font.getGlyphSet()
         glyfTable = font['glyf']
@@ -68,7 +68,6 @@ class TTGlyphPenTest(unittest.TestCase):
         pen.endPath()
         endPathGlyph = pen.glyph()
 
-        endPathGlyph.program = closePathGlyph.program
         self.assertEqual(closePathGlyph, endPathGlyph)
 
     def test_glyph_errorOnUnendedContour(self):
@@ -105,7 +104,6 @@ class TTGlyphPenTest(unittest.TestCase):
         pen.closePath()
         plainGlyph = pen.glyph()
 
-        plainGlyph.program = compositeGlyph.program
         self.assertEqual(plainGlyph, compositeGlyph)
 
 

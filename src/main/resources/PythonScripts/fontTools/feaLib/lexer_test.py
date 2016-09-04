@@ -40,8 +40,8 @@ class LexerTest(unittest.TestCase):
         self.assertRaisesRegex(FeatureLibError,
                                "Expected glyph class", lex, "@ A")
         self.assertRaisesRegex(FeatureLibError,
-                               "not be longer than 30 characters",
-                               lex, "@a123456789.a123456789.a123456789.x")
+                               "not be longer than 63 characters",
+                               lex, "@" + ("A" * 64))
         self.assertRaisesRegex(FeatureLibError,
                                "Glyph class names must consist of",
                                lex, "@Ab:c")
@@ -66,6 +66,10 @@ class LexerTest(unittest.TestCase):
         self.assertEqual(lex("0xCAFED00D"), [(Lexer.NUMBER, 0xCAFED00D)])
         self.assertEqual(lex("0xcafed00d"), [(Lexer.NUMBER, 0xCAFED00D)])
 
+    def test_float(self):
+        self.assertEqual(lex("1.23 -4.5"),
+                         [(Lexer.FLOAT, 1.23), (Lexer.FLOAT, -4.5)])
+
     def test_symbol(self):
         self.assertEqual(lex("a'"), [(Lexer.NAME, "a"), (Lexer.SYMBOL, "'")])
         self.assertEqual(
@@ -78,7 +82,9 @@ class LexerTest(unittest.TestCase):
     def test_string(self):
         self.assertEqual(lex('"foo" "bar"'),
                          [(Lexer.STRING, "foo"), (Lexer.STRING, "bar")])
-        self.assertRaises(FeatureLibError, lambda: lex('"foo\n bar"'))
+        self.assertEqual(lex('"foo \nbar\r baz \r\nqux\n\n "'),
+                         [(Lexer.STRING, "foo bar baz qux ")])
+        self.assertRaises(FeatureLibError, lambda: lex('"foo\n bar'))
 
     def test_bad_character(self):
         self.assertRaises(FeatureLibError, lambda: lex("123 \u0001"))
@@ -137,8 +143,11 @@ class IncludingLexerTest(unittest.TestCase):
             "I1a include1.fea:1",
             "I0 include0.fea:1",
             "I1b include1.fea:3",
+            "; include2.fea:2",
             "I2b include2.fea:3",
+            "; include3.fea:2",
             "I3b include3.fea:3",
+            "; include4.fea:2",
             "I4b include4.fea:3"
         ])
 

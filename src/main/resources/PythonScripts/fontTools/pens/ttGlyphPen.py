@@ -27,7 +27,7 @@ class TTGlyphPen(AbstractPen):
         self.components = []
 
     def _addPoint(self, pt, onCurve):
-        self.points.append([int(coord) for coord in pt])
+        self.points.append(pt)
         self.types.append(onCurve)
 
     def _popPoint(self):
@@ -47,11 +47,12 @@ class TTGlyphPen(AbstractPen):
         self._addPoint(pt, 1)
 
     def qCurveTo(self, *points):
+        assert len(points) >= 1
         for pt in points[:-1]:
             self._addPoint(pt, 0)
 
         # last point is None if there are no on-curve points
-        if points[-1]:
+        if points[-1] is not None:
             self._addPoint(points[-1], 1)
 
     def closePath(self):
@@ -79,7 +80,7 @@ class TTGlyphPen(AbstractPen):
     def addComponent(self, glyphName, transformation):
         self.components.append((glyphName, transformation))
 
-    def glyph(self):
+    def glyph(self, componentFlags=0x4):
         assert self._isClosed(), "Didn't close last contour."
 
         components = []
@@ -94,8 +95,8 @@ class TTGlyphPen(AbstractPen):
             component.glyphName = glyphName
             if transformation[:4] != (1, 0, 0, 1):
                 component.transform = (transformation[:2], transformation[2:4])
-            component.x, component.y = [int(n) for n in transformation[4:]]
-            component.flags = 4
+            component.x, component.y = transformation[4:]
+            component.flags = componentFlags
             components.append(component)
 
         glyph = Glyph()
@@ -109,8 +110,7 @@ class TTGlyphPen(AbstractPen):
             glyph.numberOfContours = -1
         else:
             glyph.numberOfContours = len(glyph.endPtsOfContours)
-
-        glyph.program = ttProgram.Program()
-        glyph.program.fromBytecode(b"")
+            glyph.program = ttProgram.Program()
+            glyph.program.fromBytecode(b"")
 
         return glyph

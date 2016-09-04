@@ -19,16 +19,15 @@
 package com.mitchtalmadge.emojitools.gui.tabcontrollers;
 
 import com.mitchtalmadge.emojitools.EmojiTools;
-import javafx.fxml.FXML;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.stage.FileChooser;
-import com.mitchtalmadge.emojitools.EmojiTools;
 import com.mitchtalmadge.emojitools.gui.LimitingTextField;
 import com.mitchtalmadge.emojitools.gui.dialogs.OperationFinishedDialog;
 import com.mitchtalmadge.emojitools.gui.dialogs.OverwriteWarningDialog;
 import com.mitchtalmadge.emojitools.operations.conversion.ConversionInfo;
 import com.mitchtalmadge.emojitools.operations.renaming.RenamingInfo;
+import javafx.fxml.FXML;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 
@@ -107,17 +106,47 @@ public class ExtractorTabController extends TabController {
         }
 
         if (shouldContinue) {
-            shouldContinue = EmojiTools.performExtractionOperation(selectedFile, extractionDirectory);
+            if (selectedFile.getName().endsWith(".ttc")) {
+                shouldContinue = EmojiTools.performSplittingOperation(selectedFile, extractionDirectory);
+                for (int i = 0; i < 2; i++) {
+                    if (shouldContinue) {
+                        File output = new File(extractionDirectory, "font_" + (i + 1));
+                        if (output.mkdir())
+                            shouldContinue = EmojiTools.performExtractionOperation(new File(extractionDirectory, "font_" + (i + 1) + ".ttf"), output);
+                        else {
+                            shouldContinue = false;
+                            EmojiTools.showErrorDialog("Could not create Extraction Directory", "An Extraction Directory could not be created. Does Emoji Tools have permission to write to this directory?");
+                        }
+                    }
+                }
+            } else
+                shouldContinue = EmojiTools.performExtractionOperation(selectedFile, extractionDirectory);
         } else {
             return;
         }
 
         if (this.renameTrueToggle.isSelected() && shouldContinue) {
-            shouldContinue = EmojiTools.performRenamingOperation(extractionDirectory, new RenamingInfo(RenamingInfo.PREFIX_REMOVE_ALL, RenamingInfo.CASE_DONT_CHANGE, false));
+            if (selectedFile.getName().endsWith(".ttc")) {
+                for (int i = 0; i < 2; i++) {
+                    if (shouldContinue) {
+                        File dir = new File(extractionDirectory, "font_" + (i + 1));
+                        shouldContinue = EmojiTools.performRenamingOperation(dir, new RenamingInfo(RenamingInfo.PREFIX_REMOVE_ALL, RenamingInfo.CASE_DONT_CHANGE, false));
+                    }
+                }
+            } else
+                shouldContinue = EmojiTools.performRenamingOperation(extractionDirectory, new RenamingInfo(RenamingInfo.PREFIX_REMOVE_ALL, RenamingInfo.CASE_DONT_CHANGE, false));
         }
 
         if (this.convertTrueToggle.isSelected() && shouldContinue) {
-            shouldContinue = EmojiTools.performConversionOperation(extractionDirectory, new ConversionInfo(ConversionInfo.DIRECTION_CGBI_RGBA));
+            if (selectedFile.getName().endsWith(".ttc")) {
+                for (int i = 0; i < 2; i++) {
+                    if (shouldContinue) {
+                        File dir = new File(extractionDirectory, "font_" + (i + 1));
+                        shouldContinue = EmojiTools.performConversionOperation(dir, new ConversionInfo(ConversionInfo.DIRECTION_CGBI_RGBA));
+                    }
+                }
+            } else
+                shouldContinue = EmojiTools.performConversionOperation(extractionDirectory, new ConversionInfo(ConversionInfo.DIRECTION_CGBI_RGBA));
         }
 
         if (shouldContinue)

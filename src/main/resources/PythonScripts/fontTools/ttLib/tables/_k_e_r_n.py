@@ -5,8 +5,12 @@ from fontTools.misc.textTools import safeEval, readHex
 from fontTools.misc.fixedTools import fixedToFloat as fi2fl, floatToFixed as fl2fi
 from . import DefaultTable
 import struct
+import sys
 import array
-import warnings
+import logging
+
+
+log = logging.getLogger(__name__)
 
 
 class table__k_e_r_n(DefaultTable.DefaultTable):
@@ -117,8 +121,8 @@ class KernTable_format_0(object):
 			except IndexError:
 				# Slower, but will not throw an IndexError on an invalid glyph id.
 				kernTable[(ttFont.getGlyphName(left), ttFont.getGlyphName(right))] = value
-		if len(data) > 6 * nPairs:
-			warnings.warn("excess data in 'kern' subtable: %d bytes" % len(data))
+		if len(data) > 6 * nPairs + 4: # Ignore up to 4 bytes excess
+			log.warning("excess data in 'kern' subtable: %d bytes", len(data) - 6 * nPairs)
 
 	def compile(self, ttFont):
 		nPairs = len(self.kernTable)

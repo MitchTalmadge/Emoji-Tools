@@ -3,27 +3,38 @@
 # FontDame-to-FontTools for OpenType Layout tables
 #
 # Source language spec is available at:
-# https://rawgit.com/Monotype/OpenType_Table_Source/master/otl_source.html
+# http://monotype.github.io/OpenType_Table_Source/otl_source.html
 # https://github.com/Monotype/OpenType_Table_Source/
 
 from __future__ import print_function, division, absolute_import
+from __future__ import unicode_literals
+from fontTools.misc.py23 import *
 from fontTools import ttLib
+from fontTools.ttLib.tables._c_m_a_p import cmap_classes
 from fontTools.ttLib.tables import otTables as ot
 from fontTools.ttLib.tables.otBase import ValueRecord, valueRecordFormatDict
+from fontTools.otlLib import builder as otl
 from contextlib import contextmanager
+from operator import setitem
+import logging
+import warnings
 
 class MtiLibError(Exception): pass
-class FeatureNotFoundError(MtiLibError): pass
-class LookupNotFoundError(MtiLibError): pass
+class ReferenceNotFoundError(MtiLibError): pass
+class FeatureNotFoundError(ReferenceNotFoundError): pass
+class LookupNotFoundError(ReferenceNotFoundError): pass
 
-debug = print
+
+log = logging.getLogger(__name__)
+
 
 def makeGlyph(s):
-	if s[:2] == 'U ':
+	if s[:2] in ['U ', 'u ']:
 		return ttLib.TTFont._makeGlyphName(int(s[2:], 16))
 	elif s[:2] == '# ':
 		return "glyph%.5d" % int(s[2:])
 	assert s.find(' ') < 0, "Space found in glyph name: %s" % s
+	assert s, "Glyph name is empty"
 	return s
 
 def makeGlyphs(l):
@@ -53,18 +64,58 @@ def mapFeature(sym, mapping):
 			raise FeatureNotFoundError(sym)
 	return idx
 
+def setReference(mapper, mapping, sym, setter, collection, key):
+	try:
+		mapped = mapper(sym, mapping)
+	except ReferenceNotFoundError as e:
+		try:
+			if mapping is not None:
+				mapping.addDeferredMapping(lambda ref: setter(collection, key, ref), sym, e)
+				return
+		except AttributeError:
+			pass
+		raise
+	setter(collection, key, mapped)
+
+class DeferredMapping(dict):
+
+	def __init__(self):
+		self._deferredMappings = []
+
+	def addDeferredMapping(self, setter, sym, e):
+		log.debug("Adding deferred mapping for symbol '%s' %s", sym, type(e).__name__)
+		self._deferredMappings.append((setter,sym, e))
+
+	def applyDeferredMappings(self):
+		for setter,sym,e in self._deferredMappings:
+			log.debug("Applying deferred mapping for symbol '%s' %s", sym, type(e).__name__)
+			try:
+				mapped = self[sym]
+			except KeyError:
+				raise e
+			setter(mapped)
+			log.debug("Set to %s", mapped)
+		self._deferredMappings = []
+
+
 def parseScriptList(lines, featureMap=None):
 	self = ot.ScriptList()
 	records = []
 	with lines.between('script table'):
 		for line in lines:
 			scriptTag, langSysTag, defaultFeature, features = line
-			debug("Adding script", scriptTag, "language-system", langSysTag)
+			log.debug("Adding script %s language-system %s", scriptTag, langSysTag)
 
 			langSys = ot.LangSys()
 			langSys.LookupOrder = None
-			langSys.ReqFeatureIndex = mapFeature(defaultFeature, featureMap) if defaultFeature else 0xFFFF
-			langSys.FeatureIndex = [mapFeature(sym, featureMap) for sym in stripSplitComma(features)]
+			if defaultFeature:
+				setReference(mapFeature, featureMap, defaultFeature, setattr, langSys, 'ReqFeatureIndex')
+			else:
+				langSys.ReqFeatureIndex = 0xFFFF
+			syms = stripSplitComma(features)
+			langSys.FeatureIndex = theList = [3] * len(syms)
+			for i,sym in enumerate(syms):
+				setReference(mapFeature, featureMap, sym, setitem, theList, i)
 			langSys.FeatureCount = len(langSys.FeatureIndex)
 
 			script = [s for s in records if s.ScriptTag == scriptTag]
@@ -115,7 +166,10 @@ def parseFeatureList(lines, lookupMap=None, featureMap=None):
 			self.FeatureRecord.append(featureRec)
 			feature = featureRec.Feature
 			feature.FeatureParams = None
-			feature.LookupListIndex = [mapLookup(sym, lookupMap) for sym in stripSplitComma(lookups)]
+			syms = stripSplitComma(lookups)
+			feature.LookupListIndex = theList = [None] * len(syms)
+			for i,sym in enumerate(syms):
+				setReference(mapLookup, lookupMap, sym, setitem, theList, i)
 			feature.LookupCount = len(feature.LookupListIndex)
 
 	self.FeatureCount = len(self.FeatureRecord)
@@ -153,41 +207,37 @@ def parseLookupFlags(lines):
 			filterset = int(line[1])
 	return flags, filterset
 
-def parseSingleSubst(self, lines, font, _lookupMap=None):
-	self.mapping = {}
+def parseSingleSubst(lines, font, _lookupMap=None):
+	mapping = {}
 	for line in lines:
 		assert len(line) == 2, line
 		line = makeGlyphs(line)
-		self.mapping[line[0]] = line[1]
+		mapping[line[0]] = line[1]
+	return otl.buildSingleSubstSubtable(mapping)
 
-def parseMultiple(self, lines, font, _lookupMap=None):
-	self.mapping = {}
+def parseMultiple(lines, font, _lookupMap=None):
+	mapping = {}
 	for line in lines:
 		line = makeGlyphs(line)
-		self.mapping[line[0]] = line[1:]
+		mapping[line[0]] = line[1:]
+	return otl.buildMultipleSubstSubtable(mapping)
 
-def parseAlternate(self, lines, font, _lookupMap=None):
-	self.alternates = {}
+def parseAlternate(lines, font, _lookupMap=None):
+	mapping = {}
 	for line in lines:
 		line = makeGlyphs(line)
-		self.alternates[line[0]] = line[1:]
+		mapping[line[0]] = line[1:]
+	return otl.buildAlternateSubstSubtable(mapping)
 
-def parseLigature(self, lines, font, _lookupMap=None):
-	self.ligatures = {}
+def parseLigature(lines, font, _lookupMap=None):
+	mapping = {}
 	for line in lines:
 		assert len(line) >= 2, line
 		line = makeGlyphs(line)
-		# The following single line can replace the rest of this function with fontTools >= 3.1
-		#self.ligatures[tuple(line[1:])] = line[0]
-		ligGlyph, firstGlyph = line[:2]
-		otherComponents = line[2:]
-		ligature = ot.Ligature()
-		ligature.Component = otherComponents
-		ligature.CompCount = len(ligature.Component) + 1
-		ligature.LigGlyph = ligGlyph
-		self.ligatures.setdefault(firstGlyph, []).append(ligature)
+		mapping[tuple(line[1:])] = line[0]
+	return otl.buildLigatureSubstSubtable(mapping)
 
-def parseSinglePos(self, lines, font, _lookupMap=None):
+def parseSinglePos(lines, font, _lookupMap=None):
 	values = {}
 	for line in lines:
 		assert len(line) == 3, line
@@ -199,18 +249,7 @@ def parseSinglePos(self, lines, font, _lookupMap=None):
 			values[g] = ValueRecord()
 		assert not hasattr(values[g], w), (g, w)
 		setattr(values[g], w, v)
-	self.Coverage = makeCoverage(values.keys(), font)
-	values = [values[k] for k in self.Coverage.glyphs]
-	self.ValueFormat = 0
-	for v in values:
-		self.ValueFormat |= v.getFormat()
-	if all(v == values[0] for v in values):
-		self.Format = 1
-		self.Value = values[0]
-	else:
-		self.Format = 2
-		self.Value = values
-		self.ValueCount = len(self.Value)
+	return otl.buildSinglePosSubtable(values, font.getReverseGlyphMap())
 
 def parsePair(self, lines, font, _lookupMap=None):
 	self.ValueFormat1 = self.ValueFormat2 = 0
@@ -308,9 +347,7 @@ def makeAnchor(data, klass=ot.Anchor):
 		anchor.AnchorPoint = int(data[1])
 	return anchor
 
-def parseCursive(self, lines, font, _lookupMap=None):
-	self.Format = 1
-	self.EntryExitRecord = []
+def parseCursive(lines, font, _lookupMap=None):
 	records = {}
 	for line in lines:
 		assert len(line) in [3,4], line
@@ -323,13 +360,7 @@ def parseCursive(self, lines, font, _lookupMap=None):
 			records[glyph] = [None,None]
 		assert records[glyph][idx] is None, (glyph, idx)
 		records[glyph][idx] = makeAnchor(line[2:], klass)
-	self.Coverage = makeCoverage(records.keys(), font)
-	recs = self.EntryExitRecord = []
-	for glyph in self.Coverage.glyphs:
-		rec = ot.EntryExitRecord()
-		rec.EntryAnchor,rec.ExitAnchor = records[glyph]
-		recs.append(rec)
-	self.EntryExitCount = len(self.EntryExitRecord)
+	return otl.buildCursivePosSubtable(records, font.getReverseGlyphMap())
 
 def makeMarkRecords(data, coverage, c):
 	records = []
@@ -587,7 +618,7 @@ def parseLookupRecords(items, klassName, lookupMap=None):
 		idx = int(item[0])
 		assert idx > 0, idx
 		rec.SequenceIndex = idx - 1
-		rec.LookupListIndex = mapLookup(item[1], lookupMap)
+		setReference(mapLookup, lookupMap, item[1], setattr, rec, 'LookupListIndex')
 		lst.append(rec)
 	return lst
 
@@ -649,11 +680,12 @@ def parseContext(self, lines, font, Type, lookupMap=None):
 	typ = lines.peek()[0].split()[0].lower()
 	if typ == 'glyph':
 		self.Format = 1
-		debug("Parsing %s format %s" % (Type, self.Format))
+		log.debug("Parsing %s format %s", Type, self.Format)
 		c = ContextHelper(Type, self.Format)
 		rules = []
 		for line in lines:
 			assert line[0].lower() == 'glyph', line[0]
+			while len(line) < 1+c.DataLen: line.append('')
 			seq = tuple(makeGlyphs(stripSplitComma(i)) for i in line[1:1+c.DataLen])
 			recs = parseLookupRecords(line[1+c.DataLen:], c.LookupRecord, lookupMap)
 			rules.append((seq, recs))
@@ -663,7 +695,7 @@ def parseContext(self, lines, font, Type, lookupMap=None):
 		bucketizeRules(self, c, rules, self.Coverage.glyphs)
 	elif typ.endswith('class'):
 		self.Format = 2
-		debug("Parsing %s format %s" % (Type, self.Format))
+		log.debug("Parsing %s format %s", Type, self.Format)
 		c = ContextHelper(Type, self.Format)
 		classDefs = [None] * c.DataLen
 		while lines.peek()[0].endswith("class definition begin"):
@@ -684,6 +716,7 @@ def parseContext(self, lines, font, Type, lookupMap=None):
 		rules = []
 		for line in lines:
 			assert line[0].lower().startswith('class'), line[0]
+			while len(line) < 1+c.DataLen: line.append('')
 			seq = tuple(intSplitComma(i) for i in line[1:1+c.DataLen])
 			recs = parseLookupRecords(line[1+c.DataLen:], c.LookupRecord, lookupMap)
 			rules.append((seq, recs))
@@ -693,7 +726,7 @@ def parseContext(self, lines, font, Type, lookupMap=None):
 		bucketizeRules(self, c, rules, range(max(firstClasses) + 1))
 	elif typ.endswith('coverage'):
 		self.Format = 3
-		debug("Parsing %s format %s" % (Type, self.Format))
+		log.debug("Parsing %s format %s", Type, self.Format)
 		c = ContextHelper(Type, self.Format)
 		coverages = tuple([] for i in range(c.DataLen))
 		while lines.peek()[0].endswith("coverage definition begin"):
@@ -755,7 +788,7 @@ def parseReverseChainedSubst(self, lines, font, _lookupMap=None):
 def parseLookup(lines, tableTag, font, lookupMap=None):
 	line = lines.expect('lookup')
 	_, name, typ = line
-	debug("Parsing lookup type %s %s" % (typ, name))
+	log.debug("Parsing lookup type %s %s", typ, name)
 	lookup = ot.Lookup()
 	with lines.until('lookup end'):
 
@@ -764,19 +797,19 @@ def parseLookup(lines, tableTag, font, lookupMap=None):
 			lookup.MarkFilteringSet = filterset
 		lookup.LookupType, parseLookupSubTable = {
 			'GSUB': {
-				'single':	(1,	parseSingleSubst),
-				'multiple':	(2,	parseMultiple),
-				'alternate':	(3,	parseAlternate),
-				'ligature':	(4,	parseLigature),
+				'single':	(0,	parseSingleSubst),
+				'multiple':	(0,	parseMultiple),
+				'alternate':	(0,	parseAlternate),
+				'ligature':	(0,	parseLigature),
 				'context':	(5,	parseContextSubst),
 				'chained':	(6,	parseChainedSubst),
 				'reversechained':(8,	parseReverseChainedSubst),
 			},
 			'GPOS': {
-				'single':	(1,	parseSinglePos),
+				'single':	(0,	parseSinglePos),
 				'pair':		(2,	parsePair),
 				'kernset':	(2,	parseKernset),
-				'cursive':	(3,	parseCursive),
+				'cursive':	(0,	parseCursive),
 				'mark to base':	(4,	parseMarkToBase),
 				'mark to ligature':(5,	parseMarkToLigature),
 				'mark to mark':	(6,	parseMarkToMark),
@@ -790,9 +823,12 @@ def parseLookup(lines, tableTag, font, lookupMap=None):
 		while lines.peek():
 			with lines.until(('% subtable', 'subtable end')):
 				while lines.peek():
-					subtable = ot.lookupTypes[tableTag][lookup.LookupType]()
-					subtable.LookupType = lookup.LookupType
-					parseLookupSubTable(subtable, lines, font, lookupMap)
+					if lookup.LookupType is 0:
+						subtable = parseLookupSubTable(lines, font, lookupMap)
+						lookup.LookupType = subtable.LookupType
+					else:
+						subtable = ot.lookupTypes[tableTag][lookup.LookupType]()
+						parseLookupSubTable(subtable, lines, font, lookupMap)
 					subtables.append(subtable)
 			if lines.peek() and lines.peek()[0] in ('% subtable', 'subtable end'):
 				next(lines)
@@ -805,10 +841,11 @@ def parseLookup(lines, tableTag, font, lookupMap=None):
 	return lookup
 
 def parseGSUBGPOS(lines, font, tableTag):
-	lookupMap = {}
-	featureMap = {}
+	container = ttLib.getTableClass(tableTag)()
+	lookupMap = DeferredMapping()
+	featureMap = DeferredMapping()
 	assert tableTag in ('GSUB', 'GPOS')
-	debug("Parsing", tableTag)
+	log.debug("Parsing %s", tableTag)
 	self = getattr(ot, tableTag)()
 	self.Version = 1.0
 	fields = {
@@ -816,7 +853,7 @@ def parseGSUBGPOS(lines, font, tableTag):
 		('ScriptList',
 		 lambda lines: parseScriptList (lines, featureMap)),
 		'feature table begin':
-		('FeaturetList',
+		('FeatureList',
 		 lambda lines: parseFeatureList (lines, lookupMap, featureMap)),
 		'lookup':
 		('LookupList',
@@ -827,7 +864,7 @@ def parseGSUBGPOS(lines, font, tableTag):
 	while lines.peek() is not None:
 		typ = lines.peek()[0].lower()
 		if typ not in fields:
-			debug ('Skipping', lines.peek())
+			log.debug('Skipping %s', lines.peek())
 			next(lines)
 			continue
 		attr,parser = fields[typ]
@@ -837,33 +874,28 @@ def parseGSUBGPOS(lines, font, tableTag):
 				self.LookupList.Lookup = []
 			_, name, _ = lines.peek()
 			lookup = parseLookup(lines, tableTag, font, lookupMap)
-			assert name not in lookupMap, "Duplicate lookup name: %s" % name
-			lookupMap[name] = len(self.LookupList.Lookup)
+			if lookupMap is not None:
+				assert name not in lookupMap, "Duplicate lookup name: %s" % name
+				lookupMap[name] = len(self.LookupList.Lookup)
+			else:
+				assert int(name) == len(self.LookupList.Lookup), "%d %d" % (name, len(self.Lookup))
 			self.LookupList.Lookup.append(lookup)
 		else:
 			assert getattr(self, attr) is None, attr
 			setattr(self, attr, parser(lines))
 	if self.LookupList:
 		self.LookupList.LookupCount = len(self.LookupList.Lookup)
-	return self
+	if lookupMap is not None:
+		lookupMap.applyDeferredMappings()
+	if featureMap is not None:
+		featureMap.applyDeferredMappings()
+	container.table = self
+	return container
 
 def parseGSUB(lines, font):
 	return parseGSUBGPOS(lines, font, 'GSUB')
 def parseGPOS(lines, font):
 	return parseGSUBGPOS(lines, font, 'GPOS')
-
-def makeAttachList(points, font):
-	self = ot.AttachList()
-	self.Coverage = makeCoverage(points.keys(), font)
-	records = []
-	for glyph in self.Coverage.glyphs:
-		record = ot.AttachPoint()
-		record.PointIndex = sorted(set(points[glyph]))
-		record.PointCount = len(record.PointIndex)
-		records.append(record)
-	self.AttachPoint = records
-	self.GlyphCount = len(records)
-	return self
 
 def parseAttachList(lines, font):
 	points = {}
@@ -872,25 +904,7 @@ def parseAttachList(lines, font):
 			glyph = makeGlyph(line[0])
 			assert glyph not in points, glyph
 			points[glyph] = [int(i) for i in line[1:]]
-	return makeAttachList(points, font)
-
-def makeCaretList(carets, font):
-	self = ot.LigCaretList()
-	self.Coverage = makeCoverage(carets.keys(), font)
-	records = []
-	for glyph in self.Coverage.glyphs:
-		record = ot.LigGlyph()
-		cvs = record.CaretValue = []
-		for v in carets[glyph]:
-			cv = ot.CaretValue()
-			cv.Format = 1
-			cv.Coordinate = v
-			cvs.append(cv)
-		record.CaretCount = len(record.CaretValue)
-		records.append(record)
-	self.LigGlyph = records
-	self.LigGlyphCount = len(records)
-	return self
+	return otl.buildAttachList(points, font.getReverseGlyphMap())
 
 def parseCaretList(lines, font):
 	carets = {}
@@ -902,7 +916,7 @@ def parseCaretList(lines, font):
 			thisCarets = [int(i) for i in line[2:]]
 			assert num == len(thisCarets), line
 			carets[glyph] = thisCarets
-	return makeCaretList(carets, font)
+	return otl.buildLigCaretList(carets, {}, font.getReverseGlyphMap())
 
 def makeMarkFilteringSets(sets, font):
 	self = ot.MarkGlyphSetsDef()
@@ -927,7 +941,8 @@ def parseMarkFilteringSets(lines, font):
 	return makeMarkFilteringSets(sets, font)
 
 def parseGDEF(lines, font):
-	debug("Parsing GDEF")
+	container = ttLib.getTableClass('GDEF')()
+	log.debug("Parsing GDEF")
 	self = ot.GDEF()
 	fields = {
 		'class definition begin':
@@ -948,27 +963,81 @@ def parseGDEF(lines, font):
 	while lines.peek() is not None:
 		typ = lines.peek()[0].lower()
 		if typ not in fields:
-			debug ('Skipping', line)
+			log.debug('Skipping %s', typ)
 			next(lines)
 			continue
 		attr,parser = fields[typ]
 		assert getattr(self, attr) is None, attr
 		setattr(self, attr, parser(lines, font))
 	self.Version = 1.0 if self.MarkGlyphSetsDef is None else 0x00010002
-	return self
+	container.table = self
+	return container
+
+def parseCmap(lines, font):
+	container = ttLib.getTableClass('cmap')()
+	log.debug("Parsing cmap")
+	tables = []
+	while lines.peek() is not None:
+		lines.expect('cmap subtable %d' % len(tables))
+		platId, encId, fmt, lang = [
+			parseCmapId(lines, field)
+			for field in ('platformID', 'encodingID', 'format', 'language')]
+		table = cmap_classes[fmt](fmt)
+		table.platformID = platId
+		table.platEncID = encId
+		table.language = lang
+		table.cmap = {}
+		line = next(lines)
+		while line[0] != 'end subtable':
+			table.cmap[int(line[0], 16)] = line[1]
+			line = next(lines)
+		tables.append(table)
+	container.tableVersion = 0
+	container.tables = tables
+	return container
+
+def parseCmapId(lines, field):
+	line = next(lines)
+	assert field == line[0]
+	return int(line[1])
+
+def parseTable(lines, font, tableTag=None):
+	log.debug("Parsing table")
+	line = lines.peek()
+	tag = None
+	if line[0].split()[0] == 'FontDame':
+		tag = line[0].split()[1]
+	elif ' '.join(line[0].split()[:3]) == 'Font Chef Table':
+		tag = line[0].split()[3]
+	if tag is not None:
+		next(lines)
+		tag = tag.ljust(4)
+		if tableTag is None:
+			tableTag = tag
+		else:
+			assert tableTag == tag, (tableTag, tag)
+
+	assert tableTag is not None, "Don't know what table to parse and data doesn't specify"
+
+	return {
+		'GSUB': parseGSUB,
+		'GPOS': parseGPOS,
+		'GDEF': parseGDEF,
+		'cmap': parseCmap,
+		}[tableTag](lines, font)
 
 class Tokenizer(object):
 
 	def __init__(self, f):
 		# TODO BytesIO / StringIO as needed?  also, figure out whether we work on bytes or unicode
 		lines = iter(f)
-		lines = ([s.strip() for s in line.split('\t')] for line in lines)
 		try:
 			self.filename = f.name
 		except:
 			self.filename = None
-		self._lines = lines
-		self._lineno = 0
+		self.lines = iter(lines)
+		self.line = ''
+		self.lineno = 0
 		self.stoppers = []
 		self.buffer = None
 
@@ -976,14 +1045,22 @@ class Tokenizer(object):
 		return self
 
 	def _next_line(self):
-		self._lineno += 1
-		return next(self._lines)
+		self.lineno += 1
+		line = self.line = next(self.lines)
+		line = [s.strip() for s in line.split('\t')]
+		if len(line) == 1 and not line[0]:
+			del line[0]
+		if line and not line[-1]:
+			warnings.warn('trailing tab found on line %d: %s' % (self.lineno, self.line))
+			while line and not line[-1]:
+				del line[-1]
+		return line
 
 	def _next_nonempty(self):
 		while True:
 			line = self._next_line()
 			# Skip comments and empty lines
-			if line[0] and (line[0][0] != '%' or line[0] == '% subtable'):
+			if line and line[0] and (line[0][0] != '%' or line[0] == '% subtable'):
 				return line
 
 	def _next_buffered(self):
@@ -1044,27 +1121,6 @@ class Tokenizer(object):
 		assert tag.endswith(s), "Expected '*%s', got '%s'" % (s, tag)
 		return line
 
-def parseTable(lines, font, tableTag=None):
-	debug("Parsing table")
-	line = lines.peek()
-	if line[0].split()[0] == 'FontDame':
-		next(lines)
-		tag = line[0].split()[1].ljust(4)
-		if tableTag is None:
-			tableTag = tag
-		else:
-			assert tableTag == tag, (tableTag, tag)
-
-	assert tableTag is not None, "Don't know what table to parse and data doesn't specify"
-
-	container = ttLib.getTableClass(tableTag)()
-	table = {'GSUB': parseGSUB,
-		 'GPOS': parseGPOS,
-		 'GDEF': parseGDEF,
-		}[tableTag](lines, font)
-	container.table = table
-	return container
-
 def build(f, font, tableTag=None):
 	lines = Tokenizer(f)
 	return parseTable(lines, font, tableTag=tableTag)
@@ -1074,16 +1130,21 @@ class MockFont(object):
 
 	def __init__(self):
 		self._glyphOrder = ['.notdef']
-		self._reverseGlyphOrder = {'.notdef': 0}
+		class AllocatingDict(dict):
+			def __missing__(reverseDict, key):
+				self._glyphOrder.append(key)
+				gid = len(reverseDict)
+				reverseDict[key] = gid
+				return gid
+		self._reverseGlyphOrder = AllocatingDict({'.notdef': 0})
 		self.lazy = False
 
 	def getGlyphID(self, glyph, requireReal=None):
-		gid = self._reverseGlyphOrder.get(glyph, None)
-		if gid is None:
-			gid = len(self._glyphOrder)
-			self._glyphOrder.append(glyph)
-			self._reverseGlyphOrder[glyph] = gid
+		gid = self._reverseGlyphOrder[glyph]
 		return gid
+
+	def getReverseGlyphMap(self):
+		return self._reverseGlyphOrder
 
 	def getGlyphName(self, gid):
 		return self._glyphOrder[gid]
@@ -1092,17 +1153,22 @@ class MockFont(object):
 		return self._glyphOrder
 
 def main(args):
+	from fontTools import configLogger
+	# configure the library logger (for >= WARNING)
+	configLogger()
+	# comment this out to enable debug messages from mtiLib's logger
+	# log.setLevel(logging.DEBUG)
 	font = MockFont()
 	tableTag = None
 	if args[0].startswith('-t'):
 		tableTag = args[0][2:]
 		del args[0]
 	for f in args:
-		debug("Processing", f)
-		table = build(open(f, 'rt'), font, tableTag=tableTag)
-		blob = table.compile(font)
+		log.debug("Processing %s", f)
+		table = build(open(f, 'rt', encoding="utf-8"), font, tableTag=tableTag)
+		blob = table.compile(font) # Make sure it compiles
 		decompiled = table.__class__()
-		decompiled.decompile(blob, font)
+		decompiled.decompile(blob, font) # Make sure it decompiles!
 
 		#continue
 		from fontTools.misc import xmlWriter
@@ -1110,8 +1176,8 @@ def main(args):
 		writer = xmlWriter.XMLWriter(sys.stdout)
 		writer.begintag(tag)
 		writer.newline()
-		#table.toXML(writer, font)
-		decompiled.toXML(writer, font)
+		table.toXML(writer, font)
+		#decompiled.toXML(writer, font)
 		writer.endtag(tag)
 		writer.newline()
 
