@@ -18,9 +18,11 @@
 
 package com.mitchtalmadge.emojitools.operations;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public abstract class Operation {
 
-    boolean successfullyCompleted = false;
+    private AtomicBoolean successfullyCompleted = new AtomicBoolean(false);
 
     protected abstract OperationWorker getWorker();
 
@@ -40,14 +42,19 @@ public abstract class Operation {
 
         worker.executeWorker();
 
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ignored) {
+        }
+
         //Cleanup
         worker = null;
         System.gc();
 
-        return successfullyCompleted;
+        return successfullyCompleted.get();
     }
 
     public void done(boolean successfullyCompleted) {
-        this.successfullyCompleted = successfullyCompleted;
+        this.successfullyCompleted.set(successfullyCompleted);
     }
 }
