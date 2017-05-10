@@ -1,3 +1,5 @@
+A new version of Emoji Tools is being developed. This repository is currently not being maintained. See https://EmojiTools.org/ for more details!
+
 # Emoji Tools
 Multiple useful tools to help Android and iOS/OSX developers with creating and modifying Emoji Font files.
 
