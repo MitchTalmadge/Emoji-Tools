@@ -1,4 +1,4 @@
-A new version of Emoji Tools is being developed. This repository is currently not being maintained. See https://EmojiTools.org/ for more details!
+**This repository is no longer maintained. Information in this README is archived for informational purposes, but I do not respond to support requests. Feel free to fork and continue this project.**
 
 # Emoji Tools
 Multiple useful tools to help Android and iOS/OSX developers with creating and modifying Emoji Font files.
@@ -20,7 +20,3 @@ Check out [this tutorial](https://MitchTalmadge.com/2015/07/28/how-to-modify-and
 1. Either download one of the precompiled .exe files or .jar files from the [downloads page](https://github.com/MitchTalmadge/Emoji-Tools/releases), or clone this repo into IntelliJ and create a .jar out of the sources.
 2. Put the .exe or .jar wherever you'd like. Emojis will be extracted into a new folder which is created in the same directory as the jar file. You can choose the name of this folder using the GUI. By default, it is named `ExtractedEmojis`.
 3. Double-click the .exe or .jar and Emoji Tools will open.
-
-# How to Get Help / Make a Suggestion:
-* Make a detailed ticket in the [issue tracker](https://github.com/MitchTalmadge/Emoji-Tools/issues).
-* If it's very important, you can [email me](https://MitchTalmadge.com/contact/).
