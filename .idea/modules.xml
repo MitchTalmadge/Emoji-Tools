@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Emoji-Tools.iml" filepath="$PROJECT_DIR$/.idea/Emoji-Tools.iml" />
+      <module fileurl="file://$PROJECT_DIR$/emoji-tools.iml" filepath="$PROJECT_DIR$/emoji-tools.iml" />
     </modules>
   </component>
 </project>

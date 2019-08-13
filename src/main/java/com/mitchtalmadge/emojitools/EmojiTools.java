@@ -59,7 +59,7 @@ public class EmojiTools extends Application implements Thread.UncaughtExceptionH
     private static Stage mainGuiStage;
     private static LogManager logManager;
 
-    public static void main(String[] args) {
+    static void init(String[] args) {
         System.setProperty("python.cachedir.skip", "false");
         System.setProperty("python.console.encoding", "UTF-8");
 
