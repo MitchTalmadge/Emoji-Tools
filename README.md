@@ -1,6 +1,8 @@
 **This repository is no longer maintained. Information in this README is archived for informational purposes, but I do not respond to support requests. Feel free to fork and continue this project.**
 
 # Emoji Tools
+[![Build Status](https://travis-ci.org/MitchTalmadge/Emoji-Tools.svg?branch=master)](https://travis-ci.org/MitchTalmadge/Emoji-Tools)
+
 Multiple useful tools to help Android and iOS/OSX developers with creating and modifying Emoji Font files.
 
 Features:
