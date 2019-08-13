@@ -23,13 +23,13 @@ import com.mitchtalmadge.emojitools.gui.dialogs.OperationProgressDialog;
 import com.mitchtalmadge.emojitools.operations.FontType;
 import com.mitchtalmadge.emojitools.operations.Operation;
 import com.mitchtalmadge.emojitools.operations.extraction.Ligature;
+import org.apache.commons.codec.binary.Hex;
 import org.python.core.PyList;
 import org.python.core.PyType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -172,7 +172,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                 FileOutputStream outputStream = new FileOutputStream(outputFile);
                 String imageDataHex = rawImageData.getTextContent();
                 imageDataHex = imageDataHex.replaceAll("\\s|\\n|\\r|\\t", "");
-                byte[] imageDataBytes = DatatypeConverter.parseHexBinary(imageDataHex);
+                byte[] imageDataBytes = Hex.decodeHex(imageDataHex);
                 outputStream.write(imageDataBytes);
                 outputStream.close();
             } else {
@@ -192,7 +192,7 @@ public class GoogleExtractionWorker extends ExtractionWorker {
                             FileOutputStream outputStream = new FileOutputStream(outputFile);
                             String imageDataHex = rawImageData.getTextContent();
                             imageDataHex = imageDataHex.replaceAll("\\s|\\n|\\r|\\t", "");
-                            byte[] imageDataBytes = DatatypeConverter.parseHexBinary(imageDataHex);
+                            byte[] imageDataBytes = Hex.decodeHex(imageDataHex);
                             outputStream.write(imageDataBytes);
                             outputStream.close();
                             break;

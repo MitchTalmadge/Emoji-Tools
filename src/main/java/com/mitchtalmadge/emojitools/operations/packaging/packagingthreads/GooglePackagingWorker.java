@@ -24,6 +24,7 @@ import com.mitchtalmadge.emojitools.operations.Operation;
 import com.mitchtalmadge.emojitools.operations.OperationWorker;
 import com.mitchtalmadge.emojitools.operations.packaging.LigatureSet;
 import com.mitchtalmadge.emojitools.operations.packaging.PackagingException;
+import org.apache.commons.codec.binary.Hex;
 import org.python.core.PyList;
 import org.python.core.PyType;
 import org.w3c.dom.Document;
@@ -31,7 +32,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import javax.imageio.ImageIO;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -266,7 +266,7 @@ public class GooglePackagingWorker extends OperationWorker {
             byte[] fileData = new byte[fileInputStream.available()];
             int read = fileInputStream.read(fileData);
             if (read != -1) {
-                String hexString = DatatypeConverter.printHexBinary(fileData);
+                String hexString = Hex.encodeHexString(fileData);
                 //Rewrite content of rawimagedata element with the hex string generated from the png file
                 Element rawImageDataElement = (Element) cbdtBitmapFormat17Element.getElementsByTagName("rawimagedata").item(0);
                 if (rawImageDataElement == null) {

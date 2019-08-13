@@ -1,0 +1,9 @@
+language: java
+jdk: openjdk8
+sudo: required
+cache:
+  directories:
+    - "$HOME/.m2"
+
+install: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -Drevision=${TRAVIS_COMMIT} -B -V
+script: mvn test -Drevision=${TRAVIS_COMMIT} -B

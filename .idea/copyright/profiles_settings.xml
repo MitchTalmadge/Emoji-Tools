@@ -1,3 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="Emoji Tools" />
+  <settings default="Emoji Tools">
+    <module2copyright>
+      <element module="All" copyright="Emoji Tools" />
+    </module2copyright>
+  </settings>
 </component>

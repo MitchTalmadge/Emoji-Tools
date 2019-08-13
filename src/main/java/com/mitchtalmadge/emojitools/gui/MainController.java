@@ -72,7 +72,7 @@ public class MainController implements Initializable {
     @FXML
     protected void onDonateLabelFired(MouseEvent mouseEvent) {
         try {
-            Desktop.getDesktop().browse(new URI("https://donate.mitchtalmadge.com"));
+            Desktop.getDesktop().browse(new URI("https://www.paypal.me/mitchtalmadge"));
         } catch (IOException | URISyntaxException e1) {
             e1.printStackTrace();
         }
