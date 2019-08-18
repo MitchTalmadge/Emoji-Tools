@@ -44,7 +44,7 @@ def timestampToString(value):
 	return asctime(time.gmtime(max(0, value + epoch_diff)))
 
 def timestampFromString(value):
-	return calendar.timegm(time.strptime(value)) - epoch_diff
+	return calendar.timegm(time.strptime(" ".join(str.strip(str(value)).split()))) - epoch_diff
 
 def timestampNow():
 	return int(time.time() - epoch_diff)
